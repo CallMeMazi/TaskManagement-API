@@ -4,7 +4,7 @@ using System.Text;
 namespace TaskManagement.Common.Helpers;
 public static class SecurityHelper
 {
-    public static string GetSha256Hash(string input)
+    public static string GetSha256Hash(this string input)
     {
         using (var sha256 = SHA256.Create())
         {

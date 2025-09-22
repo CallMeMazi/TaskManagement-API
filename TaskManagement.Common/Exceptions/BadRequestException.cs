@@ -9,22 +9,22 @@ public class BadRequestException : AppException
     }
 
     public BadRequestException(string? message)
-        : base(HttpStatusCode.BadRequest, ResultStatus.BadRequest, message, null, null)
+        : base(HttpStatusCode.BadRequest, ResultStatus.BadRequest, message, new() { message ?? "مشکلی پیش آمده!"}, null)
     {
     }
 
-    public BadRequestException(string? message, string[]? errorMessages)
+    public BadRequestException(string? message, List<string>? errorMessages)
         : base(HttpStatusCode.BadRequest, ResultStatus.BadRequest, message, errorMessages, null)
     {
     }
 
-    public BadRequestException(string? message, string[]? errorMessages, Exception? innerException)
+    public BadRequestException(string? message, List<string>? errorMessages, Exception? innerException)
         : base(HttpStatusCode.BadRequest, ResultStatus.BadRequest, message, errorMessages, innerException)
     {
     }
 
     public BadRequestException(string? message, Exception? innerException)
-        : base(HttpStatusCode.BadRequest, ResultStatus.BadRequest, message, null, innerException)
+        : base(HttpStatusCode.BadRequest, ResultStatus.BadRequest, message, new() { message ?? "مشکلی پیش آمده!" }, innerException)
     {
     }
 }

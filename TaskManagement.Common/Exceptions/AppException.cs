@@ -5,7 +5,7 @@ public class AppException : Exception
 {
     public HttpStatusCode HttpStatus { get; set; }
     public ResultStatus ResultStatus { get; set; }
-    public string[] ErrorMessages { get; set; }
+    public List<string>? ErrorMessages { get; set; }
 
 
     public AppException() 
@@ -28,17 +28,17 @@ public class AppException : Exception
     {
     }
 
-    public AppException(HttpStatusCode httpStatus, ResultStatus resultStatus, string? message, string[]? errorMessages)
+    public AppException(HttpStatusCode httpStatus, ResultStatus resultStatus, string? message, List<string>? errorMessages)
        : this(httpStatus, resultStatus, message, errorMessages, null)
     {
     }
 
-    public AppException(HttpStatusCode httpStatus, ResultStatus resultStatus, string? message, string[]? errorMessages, Exception? innerException)
+    public AppException(HttpStatusCode httpStatus, ResultStatus resultStatus, string? message, List<string>? errorMessages, Exception? innerException)
        : base(message, innerException)
     {
         HttpStatus = httpStatus;
         ResultStatus = resultStatus;
-        ErrorMessages = errorMessages ?? new string[] {"خطایی در سرور رخ داد!"};
+        ErrorMessages = errorMessages ?? new() { "خطایی در سرور رخ داد!"};
     }
 
 }

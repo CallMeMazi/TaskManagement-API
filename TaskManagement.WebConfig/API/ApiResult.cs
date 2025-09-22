@@ -11,7 +11,7 @@ public class ApiResult
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public required string Message { get; set; }
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-    public string[]? ErrorMessages { get; set; }
+    public List<string>? ErrorMessages { get; set; }
 
 
     public ApiResult()
@@ -19,7 +19,7 @@ public class ApiResult
         IsSuccess = false;
         Message = "خطایی در سرور رخ داد!";
         ResultStatus = ResultStatus.ServerError;
-        ErrorMessages = new[] { "خطایی در سرور رخ داد!" };
+        ErrorMessages = new() { "خطایی در سرور رخ داد!" };
     }
 
     public ApiResult(bool isSuccess)
@@ -27,7 +27,7 @@ public class ApiResult
         IsSuccess = isSuccess;
         ResultStatus = IsSuccess ? ResultStatus.Success : ResultStatus.ServerError;
         Message = isSuccess ? "عملیات با موفیت انجام شد." : "خطایی در سرور رخ داد!";
-        ErrorMessages = isSuccess ? null : new[] { "خطایی در سرور رخ داد!" };
+        ErrorMessages = isSuccess ? null : new() { "خطایی در سرور رخ داد!" };
     }
 
     public ApiResult(bool isSuccess, string message)
@@ -35,15 +35,15 @@ public class ApiResult
         IsSuccess = isSuccess;
         ResultStatus = isSuccess ? ResultStatus.Success : ResultStatus.ServerError;
         Message = ValidationMessage(message, isSuccess);
-        ErrorMessages = isSuccess ? null : new[] { "خطایی در سرور رخ داد!" };
+        ErrorMessages = isSuccess ? null : new() { "خطایی در سرور رخ داد!" };
     }
 
-    public ApiResult(bool isSuccess, string message, string[]? errorMessages)
+    public ApiResult(bool isSuccess, string message, List<string>? errorMessages)
     {
         IsSuccess = isSuccess;
         ResultStatus = isSuccess ? ResultStatus.Success : ResultStatus.ServerError; ;
         Message = ValidationMessage(message, isSuccess);
-        ErrorMessages = errorMessages ?? new[] { "خطایی در سرور رخ داد!" };
+        ErrorMessages = errorMessages ?? new() { "خطایی در سرور رخ داد!" };
     }
 
     public ApiResult(bool isSuccess, string message, ResultStatus resultStatus)
@@ -51,15 +51,15 @@ public class ApiResult
         IsSuccess = isSuccess;
         ResultStatus = resultStatus;
         Message = ValidationMessage(message, isSuccess);
-        ErrorMessages = isSuccess ? null : new[] { "خطایی در سرور رخ داد!" };
+        ErrorMessages = isSuccess ? null : new() { "خطایی در سرور رخ داد!" };
     }
 
-    public ApiResult(bool isSuccess, string message, string[]? errorMessages, ResultStatus resultStatus)
+    public ApiResult(bool isSuccess, string message, List<string>? errorMessages, ResultStatus resultStatus)
     {
         IsSuccess = isSuccess;
         ResultStatus = resultStatus;
         Message = ValidationMessage(message, isSuccess);
-        ErrorMessages = errorMessages ?? new[] { "خطایی در سرور رخ داد!" };
+        ErrorMessages = errorMessages ?? new() { "خطایی در سرور رخ داد!" };
     }
 
 
