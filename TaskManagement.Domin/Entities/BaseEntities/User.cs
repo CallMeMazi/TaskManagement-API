@@ -19,6 +19,7 @@ public class User : BaseEntity
     public ICollection<Task> TaskAsCreator { get; private set; }
     public ICollection<TaskAssignment> MyTasks { get; private set; }
     public ICollection<TaskInfo> MyTaskInfo { get; private set; }
+    public ICollection<UserToken> MyTokens { get; private set; }
 
 
     private User() { }
