@@ -10,8 +10,4 @@
     <ProjectReference Include="..\TaskManagement.Common\TaskManagement.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Entities\LogEntities\" />
-  </ItemGroup>
-
 </Project>

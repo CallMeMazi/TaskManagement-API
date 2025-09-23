@@ -1,6 +1,6 @@
 ﻿using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Enums;
+using TaskManagement.Domin.Enums.Roles;
 
 namespace TaskManagement.Domin.Entities.BaseEntities;
 public class ProjectMemberShip : BaseEntity

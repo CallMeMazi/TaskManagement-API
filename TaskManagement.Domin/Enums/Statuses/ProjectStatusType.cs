@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Domin.Enums;
+﻿namespace TaskManagement.Domin.Enums.Statuses;
 public enum ProjectStatusType
 {
     InProgress,

@@ -1,6 +1,6 @@
 ﻿using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Enums;
+using TaskManagement.Domin.Enums.Statuses;
 
 namespace TaskManagement.Domin.Entities.BaseEntities;
 public class Project : BaseEntity
