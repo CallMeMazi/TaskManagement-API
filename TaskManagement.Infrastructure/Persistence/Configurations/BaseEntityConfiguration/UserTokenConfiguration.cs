@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManagement.Domin.Entities.BaseEntities;
 
 namespace TaskManagement.Infrastructure.Persistence.Configurations.BaseEntityConfiguration;
-public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
+public class UserTokenConfiguration : IBaseConfiguration<UserToken>
 {
     public void Configure(EntityTypeBuilder<UserToken> builder)
     {
@@ -13,7 +13,8 @@ public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
 
         builder.Property(ut => ut.Token)
             .IsRequired()
-            .HasColumnType("nvarchar(max)");
+            .HasColumnType("nvarchar(450)")
+            .HasMaxLength(450);
 
         builder.Property(ut => ut.SecurityStamp)
             .IsRequired()

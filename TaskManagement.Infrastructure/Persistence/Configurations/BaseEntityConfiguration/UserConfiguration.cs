@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManagement.Domin.Entities.BaseEntities;
 
 namespace TaskManagement.Infrastructure.Persistence.Configurations.BaseEntityConfiguration;
-public class UserConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : IBaseConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
@@ -24,7 +24,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.PasswordHash)
             .IsRequired()
             .HasColumnType("nvarchar(256)")
-            .HasMaxLength(500);
+            .HasMaxLength(256);
 
         builder.Property(u => u.FirstName)
             .IsRequired()

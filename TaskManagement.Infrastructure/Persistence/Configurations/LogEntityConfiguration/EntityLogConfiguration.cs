@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManagement.Domin.Entities.LogEntities;
 
 namespace TaskManagement.Infrastructure.Persistence.Configurations.LogEntityConfiguration;
-public class EntityLogConfiguration : IEntityTypeConfiguration<EntityLog>
+public class EntityLogConfiguration : ILogConfigyration<EntityLog>
 {
     public void Configure(EntityTypeBuilder<EntityLog> builder)
     {

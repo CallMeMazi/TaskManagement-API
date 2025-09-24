@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManagement.Domin.Entities.BaseEntities;
 
 namespace TaskManagement.Infrastructure.Persistence.Configurations.BaseEntityConfiguration;
-public class OrganizationMemberShipConfiguration : IEntityTypeConfiguration<OrganizationMemberShip>
+public class OrganizationMemberShipConfiguration : IBaseConfiguration<OrganizationMemberShip>
 {
     public void Configure(EntityTypeBuilder<OrganizationMemberShip> builder)
     {

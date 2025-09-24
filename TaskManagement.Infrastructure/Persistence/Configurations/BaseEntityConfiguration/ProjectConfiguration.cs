@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManagement.Domin.Entities.BaseEntities;
 
 namespace TaskManagement.Infrastructure.Persistence.Configurations.BaseEntityConfiguration;
-public class ProjectConfiguration : IEntityTypeConfiguration<Project>
+public class ProjectConfiguration : IBaseConfiguration<Project>
 {
     public void Configure(EntityTypeBuilder<Project> builder)
     {
