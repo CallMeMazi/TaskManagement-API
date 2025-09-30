@@ -12,6 +12,8 @@ public class User : BaseEntity
     public byte Points { get; private set; }
     public DateTime? LastLoginDate { get; private set; }
 
+    #region Navigation Prop
+
     public ICollection<Organization> OrgAsOwner { get; private set; }
     public ICollection<OrganizationMemberShip> OrgAsMember { get; private set; }
     public ICollection<Project> ProjAsCreator { get; private set; }
@@ -20,6 +22,8 @@ public class User : BaseEntity
     public ICollection<TaskAssignment> MyTasks { get; private set; }
     public ICollection<TaskInfo> MyTaskInfo { get; private set; }
     public ICollection<UserToken> MyTokens { get; private set; }
+
+    #endregion
 
 
     private User() { }

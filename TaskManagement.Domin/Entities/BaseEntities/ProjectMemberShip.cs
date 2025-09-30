@@ -9,8 +9,12 @@ public class ProjectMemberShip : BaseEntity
     public Guid ProjId { get; private set; }
     public ProjectRoles Role { get; private set; }
 
+    #region Navigation Prop
+
     public User User { get; private set; }
     public Project Project { get; private set; }
+
+    #endregion
 
 
     private ProjectMemberShip() { }

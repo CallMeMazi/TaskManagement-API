@@ -16,10 +16,14 @@ public class Task : BaseEntity
     public DateTime TaskDeadline { get; private set; }
     public byte TaskProgress { get; private set; }
 
+    #region Navigation Prop
+
     public Project Project { get; private set; }
     public User Creator { get; private set; }
     public ICollection<TaskAssignment> Members { get; private set; }
     public ICollection<TaskInfo> Info { get; private set; }
+
+    #endregion
 
 
     private Task() { }

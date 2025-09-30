@@ -12,9 +12,13 @@ public class TaskInfo : BaseEntity
     public DateTime EndedTaskAt { get; private set; } = DateTime.Now;
     public byte TotalHours => Convert.ToByte((EndedTaskAt - StartedTaskAt).TotalHours);
 
+    #region Navigation Prop
+
     public Task Task { get; private set; }
     public User User { get; private set; }
     public TaskAssignment TaskAssignment { get; private set; }
+
+    #endregion
 
 
     private TaskInfo() { }

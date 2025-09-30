@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Entities.LogEntities;
 using TaskManagement.Infrastructure.Persistence.Configurations.LogEntityConfiguration;
 using TaskManagement.Infrastructure.Utilities;

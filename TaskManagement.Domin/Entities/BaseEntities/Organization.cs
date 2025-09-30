@@ -11,9 +11,13 @@ public class Organization : BaseEntity
     public bool IsActive { get; private set; } = true;
     public byte MaxUsers { get; private set; }
 
+    #region Navigation Prop
+
     public User Owner { get; private set; }
     public ICollection<OrganizationMemberShip> Members { get; private set; }
     public ICollection<Project> Projects { get; private set; }
+
+    #endregion
 
 
     private Organization() { }

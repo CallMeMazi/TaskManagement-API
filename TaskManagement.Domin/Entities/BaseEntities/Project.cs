@@ -17,10 +17,14 @@ public class Project : BaseEntity
     public byte ProjMaxUsers { get; private set; }
     public byte ProjMaxTasks { get; private set; }
 
+    #region Navigation Prop
+
     public Organization Org { get; private set; }
     public User Creator { get; private set; }
     public ICollection<ProjectMemberShip> ProjMember { get; private set; }
     public ICollection<Task> Tasks { get; private set; }
+
+    #endregion
 
 
     private Project() { }

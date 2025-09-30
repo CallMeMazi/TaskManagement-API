@@ -10,10 +10,13 @@ public class TaskAssignment : BaseEntity
     public bool IsInProgress { get; private set; } = false;
     public DateTime? LastStartedAt { get; private set; }
 
+    #region Navigation Prop
+
     public Task Task { get; private set; }
     public User User { get; private set; }
     public ICollection<TaskInfo> Info { get; private set; }
 
+    #endregion
 
     private TaskAssignment() { }
     public TaskAssignment(Guid taskId, Guid userId)

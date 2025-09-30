@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManagement.WebConfig.DI;
-public static class DbConfigyration
+public static class DbConfiguration
 {
     public static IServiceCollection AddApplicationDbContext(this IServiceCollection services, string conecctionString)
     {

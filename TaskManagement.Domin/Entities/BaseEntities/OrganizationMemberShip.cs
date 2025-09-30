@@ -9,8 +9,12 @@ public class OrganizationMemberShip : BaseEntity
     public Guid UserId { get; private set; }
     public OrganizationRoles Role { get; private set; }
 
+    #region Navigation Prop
+
     public Organization Org { get; private set; }
     public User User { get; private set; }
+
+    #endregion
 
 
     private OrganizationMemberShip() { }
