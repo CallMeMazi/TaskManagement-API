@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using TaskManagement.Common.Enums;
 
 namespace TaskManagement.Common.Exceptions;
 public class ForbiddenException : AppException

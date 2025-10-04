@@ -16,6 +16,11 @@ public class OrganizationConfiguration : IBaseConfiguration<Organization>
             .HasColumnType("nvarchar(100)")
             .HasMaxLength(100);
 
+        builder.Property(o => o.SecondOrgName)
+            .IsRequired()
+            .HasColumnType("nvarchar(120)")
+            .HasMaxLength(120);
+
         builder.Property(o => o.OrgCode)
             .IsRequired()
             .HasColumnType("nvarchar(120)")

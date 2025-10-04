@@ -98,8 +98,5 @@ public class UserConfiguration : IBaseConfiguration<User>
 
         builder.HasIndex(u => u.MobileNumber)
             .IsUnique();
-
-        builder.HasIndex(u => u.Email)
-            .IsUnique();
     }
 }

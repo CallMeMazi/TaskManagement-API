@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Common;
+﻿namespace TaskManagement.Common.Enums;
 public enum ResultStatus
 {
     Success = 200,

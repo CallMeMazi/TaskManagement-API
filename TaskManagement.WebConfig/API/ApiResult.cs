@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using TaskManagement.Common;
+using TaskManagement.Common.Enums;
 using TaskManagement.Common.Helpers;
 
 namespace TaskManagement.WebConfig.API;

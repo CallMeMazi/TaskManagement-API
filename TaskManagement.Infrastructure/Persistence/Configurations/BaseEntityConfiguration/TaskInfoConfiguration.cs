@@ -11,21 +11,22 @@ public class TaskInfoConfiguration : IBaseConfiguration<TaskInfo>
 
         builder.HasKey(ti => ti.Id);
 
-        builder.Property(ti => ti.TaskInfoDescreption)
-            .IsRequired()
+        builder.Property(ti => ti.TaskInfoDescription)
             .HasColumnType("nvarchar(200)")
             .HasMaxLength(200);
 
         builder.Property(ti => ti.StartedTaskAt)
             .IsRequired()
-            .HasColumnType("datetime2(6)");
-
-        builder.Property(ti => ti.EndedTaskAt)
-            .IsRequired()
             .HasColumnType("datetime2(6)")
             .HasDefaultValueSql("getdate()");
 
-        builder.Ignore(ti => ti.TotalHours);
+        builder.Property(ti => ti.EndedTaskAt)
+            .HasColumnType("datetime2(6)");
+
+        builder.Property(ti => ti.TotalHours)
+            .IsRequired()
+            .HasColumnType("tinyint")
+            .HasDefaultValue(0);
 
         //base property
         builder.Property(ti => ti.IsDelete)

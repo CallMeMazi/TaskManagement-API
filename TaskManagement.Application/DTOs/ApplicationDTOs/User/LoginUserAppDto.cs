@@ -1,7 +1,6 @@
 ﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.User;
-public class LoginUserDto
+public class LoginUserAppDto
 {
-    public string? MobileNumber { get; set; }
-    public string? Email { get; set; }
+    public required string MobileNumber { get; set; }
     public required string Password { get; set; }
 }

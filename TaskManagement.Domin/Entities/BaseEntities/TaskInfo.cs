@@ -7,10 +7,10 @@ public class TaskInfo : BaseEntity
     public Guid TaskId { get; private set; }
     public Guid UserId { get; private set; }
     public Guid TaskAssignmentId { get; private set; }
-    public string TaskInfoDescreption { get; private set; }
+    public string? TaskInfoDescription { get; private set; }
     public DateTime StartedTaskAt { get; private set; }
-    public DateTime EndedTaskAt { get; private set; } = DateTime.Now;
-    public byte TotalHours => Convert.ToByte((EndedTaskAt - StartedTaskAt).TotalHours);
+    public DateTime? EndedTaskAt { get; private set; }
+    public byte TotalHours { get; set; }
 
     #region Navigation Prop
 
@@ -22,21 +22,29 @@ public class TaskInfo : BaseEntity
 
 
     private TaskInfo() { }
-    public TaskInfo(Guid taskId, Guid userId, Guid taskAssignmentId
-        , string taskInfoDescreption, DateTime startedTaskAt)
+    public TaskInfo(Guid taskId, Guid userId, Guid taskAssignmentId)
     {
-        ValidateTaskInfo(taskId, userId, taskAssignmentId, taskInfoDescreption, startedTaskAt);
+        ValidateTaskInfo(taskId, userId, taskAssignmentId);
 
         TaskId = taskId;
         UserId = userId;
         TaskAssignmentId = taskAssignmentId;
-        TaskInfoDescreption = taskInfoDescreption;
-        StartedTaskAt = startedTaskAt;
     }
 
 
-    public void ValidateTaskInfo(Guid taskId, Guid userId, Guid taskAssignmentId
-        , string taskInfoDescreption, DateTime startedTaskAt)
+    public void EndTask(string taskInfoDescription)
+    {
+        if (taskInfoDescription.IsNullParameter())
+            throw new BadRequestException("توضیحات تسک خالی است!");
+       
+        TaskInfoDescription = taskInfoDescription;
+        EndedTaskAt = DateTime.Now;
+        TotalHours = GetTotalHours(StartedTaskAt);
+
+        UpdatedAt = DateTime.Now;
+    }
+
+    public void ValidateTaskInfo(Guid taskId, Guid userId, Guid taskAssignmentId)
     {
         var errorMessages = new List<string>();
 
@@ -49,16 +57,9 @@ public class TaskInfo : BaseEntity
         if (taskAssignmentId == Guid.Empty)
             errorMessages.Add("آیدی تسک کاربر خالی است!");
 
-        if (taskInfoDescreption.IsNullParameter())
-            errorMessages.Add("توضیحات گزارش تسک خالی است!");
-
-        if (startedTaskAt.IsNullParameter())
-            errorMessages.Add("تاریخ شروع خالی است!");
-
-        if (startedTaskAt >= DateTime.Now)
-            errorMessages.Add("تاریخ شروع نامعتبر است!");
-
         if (errorMessages.Any())
             throw new BadRequestException("اطلاعات نامعتبر است!", errorMessages);
     }
+    public byte GetTotalHours(DateTime startrdTaskAt) =>
+        Convert.ToByte((EndedTaskAt! - startrdTaskAt).Value.TotalHours);
 }

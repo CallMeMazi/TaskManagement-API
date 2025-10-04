@@ -40,12 +40,10 @@ public class User : BaseEntity
     }
 
 
-    public void UpdateUser(string mobileNumber, string email, string firstName
-        , string lastName)
+    public void UpdateUser(string email, string firstName, string lastName)
     {
-        ValidateUserUpdating(mobileNumber, email, firstName, lastName);
+        ValidateUserUpdating(email, firstName, lastName);
 
-        MobileNumber = mobileNumber;
         Email = email;
         FirstName = firstName;
         LastName = lastName;
@@ -88,15 +86,18 @@ public class User : BaseEntity
         if (lastName.IsNullParameter())
             errorMessages.Add("نام خانوادگی خالی است!");
 
-        ValidateMobileNumberAndEmail(mobileNumber, email, errorMessages);
+        if (!StringHelper.MobileRegex.IsMatch(mobileNumber))
+            errorMessages.Add("شماره موبایل نامعتبر است. باید با 09 شروع شود و 11 رقم باشد.");
+
+        if (!StringHelper.EmailRegex.IsMatch(email))
+            errorMessages.Add("ایمیل نامعتبر است!");
+
+        if (errorMessages.Any())
+            throw new BadRequestException("اطلاعات نامعبر هستند!", errorMessages);
     }
-    public void ValidateUserUpdating(string mobileNumber, string email, string firstName
-        , string lastName)
+    public void ValidateUserUpdating(string email, string firstName, string lastName)
     {
         var errorMessages = new List<string>();
-
-        if (mobileNumber.IsNullParameter())
-            errorMessages.Add("شماره موبایل خالی است!");
 
         if (email.IsNullParameter())
             errorMessages.Add("ایمیل خالی است!");
@@ -107,13 +108,6 @@ public class User : BaseEntity
 
         if (lastName.IsNullParameter())
             errorMessages.Add("نام خانوادگی خالی است!");
-
-        ValidateMobileNumberAndEmail(mobileNumber, email, errorMessages);
-    }
-    public void ValidateMobileNumberAndEmail(string mobileNumber, string email, List<string> errorMessages)
-    {
-        if (!StringHelper.MobileRegex.IsMatch(mobileNumber))
-            errorMessages.Add("شماره موبایل نامعتبر است. باید با 09 شروع شود و 11 رقم باشد.");
 
         if (!StringHelper.EmailRegex.IsMatch(email))
             errorMessages.Add("ایمیل نامعتبر است!");
