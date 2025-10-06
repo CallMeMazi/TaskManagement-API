@@ -1,7 +1,7 @@
 ﻿using TaskManagement.Domin.Enums.Statuses;
 
 namespace TaskManagement.Application.DTOs.SharedDTOs.Project;
-public class ProjectDetails
+public class ProjectDetailsDto
 {
     public required string ProjName { get; set; }
     public required string ProjDescription { get; set; }

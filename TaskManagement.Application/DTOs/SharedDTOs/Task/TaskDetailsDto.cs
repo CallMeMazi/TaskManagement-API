@@ -2,7 +2,7 @@
 using TaskManagement.Domin.Enums.Statuses;
 
 namespace TaskManagement.Application.DTOs.SharedDTOs.Task;
-public class TaskDetails
+public class TaskDetailsDto
 {
     public required string TaskName { get; set; }
     public required string TaskDescription { get; set; }

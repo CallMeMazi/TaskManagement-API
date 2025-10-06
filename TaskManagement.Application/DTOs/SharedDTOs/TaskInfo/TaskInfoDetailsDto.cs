@@ -1,5 +1,5 @@
 ﻿namespace TaskManagement.Application.DTOs.SharedDTOs.TaskInfo;
-public class TaskInfoDetails
+public class TaskInfoDetailsDto
 {
     public required string TaskInfoDescription { get; set; }
     public DateTime StartedTaskAt { get; set; }

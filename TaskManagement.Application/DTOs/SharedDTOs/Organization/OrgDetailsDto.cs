@@ -1,5 +1,5 @@
 ﻿namespace TaskManagement.Application.DTOs.SharedDTOs.Organization;
-public class OrgDetails
+public class OrgDetailsDto
 {
     public required string OrgName { get; set; }
     public required string SecondOrgName { get; set; }

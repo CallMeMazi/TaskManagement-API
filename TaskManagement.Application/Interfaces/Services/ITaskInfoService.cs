@@ -6,7 +6,7 @@ using TaskManagement.Common.Classes;
 namespace TaskManagement.Application.Interfaces.Services;
 public interface ITaskInfoService
 {
-    Task<GeneralResult<TaskInfoDetails>> GetTaskInfoByIdAsync(Guid taskInfoId, CancellationToken cancellationToken);
+    Task<GeneralResult<TaskInfoDetailsDto>> GetTaskInfoByIdAsync(Guid taskInfoId, CancellationToken cancellationToken);
     Task<GeneralResult> CreateTaskInfoAsync(CreateTaskInfoAppDto command, CancellationToken cancellationToken);
     Task<GeneralResult> EndTaksInfoAsync(EndTaskInfoAppDto command, CancellationToken cancellationToken);
 }

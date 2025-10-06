@@ -13,7 +13,6 @@
   <ItemGroup>
     <Folder Include="MediatR\Behaviors\" />
     <Folder Include="Services\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
   <ItemGroup>

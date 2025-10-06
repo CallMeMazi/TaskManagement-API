@@ -5,7 +5,7 @@ using TaskManagement.Common.Classes;
 namespace TaskManagement.Application.Interfaces.Services;
 public interface ITaskService
 {
-    Task<GeneralResult<TaskDetails>> GetTaskByIdAsync(Guid taskId, CancellationToken cancellationToken);
+    Task<GeneralResult<TaskDetailsDto>> GetTaskByIdAsync(Guid taskId, CancellationToken cancellationToken);
     Task<GeneralResult> CreateTaskAsync(CreateTaskAppDto command, CancellationToken cancellationToken);
     Task<GeneralResult> UpdateTaskAsync(UpdateTaskAppDto command, CancellationToken cancellationToken);
     Task<GeneralResult> SoftDeleteTaskAsync(UserTaskAppDto command, CancellationToken cancellationToken);

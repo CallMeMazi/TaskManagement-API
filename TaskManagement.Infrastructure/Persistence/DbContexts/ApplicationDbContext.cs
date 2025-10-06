@@ -25,7 +25,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public override int SaveChanges()
     {
         _cleanString();
-        return base.SaveChanges();
+        return base.SaveChanges(acceptAllChangesOnSuccess: true);
     }
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
@@ -40,7 +40,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         _cleanString();
-        return base.SaveChangesAsync(cancellationToken);
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess: true, cancellationToken);
     }
 
     private void _cleanString()

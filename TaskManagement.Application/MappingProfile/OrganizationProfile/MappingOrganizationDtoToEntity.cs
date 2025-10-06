@@ -19,6 +19,6 @@ public class MappingOrganizationDtoToEntity : Profile
         ));
 
         // Query DTOs
-        CreateMap<Organization, OrgDetails>();
+        CreateMap<Organization, OrgDetailsDto>();
     }
 }
