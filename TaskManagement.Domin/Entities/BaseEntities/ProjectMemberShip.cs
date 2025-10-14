@@ -5,8 +5,8 @@ using TaskManagement.Domin.Enums.Roles;
 namespace TaskManagement.Domin.Entities.BaseEntities;
 public class ProjectMemberShip : BaseEntity
 {
-    public Guid UserId { get; private set; }
-    public Guid ProjId { get; private set; }
+    public int UserId { get; private set; }
+    public int ProjId { get; private set; }
     public ProjectRoles Role { get; private set; }
 
     #region Navigation Prop
@@ -18,7 +18,7 @@ public class ProjectMemberShip : BaseEntity
 
 
     private ProjectMemberShip() { }
-    public ProjectMemberShip(Guid userId, Guid projId, ProjectRoles role)
+    public ProjectMemberShip(int userId, int projId, ProjectRoles role)
     {
         ValidateProjMemberShip(userId, projId);
 
@@ -41,14 +41,14 @@ public class ProjectMemberShip : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateProjMemberShip(Guid userId, Guid projId)
+    public void ValidateProjMemberShip(int userId, int projId)
     {
         var errorMessages = new List<string>();
 
-        if (userId == Guid.Empty)
+        if (userId <= 0)
             errorMessages.Add("آیدی سازمان خالی است!");
 
-        if (projId == Guid.Empty)
+        if (projId <= 0)
             errorMessages.Add("آیدی کاربر خالی است!");
 
         if (errorMessages.Any())

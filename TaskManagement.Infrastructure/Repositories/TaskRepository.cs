@@ -33,13 +33,13 @@ public class TaskRepository : BaseRepository<Domin.Entities.BaseEntities.Task>, 
             .ToListAsync(cancellationToken);
     }
 
-    public Task<Domin.Entities.BaseEntities.Task?> GetTaskByIdAsync(Guid taskId, bool isTracking = false, CancellationToken cancellationToken = default)
+    public Task<Domin.Entities.BaseEntities.Task?> GetTaskByIdAsync(int taskId, bool isTracking = false, CancellationToken cancellationToken = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.FirstOrDefaultAsync(p => p.Id == taskId, cancellationToken);
     }
 
-    public Task<TaskDetailsDto?> GetTaskDtoByIdAsync(Guid taskId, CancellationToken cancellationToken = default)
+    public Task<TaskDetailsDto?> GetTaskDtoByIdAsync(int taskId, CancellationToken cancellationToken = default)
     {
         return Entities.AsNoTracking()
             .Where(u => u.Id == taskId)

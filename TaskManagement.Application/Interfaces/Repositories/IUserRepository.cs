@@ -13,9 +13,9 @@ public interface IUserRepository : IBaseRepository<User>
     Task<List<UserDetailsDto>> GetAllUserDtosAsync(CancellationToken cancellationToken = default);
     Task<List<User>> GetAllUsersAsync(bool isTracking = false, CancellationToken cancellationToken = default);
     Task<User?> GetUserByFilterAsync(Expression<Func<User, bool>> filter, bool isTracking = false, CancellationToken cancellationToken = default);
-    Task<User?> GetUserByIdAsync(Guid userId, bool isTracking = false, CancellationToken cancellationToken = default);
+    Task<User?> GetUserByIdAsync(int userId, bool isTracking = false, CancellationToken cancellationToken = default);
     Task<UserDetailsDto?> GetUserDtoByFilterAsync(Expression<Func<User, bool>> filter, CancellationToken cancellationToken = default);
-    Task<UserDetailsDto?> GetUserDtoByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<UserDetailsDto?> GetUserDtoByIdAsync(int userId, CancellationToken cancellationToken = default);
     void UpdateRangeUsers(IEnumerable<User> entities);
     void UpdateUser(User entity);
 }

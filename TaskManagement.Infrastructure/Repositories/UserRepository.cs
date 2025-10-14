@@ -34,13 +34,13 @@ public class UserRepository : BaseRepository<User>, IUserRepository
             .ToListAsync(cancellationToken);
     }
 
-    public Task<User?> GetUserByIdAsync(Guid userId, bool isTracking = false, CancellationToken cancellationToken = default)
+    public Task<User?> GetUserByIdAsync(int userId, bool isTracking = false, CancellationToken cancellationToken = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
-    public Task<UserDetailsDto?> GetUserDtoByIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public Task<UserDetailsDto?> GetUserDtoByIdAsync(int userId, CancellationToken cancellationToken = default)
     {
         return Entities.AsNoTracking()
             .Where(u => u.Id == userId)

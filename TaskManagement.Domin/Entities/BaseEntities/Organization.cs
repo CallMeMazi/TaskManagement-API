@@ -6,7 +6,7 @@ public class Organization : BaseEntity
 {
     public string OrgName { get; private set; }
     public string SecondOrgName { get; set; }
-    public Guid OwnerId { get; private set; }
+    public int OwnerId { get; private set; }
     public string OrgCode { get; private set; }
     public string OrgDescription { get; private set; }
     public bool IsActive { get; private set; } = true;
@@ -22,7 +22,7 @@ public class Organization : BaseEntity
 
 
     private Organization() { }
-    public Organization(string orgName, string secondOrgName, Guid ownerId
+    public Organization(string orgName, string secondOrgName, int ownerId
         , string orgDescription, byte maxUsers)
     {
         ValidateOrgCreating(orgName, secondOrgName, ownerId, orgDescription, maxUsers);
@@ -57,7 +57,7 @@ public class Organization : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateOrgCreating(string orgName, string secondOrgName, Guid ownerId
+    public void ValidateOrgCreating(string orgName, string secondOrgName, int ownerId
         , string orgDescription, int maxUser)
     {
         var errorMessages = new List<string>();
@@ -68,7 +68,7 @@ public class Organization : BaseEntity
         if (secondOrgName.IsNullParameter())
             errorMessages.Add("نام ثانویه سازمان خالی است!");
 
-        if (ownerId == Guid.Empty)
+        if (ownerId <= 0)
             errorMessages.Add("آیدی سازنده سازمان نامعتبر است!");
 
         if (orgDescription.IsNullParameter())

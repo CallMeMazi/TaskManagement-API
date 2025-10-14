@@ -5,7 +5,6 @@ namespace TaskManagement.Common.Helpers;
 public static class StringHelper
 {
     public static readonly Regex MobileRegex = new Regex(@"^09\d{9}$", RegexOptions.Compiled);
-    public static readonly Regex EmailRegex = new Regex(@"^[^\s@]+@[^\s@]+\.[^\s@]+$", RegexOptions.Compiled);
 
     public static bool PhoneValid(this string? value)
     {

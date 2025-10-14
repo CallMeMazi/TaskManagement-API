@@ -13,9 +13,9 @@ public interface IProjectRepository : IBaseRepository<Project>
     Task<List<ProjectDetailsDto>> GetAllProjectDtosAsync(CancellationToken cancellationToken = default);
     Task<List<Project>> GetAllProjectsAsync(bool isTracking = false, CancellationToken cancellationToken = default);
     Task<Project?> GetProjectByFilterAsync(Expression<Func<Project, bool>> filter, bool isTracking = false, CancellationToken cancellationToken = default);
-    Task<Project?> GetProjectByIdAsync(Guid projectId, bool isTracking = false, CancellationToken cancellationToken = default);
+    Task<Project?> GetProjectByIdAsync(int projectId, bool isTracking = false, CancellationToken cancellationToken = default);
     Task<ProjectDetailsDto?> GetProjectDtoByFilterAsync(Expression<Func<Project, bool>> filter, CancellationToken cancellationToken = default);
-    Task<ProjectDetailsDto?> GetProjectDtoByIdAsync(Guid projectId, CancellationToken cancellationToken = default);
+    Task<ProjectDetailsDto?> GetProjectDtoByIdAsync(int projectId, CancellationToken cancellationToken = default);
     void UpdateProject(Project entity);
     void UpdateRangeProjects(IEnumerable<Project> entities);
 }

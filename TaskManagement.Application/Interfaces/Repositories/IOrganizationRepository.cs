@@ -13,9 +13,9 @@ public interface IOrganizationRepository : IBaseRepository<Organization>
     Task<List<Organization>> GetAllOrgsAsync(bool isTracking = false, CancellationToken cancellationToken = default);
     Task<List<OrgDetailsDto>> GetAllOrgDtosAsync(CancellationToken cancellationToken = default);
     Task<Organization?> GetOrgByFilterAsync(Expression<Func<Organization, bool>> filter, bool isTracking = false, CancellationToken cancellationToken = default);
-    Task<Organization?> GetOrgByIdAsync(Guid orgId, bool isTracking = false, CancellationToken cancellationToken = default);
+    Task<Organization?> GetOrgByIdAsync(int orgId, bool isTracking = false, CancellationToken cancellationToken = default);
     Task<OrgDetailsDto?> GetOrgDtoByFilterAsync(Expression<Func<Organization, bool>> filter, CancellationToken cancellationToken = default);
-    Task<OrgDetailsDto?> GetOrgDtoByIdAsync(Guid orgId, CancellationToken cancellationToken = default);
+    Task<OrgDetailsDto?> GetOrgDtoByIdAsync(int orgId, CancellationToken cancellationToken = default);
     void UpdateOrg(Organization entity);
     void UpdateRangeOrgs(IEnumerable<Organization> entities);
 }

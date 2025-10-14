@@ -12,9 +12,9 @@ public interface ITaskRepository : IBaseRepository<Domin.Entities.BaseEntities.T
     Task<List<TaskDetailsDto>> GetAllTaskDtosAsync(CancellationToken cancellationToken = default);
     Task<List<Domin.Entities.BaseEntities.Task>> GetAllTasksAsync(bool isTracking = false, CancellationToken cancellationToken = default);
     Task<Domin.Entities.BaseEntities.Task?> GetTaskByFilterAsync(Expression<Func<Domin.Entities.BaseEntities.Task, bool>> filter, bool isTracking = false, CancellationToken cancellationToken = default);
-    Task<Domin.Entities.BaseEntities.Task?> GetTaskByIdAsync(Guid taskId, bool isTracking = false, CancellationToken cancellationToken = default);
+    Task<Domin.Entities.BaseEntities.Task?> GetTaskByIdAsync(int taskId, bool isTracking = false, CancellationToken cancellationToken = default);
     Task<TaskDetailsDto?> GetTaskDtoByFilterAsync(Expression<Func<Domin.Entities.BaseEntities.Task, bool>> filter, CancellationToken cancellationToken = default);
-    Task<TaskDetailsDto?> GetTaskDtoByIdAsync(Guid taskId, CancellationToken cancellationToken = default);
+    Task<TaskDetailsDto?> GetTaskDtoByIdAsync(int taskId, CancellationToken cancellationToken = default);
     void UpdateRangeTasks(IEnumerable<Domin.Entities.BaseEntities.Task> entities);
     void UpdateTask(Domin.Entities.BaseEntities.Task entity);
 }

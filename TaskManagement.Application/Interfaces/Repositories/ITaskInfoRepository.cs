@@ -13,9 +13,9 @@ public interface ITaskInfoRepository : IBaseRepository<TaskInfo>
     Task<List<TaskInfoDetailsDto>> GetAllTaskInfoDtosAsync(CancellationToken cancellationToken = default);
     Task<List<TaskInfo>> GetAllTaskInfosAsync(bool isTracking = false, CancellationToken cancellationToken = default);
     Task<TaskInfo?> GetTaskInfoByFilterAsync(Expression<Func<TaskInfo, bool>> filter, bool isTracking = false, CancellationToken cancellationToken = default);
-    Task<TaskInfo?> GetTaskInfoByIdAsync(Guid taskInfoId, bool isTracking = false, CancellationToken cancellationToken = default);
+    Task<TaskInfo?> GetTaskInfoByIdAsync(int taskInfoId, bool isTracking = false, CancellationToken cancellationToken = default);
     Task<TaskInfoDetailsDto?> GetTaskInfoDtoByFilterAsync(Expression<Func<TaskInfo, bool>> filter, CancellationToken cancellationToken = default);
-    Task<TaskInfoDetailsDto?> GetTaskInfoDtoByIdAsync(Guid taskInfoId, CancellationToken cancellationToken = default);
+    Task<TaskInfoDetailsDto?> GetTaskInfoDtoByIdAsync(int taskInfoId, CancellationToken cancellationToken = default);
     void UpdateRangeTaskInfos(IEnumerable<TaskInfo> entities);
     void UpdateTaskInfo(TaskInfo entity);
 }

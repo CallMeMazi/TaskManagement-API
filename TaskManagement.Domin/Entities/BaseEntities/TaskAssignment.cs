@@ -3,8 +3,8 @@
 namespace TaskManagement.Domin.Entities.BaseEntities;
 public class TaskAssignment : BaseEntity
 {
-    public Guid TaskId { get; private set; }
-    public Guid UserId { get; private set; }
+    public int TaskId { get; private set; }
+    public int UserId { get; private set; }
     public byte TotalTimeSpent { get; private set; }
     public byte StartTaskCount { get; private set; }
     public bool IsInProgress { get; private set; } = false;
@@ -19,7 +19,7 @@ public class TaskAssignment : BaseEntity
     #endregion
 
     private TaskAssignment() { }
-    public TaskAssignment(Guid taskId, Guid userId)
+    public TaskAssignment(int taskId, int userId)
     {
         ValidateTaskAssignmentCreating(taskId, userId);
 
@@ -58,14 +58,14 @@ public class TaskAssignment : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateTaskAssignmentCreating(Guid taskId, Guid userId)
+    public void ValidateTaskAssignmentCreating(int taskId, int userId)
     {
         var errorMessages = new List<string>();
 
-        if (taskId == Guid.Empty)
+        if (taskId <= 0)
             errorMessages.Add("آیدی تسک خالی است!");
 
-        if (userId == Guid.Empty)
+        if (userId <= 0)
             errorMessages.Add("آیدی کاربر خالی است!");
 
         if (errorMessages.Any())

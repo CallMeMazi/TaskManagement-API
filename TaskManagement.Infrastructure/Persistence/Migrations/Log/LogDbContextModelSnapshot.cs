@@ -24,10 +24,11 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Log
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.LogEntities.EntityLog", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<byte>("Action")
                         .HasColumnType("tinyint");
@@ -37,8 +38,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Log
                         .HasColumnType("datetime2(6)")
                         .HasDefaultValueSql("getdate()");
 
-                    b.Property<Guid>("EntityId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("EntityId")
+                        .HasColumnType("int");
 
                     b.Property<byte>("EntityType")
                         .HasColumnType("tinyint");
@@ -57,16 +58,17 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Log
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.LogEntities.EntityRelationLog", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<byte>("Action")
                         .HasColumnType("tinyint");
 
-                    b.Property<Guid>("ActorUserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ActorUserId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -78,14 +80,14 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Log
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<Guid>("PrimaryEntityId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("PrimaryEntityId")
+                        .HasColumnType("int");
 
                     b.Property<byte>("PrimaryEntityType")
                         .HasColumnType("tinyint");
 
-                    b.Property<Guid>("SecondaryEntityId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("SecondaryEntityId")
+                        .HasColumnType("int");
 
                     b.Property<byte>("SecondaryEntityType")
                         .HasColumnType("tinyint");

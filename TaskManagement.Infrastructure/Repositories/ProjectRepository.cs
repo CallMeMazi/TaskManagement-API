@@ -34,13 +34,13 @@ public class ProjectRepository : BaseRepository<Project>, IProjectRepository
             .ToListAsync(cancellationToken);
     }
 
-    public Task<Project?> GetProjectByIdAsync(Guid projectId, bool isTracking = false, CancellationToken cancellationToken = default)
+    public Task<Project?> GetProjectByIdAsync(int projectId, bool isTracking = false, CancellationToken cancellationToken = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.FirstOrDefaultAsync(p => p.Id == projectId, cancellationToken);
     }
 
-    public Task<ProjectDetailsDto?> GetProjectDtoByIdAsync(Guid projectId, CancellationToken cancellationToken = default)
+    public Task<ProjectDetailsDto?> GetProjectDtoByIdAsync(int projectId, CancellationToken cancellationToken = default)
     {
         return Entities.AsNoTracking()
             .Where(u => u.Id == projectId)

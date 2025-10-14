@@ -18,7 +18,6 @@ public class LogDbContext(DbContextOptions<LogDbContext> options) : DbContext(op
         modelBuilder.RegisterAllEntities<LogBaseEntity>(dominAssembly);
         modelBuilder.RegisterEntityTypeConfiguration(typeof(ILogConfigyration<>), infrastructureAssembly);
         modelBuilder.AddRestrictDeleteBehaviorConvention();
-        modelBuilder.AddSequentialGuidForIdConvention();
         modelBuilder.AddPluralizingTableNameConvention();
     }
 

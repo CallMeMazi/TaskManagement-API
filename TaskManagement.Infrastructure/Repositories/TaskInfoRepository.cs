@@ -33,13 +33,13 @@ public class TaskInfoRepository : BaseRepository<TaskInfo>, ITaskInfoRepository
             .ToListAsync(cancellationToken);
     }
 
-    public Task<TaskInfo?> GetTaskInfoByIdAsync(Guid taskInfoId, bool isTracking = false, CancellationToken cancellationToken = default)
+    public Task<TaskInfo?> GetTaskInfoByIdAsync(int taskInfoId, bool isTracking = false, CancellationToken cancellationToken = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.FirstOrDefaultAsync(p => p.Id == taskInfoId, cancellationToken);
     }
 
-    public Task<TaskInfoDetailsDto?> GetTaskInfoDtoByIdAsync(Guid taskInfoId, CancellationToken cancellationToken = default)
+    public Task<TaskInfoDetailsDto?> GetTaskInfoDtoByIdAsync(int taskInfoId, CancellationToken cancellationToken = default)
     {
         return Entities.AsNoTracking()
             .Where(u => u.Id == taskInfoId)

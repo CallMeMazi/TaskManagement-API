@@ -8,8 +8,8 @@ public static class SystemConfiguration
     {
         services.AddAutoMapper(cfg => { }, new[]
         {
-            Assembly.Load(nameof(TaskManagement.Application)),
-            Assembly.Load(nameof(TaskManagement.Infrastructure))
+            Assembly.Load("TaskManagement.Application"),
+            Assembly.Load("TaskManagement.Infrastructure")
         });
 
         return services;

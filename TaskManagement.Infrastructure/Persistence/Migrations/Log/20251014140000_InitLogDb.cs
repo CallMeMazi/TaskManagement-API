@@ -15,9 +15,10 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Log
                 name: "EntityLogs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     EntityType = table.Column<byte>(type: "tinyint", nullable: false),
-                    EntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EntityId = table.Column<int>(type: "int", nullable: false),
                     Action = table.Column<byte>(type: "tinyint", nullable: false),
                     LogDescription = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2(6)", nullable: false, defaultValueSql: "getdate()")
@@ -31,12 +32,13 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Log
                 name: "EntityRelationLogs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     PrimaryEntityType = table.Column<byte>(type: "tinyint", nullable: false),
-                    PrimaryEntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PrimaryEntityId = table.Column<int>(type: "int", nullable: false),
                     SecondaryEntityType = table.Column<byte>(type: "tinyint", nullable: false),
-                    SecondaryEntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ActorUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SecondaryEntityId = table.Column<int>(type: "int", nullable: false),
+                    ActorUserId = table.Column<int>(type: "int", nullable: false),
                     Action = table.Column<byte>(type: "tinyint", nullable: false),
                     LogDescription = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2(6)", nullable: false, defaultValueSql: "getdate()")

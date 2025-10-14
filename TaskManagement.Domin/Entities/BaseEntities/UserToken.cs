@@ -5,8 +5,8 @@ using TaskManagement.Domin.Enums.Statuses;
 namespace TaskManagement.Domin.Entities.BaseEntities;
 public class UserToken : IBaseEntity
 {
-    public Guid Id { get; private set; }
-    public Guid UserId { get; private set; }
+    public int Id { get; private set; }
+    public int UserId { get; private set; }
     public string Token { get; private set; }
     public Guid SecurityStamp { get; private set; }
     public TokenStatus TokenStatus { get; private set; } = TokenStatus.Active;
@@ -20,7 +20,7 @@ public class UserToken : IBaseEntity
 
 
     private UserToken() { }
-    public UserToken(Guid userId, string token, Guid securityStamp
+    public UserToken(int userId, string token, Guid securityStamp
         , DateTime expiredAt, string userIp)
     {
         ValidateUserToken(userId, token, securityStamp, expiredAt, userIp);
@@ -58,12 +58,12 @@ public class UserToken : IBaseEntity
         LastUsedAt = DateTime.Now;
     }
 
-    public void ValidateUserToken(Guid userId, string token, Guid securityStamp
+    public void ValidateUserToken(int userId, string token, Guid securityStamp
         , DateTime expiredAt, string userIp)
     {
         var errorMessages = new List<string>();
 
-        if (userId == Guid.Empty)
+        if (userId <= 0)
             errorMessages.Add("آیدی کاربر خالی است!");
 
         if (securityStamp == Guid.Empty)

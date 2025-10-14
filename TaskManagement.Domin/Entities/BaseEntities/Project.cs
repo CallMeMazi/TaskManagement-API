@@ -7,8 +7,8 @@ public class Project : BaseEntity
 {
     public string ProjName { get; private set; }
     public string ProjDescription { get; private set; }
-    public Guid OrgId { get; private set; }
-    public Guid CreatorId { get; private set; }
+    public int OrgId { get; private set; }
+    public int CreatorId { get; private set; }
     public byte ProjProgress { get; private set; }
     public ProjectStatusType ProjStatus { get; private set; } = ProjectStatusType.InProgress;
     public bool IsActive { get; private set; } = true;
@@ -28,8 +28,8 @@ public class Project : BaseEntity
 
 
     private Project() { }
-    public Project(string projName, string projDescription, Guid orgId
-        , Guid creatorId, byte maxUsers, byte maxTasks)
+    public Project(string projName, string projDescription, int orgId
+        , int creatorId, byte maxUsers, byte maxTasks)
     {
         ValidateProjectCreating(projName, projDescription, orgId, creatorId, maxUsers, maxTasks);
 
@@ -153,8 +153,8 @@ public class Project : BaseEntity
         ProjEndAt = DateTime.Now;
     }
 
-    public void ValidateProjectCreating(string projName, string projDescription, Guid orgId
-        , Guid creatorId, byte maxUsers, byte maxTasks)
+    public void ValidateProjectCreating(string projName, string projDescription, int orgId
+        , int creatorId, byte maxUsers, byte maxTasks)
     {
         var errorMessages = new List<string>();
 
@@ -164,10 +164,10 @@ public class Project : BaseEntity
         if (projDescription.IsNullParameter())
             errorMessages.Add("توضیحات پروژه خالی است!");
 
-        if (orgId == Guid.Empty)
+        if (orgId <= 0)
             errorMessages.Add("آیدی سازمان نامعتبر است!");
 
-        if (creatorId == Guid.Empty)
+        if (creatorId <= 0)
             errorMessages.Add("آیدی کاربر سازنده خالی است!");
 
         if (maxUsers <= 3)

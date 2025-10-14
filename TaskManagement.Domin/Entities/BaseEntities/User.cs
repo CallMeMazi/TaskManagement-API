@@ -89,7 +89,7 @@ public class User : BaseEntity
         if (!StringHelper.MobileRegex.IsMatch(mobileNumber))
             errorMessages.Add("شماره موبایل نامعتبر است. باید با 09 شروع شود و 11 رقم باشد.");
 
-        if (!StringHelper.EmailRegex.IsMatch(email))
+        if (email.IsValidEmail())
             errorMessages.Add("ایمیل نامعتبر است!");
 
         if (errorMessages.Any())
@@ -109,7 +109,7 @@ public class User : BaseEntity
         if (lastName.IsNullParameter())
             errorMessages.Add("نام خانوادگی خالی است!");
 
-        if (!StringHelper.EmailRegex.IsMatch(email))
+        if (email.IsValidEmail())
             errorMessages.Add("ایمیل نامعتبر است!");
 
         if (errorMessages.Any())

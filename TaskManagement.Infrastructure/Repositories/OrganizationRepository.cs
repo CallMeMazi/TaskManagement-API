@@ -34,13 +34,13 @@ public class OrganizationRepository : BaseRepository<Organization>, IOrganizatio
             .ToListAsync(cancellationToken);
     }
 
-    public Task<Organization?> GetOrgByIdAsync(Guid orgId, bool isTracking = false, CancellationToken cancellationToken = default)
+    public Task<Organization?> GetOrgByIdAsync(int orgId, bool isTracking = false, CancellationToken cancellationToken = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.FirstOrDefaultAsync(o => o.Id == orgId, cancellationToken);
     }
 
-    public Task<OrgDetailsDto?> GetOrgDtoByIdAsync(Guid orgId, CancellationToken cancellationToken = default)
+    public Task<OrgDetailsDto?> GetOrgDtoByIdAsync(int orgId, CancellationToken cancellationToken = default)
     {
         return Entities.AsNoTracking()
             .Where(u => u.Id == orgId)

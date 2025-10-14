@@ -29,7 +29,7 @@ public static class ModelBuilderHelper
     /// <param name="modelBuilder"></param>
     public static void AddSequentialGuidForIdConvention(this ModelBuilder modelBuilder)
     {
-        modelBuilder.AddDefaultValueSqlConvention("Id", typeof(Guid), "NEWSEQUENTIALID()");
+        modelBuilder.AddDefaultValueSqlConvention("Id", typeof(int), "NEWSEQUENTIALID()");
     }
 
     /// <summary>

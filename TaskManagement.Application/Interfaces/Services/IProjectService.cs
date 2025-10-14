@@ -6,7 +6,7 @@ using TaskManagement.Domin.Enums.Statuses;
 namespace TaskManagement.Application.Interfaces.Services;
 public interface IProjectService
 {
-    Task<GeneralResult<ProjectDetailsDto>> GetProjectByIdAsync(Guid projId, CancellationToken cancellationToken);
+    Task<GeneralResult<ProjectDetailsDto>> GetProjectByIdAsync(int projId, CancellationToken cancellationToken);
     Task<GeneralResult> CreateProjectAsync(CreateProjectAppDto command, CancellationToken cancellationToken);
     Task<GeneralResult> UpdateProjectAsync(UpdateProjectAppDto command, CancellationToken cancellationToken);
     Task<GeneralResult> SoftDeleteProjectAsync(UserProjectAppDto command, CancellationToken cancellationToken);

@@ -8,7 +8,7 @@ public interface IBaseEntity
 
 public abstract class BaseEntity : IBaseEntity
 {
-    public Guid Id { get; protected set; }
+    public int Id { get; protected set; }
     public bool IsDelete { get; protected set; } = false;
     public DateTime CreatedAt { get; protected set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; protected set; }

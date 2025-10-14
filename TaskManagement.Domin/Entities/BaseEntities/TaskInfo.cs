@@ -4,9 +4,9 @@ using TaskManagement.Common.Helpers;
 namespace TaskManagement.Domin.Entities.BaseEntities;
 public class TaskInfo : BaseEntity
 {
-    public Guid TaskId { get; private set; }
-    public Guid UserId { get; private set; }
-    public Guid TaskAssignmentId { get; private set; }
+    public int TaskId { get; private set; }
+    public int UserId { get; private set; }
+    public int TaskAssignmentId { get; private set; }
     public string? TaskInfoDescription { get; private set; }
     public DateTime StartedTaskAt { get; private set; }
     public DateTime? EndedTaskAt { get; private set; }
@@ -22,7 +22,7 @@ public class TaskInfo : BaseEntity
 
 
     private TaskInfo() { }
-    public TaskInfo(Guid taskId, Guid userId, Guid taskAssignmentId)
+    public TaskInfo(int taskId, int userId, int taskAssignmentId)
     {
         ValidateTaskInfo(taskId, userId, taskAssignmentId);
 
@@ -44,17 +44,17 @@ public class TaskInfo : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateTaskInfo(Guid taskId, Guid userId, Guid taskAssignmentId)
+    public void ValidateTaskInfo(int taskId, int userId, int taskAssignmentId)
     {
         var errorMessages = new List<string>();
 
-        if (taskId == Guid.Empty)
+        if (taskId <= 0)
             errorMessages.Add("آیدی تسک خالی است!");
 
-        if (userId == Guid.Empty)
+        if (userId <= 0)
             errorMessages.Add("آیدی کاربر خالی است!");
 
-        if (taskAssignmentId == Guid.Empty)
+        if (taskAssignmentId <= 0)
             errorMessages.Add("آیدی تسک کاربر خالی است!");
 
         if (errorMessages.Any())

@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <Folder Include="MediatR\Behaviors\" />
+    <Folder Include="Persistence\Migrations\Log\" />
+    <Folder Include="Persistence\Migrations\Main\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

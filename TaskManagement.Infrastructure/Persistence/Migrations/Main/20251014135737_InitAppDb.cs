@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
 {
     /// <inheritdoc />
-    public partial class InitMainDb : Migration
+    public partial class InitAppDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +15,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     MobileNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
@@ -36,9 +37,11 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                 name: "Organizations",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     OrgName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    OwnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SecondOrgName = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
+                    OwnerId = table.Column<int>(type: "int", nullable: false),
                     OrgCode = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
                     OrgDescription = table.Column<string>(type: "nvarchar(400)", maxLength: 400, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
@@ -62,8 +65,9 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                 name: "UserTokens",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     Token = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     SecurityStamp = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TokenStatus = table.Column<byte>(type: "tinyint", nullable: false),
@@ -88,9 +92,10 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                 name: "OrganizationMemberShips",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
-                    OrgId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrgId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     Role = table.Column<byte>(type: "tinyint", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2(6)", nullable: false, defaultValueSql: "getdate()"),
@@ -117,11 +122,12 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                 name: "Projects",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     ProjName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     ProjDescription = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    OrgId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrgId = table.Column<int>(type: "int", nullable: false),
+                    CreatorId = table.Column<int>(type: "int", nullable: false),
                     ProjProgress = table.Column<byte>(type: "tinyint", nullable: false, defaultValue: (byte)0),
                     ProjStatus = table.Column<byte>(type: "tinyint", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
@@ -154,9 +160,10 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                 name: "ProjectMemberShips",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProjId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    ProjId = table.Column<int>(type: "int", nullable: false),
                     Role = table.Column<byte>(type: "tinyint", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2(6)", nullable: false, defaultValueSql: "getdate()"),
@@ -183,9 +190,10 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                 name: "Tasks",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
-                    ProjId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProjId = table.Column<int>(type: "int", nullable: false),
+                    CreatorId = table.Column<int>(type: "int", nullable: false),
                     TaskName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     TaskDescription = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
@@ -218,9 +226,10 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                 name: "TaskAssignments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
-                    TaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TaskId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     TotalTimeSpent = table.Column<byte>(type: "tinyint", nullable: false, defaultValue: (byte)0),
                     StartTaskCount = table.Column<byte>(type: "tinyint", nullable: false, defaultValue: (byte)0),
                     IsInProgress = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
@@ -250,13 +259,15 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                 name: "TaskInfos",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWSEQUENTIALID()"),
-                    TaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TaskAssignmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TaskInfoDescreption = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    StartedTaskAt = table.Column<DateTime>(type: "datetime2(6)", nullable: false),
-                    EndedTaskAt = table.Column<DateTime>(type: "datetime2(6)", nullable: false, defaultValueSql: "getdate()"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TaskId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    TaskAssignmentId = table.Column<int>(type: "int", nullable: false),
+                    TaskInfoDescription = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    StartedTaskAt = table.Column<DateTime>(type: "datetime2(6)", nullable: false, defaultValueSql: "getdate()"),
+                    EndedTaskAt = table.Column<DateTime>(type: "datetime2(6)", nullable: true),
+                    TotalHours = table.Column<byte>(type: "tinyint", nullable: false, defaultValue: (byte)0),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2(6)", nullable: false, defaultValueSql: "getdate()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2(6)", nullable: true)
@@ -359,12 +370,6 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                 name: "IX_Tasks_ProjId",
                 table: "Tasks",
                 column: "ProjId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_Email",
-                table: "Users",
-                column: "Email",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_MobileNumber",

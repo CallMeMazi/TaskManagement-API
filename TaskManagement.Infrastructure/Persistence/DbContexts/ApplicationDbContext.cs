@@ -18,7 +18,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.RegisterAllEntities<IBaseEntity>(dominAssembly);
         modelBuilder.RegisterEntityTypeConfiguration(typeof(IBaseConfiguration<>), infrastructureAssembly);
         modelBuilder.AddRestrictDeleteBehaviorConvention();
-        modelBuilder.AddSequentialGuidForIdConvention();
         modelBuilder.AddPluralizingTableNameConvention();
     }
 

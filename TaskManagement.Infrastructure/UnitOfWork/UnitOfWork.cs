@@ -6,7 +6,6 @@ namespace TaskManagement.Infrastructure.UnitOfWork;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
-    private bool disposedValue;
 
     public IUserRepository UserRepository { get; }
     public IOrganizationRepository OrganizationRepository { get; }

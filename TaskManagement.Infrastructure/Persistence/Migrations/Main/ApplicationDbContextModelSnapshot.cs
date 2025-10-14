@@ -24,10 +24,11 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.BaseEntities.Organization", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -64,8 +65,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SecondOrgName")
                         .IsRequired()
@@ -87,10 +88,11 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.BaseEntities.OrganizationMemberShip", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -102,8 +104,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<Guid>("OrgId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("OrgId")
+                        .HasColumnType("int");
 
                     b.Property<byte>("Role")
                         .HasColumnType("tinyint");
@@ -111,8 +113,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2(6)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -125,18 +127,19 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.BaseEntities.Project", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(6)")
                         .HasDefaultValueSql("getdate()");
 
-                    b.Property<Guid>("CreatorId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("CreatorId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -148,8 +151,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<Guid>("OrgId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("OrgId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ProjDescription")
                         .IsRequired()
@@ -201,10 +204,11 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.BaseEntities.ProjectMemberShip", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -216,8 +220,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<Guid>("ProjId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ProjId")
+                        .HasColumnType("int");
 
                     b.Property<byte>("Role")
                         .HasColumnType("tinyint");
@@ -225,8 +229,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2(6)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -239,18 +243,19 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.BaseEntities.Task", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2(6)")
                         .HasDefaultValueSql("getdate()");
 
-                    b.Property<Guid>("CreatorId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("CreatorId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -262,8 +267,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<Guid>("ProjId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ProjId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("TaskDeadline")
                         .HasColumnType("datetime2(6)");
@@ -303,10 +308,11 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.BaseEntities.TaskAssignment", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -331,8 +337,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                         .HasColumnType("tinyint")
                         .HasDefaultValue((byte)0);
 
-                    b.Property<Guid>("TaskId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
 
                     b.Property<byte>("TotalTimeSpent")
                         .ValueGeneratedOnAdd()
@@ -342,8 +348,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2(6)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -356,10 +362,11 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.BaseEntities.TaskInfo", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -379,11 +386,11 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                         .HasColumnType("datetime2(6)")
                         .HasDefaultValueSql("getdate()");
 
-                    b.Property<Guid>("TaskAssignmentId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("TaskAssignmentId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("TaskId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
 
                     b.Property<string>("TaskInfoDescription")
                         .HasMaxLength(200)
@@ -397,8 +404,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2(6)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -413,10 +420,11 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.BaseEntities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -472,10 +480,11 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
 
             modelBuilder.Entity("TaskManagement.Domin.Entities.BaseEntities.UserToken", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -504,8 +513,8 @@ namespace TaskManagement.Infrastructure.Persistence.Migrations.Main
                     b.Property<byte>("TokenStatus")
                         .HasColumnType("tinyint");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserIp")
                         .IsRequired()
