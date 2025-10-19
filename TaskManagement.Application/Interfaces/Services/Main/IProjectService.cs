@@ -1,9 +1,8 @@
 ﻿using TaskManagement.Application.DTOs.ApplicationDTOs.Project;
 using TaskManagement.Application.DTOs.SharedDTOs.Project;
 using TaskManagement.Common.Classes;
-using TaskManagement.Domin.Enums.Statuses;
 
-namespace TaskManagement.Application.Interfaces.Services;
+namespace TaskManagement.Application.Interfaces.Services.Main;
 public interface IProjectService
 {
     Task<GeneralResult<ProjectDetailsDto>> GetProjectByIdAsync(int projId, CancellationToken cancellationToken);

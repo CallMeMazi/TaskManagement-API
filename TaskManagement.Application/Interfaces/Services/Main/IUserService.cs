@@ -2,7 +2,7 @@
 using TaskManagement.Application.DTOs.SharedDTOs.User;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Interfaces.Services;
+namespace TaskManagement.Application.Interfaces.Services.Main;
 public interface IUserService
 {
     Task<GeneralResult<UserDetailsDto>> GetUserByMobileNumberAsync(string mobileNumber, CancellationToken cancellationToken);

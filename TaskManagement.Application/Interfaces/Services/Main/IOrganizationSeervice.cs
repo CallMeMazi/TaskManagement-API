@@ -2,7 +2,7 @@
 using TaskManagement.Application.DTOs.SharedDTOs.Organization;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Interfaces.Services;
+namespace TaskManagement.Application.Interfaces.Services.Main;
 public interface IOrganizationSeervice
 {
     Task<GeneralResult<OrgDetailsDto>> GetOrganizationByIdCodeAsync(string orgName, CancellationToken cancellationToken);
