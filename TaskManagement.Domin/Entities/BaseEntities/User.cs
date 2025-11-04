@@ -7,6 +7,7 @@ public class User : BaseEntity
     public string MobileNumber { get; private set; }
     public string Email { get; private set; }
     public string PasswordHash { get; private set; }
+    public string SecurityStamp { get; private set; }
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
     public byte Points { get; private set; }
@@ -34,9 +35,10 @@ public class User : BaseEntity
 
         MobileNumber = mobileNumber;
         Email = email;
-        PasswordHash = password.GetSha256Hash();
+        PasswordHash = password;
         FirstName = firstName;
         LastName = lastName;
+        ChangeSecurityStamp();
     }
 
 
@@ -50,17 +52,16 @@ public class User : BaseEntity
 
         UpdatedAt = DateTime.Now;
     }
-    public void ChangeUserPassword(string oldPassword, string newPassword)
+    public void ChangeUserPassword(string newPassword)
     {
-        if (oldPassword.IsNullParameter() || newPassword.IsNullParameter())
-            throw new BadRequestException("رمز خالی است!");
-
-        if (oldPassword != PasswordHash)
-            throw new BadRequestException("رمز نامعتبر است!");
+        if (newPassword.IsNullParameter())
+            throw new BadRequestException("رمز عبور خالی است!");
 
         PasswordHash = newPassword;
         UpdatedAt = DateTime.Now;
     }
+    public void ChangeSecurityStamp()
+        =>  SecurityStamp = Guid.NewGuid().ToString();
     public void ChangeLastLoginDate()
         => LastLoginDate = DateTime.Now;
     public void IncreaseOrDecreasePoints(byte amount)

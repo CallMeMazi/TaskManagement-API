@@ -11,14 +11,20 @@ public class UserTokenConfiguration : IBaseConfiguration<UserToken>
 
         builder.HasKey(ut => ut.Id);
 
-        builder.Property(ut => ut.Token)
+        builder.Property(ut => ut.AccessTokenHash)
             .IsRequired()
-            .HasColumnType("nvarchar(450)")
-            .HasMaxLength(450);
+            .HasColumnType("nvarchar(1000)")
+            .HasMaxLength(1000);
+
+        builder.Property(ut => ut.RefreshTokenHash)
+            .IsRequired()
+            .HasColumnType("nvarchar(50)")
+            .HasMaxLength(50);
 
         builder.Property(ut => ut.SecurityStamp)
             .IsRequired()
-            .HasColumnType("uniqueidentifier");
+            .HasColumnType("nvarchar(50)")
+            .HasMaxLength(50);
 
         builder.Property(ut => ut.TokenStatus)
             .IsRequired()
@@ -46,9 +52,21 @@ public class UserTokenConfiguration : IBaseConfiguration<UserToken>
             .HasColumnType("nvarchar(50)")
             .HasMaxLength(50);
 
+        builder.Property(ut => ut.UserAgent)
+            .IsRequired()
+            .HasColumnType("nvarchar(50)")
+            .HasMaxLength(50);
+
         #endregion
 
-        builder.HasIndex(ut => ut.Token)
+        builder.HasIndex(ut => ut.UserId);
+
+        builder.HasIndex(ut => ut.AccessTokenHash)
             .IsUnique();
+
+        builder.HasIndex(ut => ut.RefreshTokenHash)
+            .IsUnique();
+
+        builder.HasIndex(ut => ut.TokenStatus);
     }
 }

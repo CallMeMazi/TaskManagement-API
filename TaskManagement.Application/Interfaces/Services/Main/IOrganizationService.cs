@@ -3,7 +3,7 @@ using TaskManagement.Application.DTOs.SharedDTOs.Organization;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Interfaces.Services.Main;
-public interface IOrganizationSeervice
+public interface IOrganizationService
 {
     Task<GeneralResult<OrgDetailsDto>> GetOrganizationByIdCodeAsync(string orgName, CancellationToken cancellationToken);
     Task<GeneralResult> CreateOrganizationAsync(CreateOrgAppDto command, CancellationToken cancellationToken);

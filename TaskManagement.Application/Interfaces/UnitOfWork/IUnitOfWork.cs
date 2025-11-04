@@ -8,6 +8,7 @@ public interface IUnitOfWork
     ITaskInfoRepository TaskInfoRepository { get; }
     ITaskRepository TaskRepository { get; }
     IUserRepository UserRepository { get; }
+    IUserTokenRepository UserTokenRepository { get; }
 
     void Save();
     void Save(bool acceptAllChangesOnSuccess);

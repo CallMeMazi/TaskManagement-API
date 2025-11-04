@@ -11,13 +11,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapperConfig();
 
 // DbContext Services
-builder.Services.AddApplicationDbContext(builder.Configuration);
-builder.Services.AddLogDbContext(builder.Configuration);
+builder.Services.AddDbContexts(builder.Configuration);
 
 // Custom Services
-builder.Services.AddRepositoriesConfig();
-builder.Services.AddUnitOfWorkConfig();
-builder.Services.AddServicesConfig();
+builder.Services.AddAppServicesConfig(builder.Configuration);
 
 var app = builder.Build();
 

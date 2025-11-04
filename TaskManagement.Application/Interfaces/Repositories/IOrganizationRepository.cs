@@ -18,4 +18,5 @@ public interface IOrganizationRepository : IBaseRepository<Organization>
     Task<OrgDetailsDto?> GetOrgDtoByIdAsync(int orgId, CancellationToken cancellationToken = default);
     void UpdateOrg(Organization entity);
     void UpdateRangeOrgs(IEnumerable<Organization> entities);
+    Task<bool> IsOrgExistByFilterAsync(Expression<Func<Organization, bool>> filter, CancellationToken cancellationToken);
 }

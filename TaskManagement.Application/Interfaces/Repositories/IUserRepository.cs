@@ -18,4 +18,5 @@ public interface IUserRepository : IBaseRepository<User>
     Task<UserDetailsDto?> GetUserDtoByIdAsync(int userId, CancellationToken cancellationToken = default);
     void UpdateRangeUsers(IEnumerable<User> entities);
     void UpdateUser(User entity);
+    Task<bool> IsUserExistByFilterAsync(Expression<Func<User, bool>> filter, CancellationToken cancellationToken);
 }

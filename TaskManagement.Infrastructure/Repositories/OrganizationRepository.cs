@@ -67,6 +67,11 @@ public class OrganizationRepository : BaseRepository<Organization>, IOrganizatio
         return Entities.FindAsync(ids, cancellationToken);
     }
 
+    public Task<bool> IsOrgExistByFilterAsync(Expression<Func<Organization, bool>> filter, CancellationToken cancellationToken)
+    {
+        return Entities.AnyAsync(filter, cancellationToken);
+    }
+
     public async System.Threading.Tasks.Task AddOrgAsync(Organization entity, CancellationToken cancellationToken = default)
     {
         if (entity.IsNullParameter())

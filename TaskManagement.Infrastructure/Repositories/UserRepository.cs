@@ -115,5 +115,10 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         Entities.RemoveRange(entities);
     }
 
+    public Task<bool> IsUserExistByFilterAsync(Expression<Func<User, bool>> filter, CancellationToken cancellationToken)
+    {
+        return Entities.AnyAsync(filter, cancellationToken);
+    }
+
     #endregion
 }

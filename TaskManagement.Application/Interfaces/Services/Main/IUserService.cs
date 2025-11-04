@@ -10,5 +10,4 @@ public interface IUserService
     Task<GeneralResult> UpdateUserAsync(UpdateUserAppDto command, CancellationToken cancellationToken);
     Task<GeneralResult> SoftDeleteUserAsync(DeleteUserAppDto command, CancellationToken cancellationToken);
     Task<GeneralResult> ChangePasswordUserAsync(ChangePasswordUserAppDto command, CancellationToken cancellationToken);
-    Task<GeneralResult> LoginUserAsync(LoginUserAppDto command, CancellationToken cancellationToken);
 }

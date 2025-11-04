@@ -26,6 +26,11 @@ public class UserConfiguration : IBaseConfiguration<User>
             .HasColumnType("nvarchar(256)")
             .HasMaxLength(256);
 
+        builder.Property(u => u.SecurityStamp)
+            .IsRequired()
+            .HasColumnType("nvarchar(50)")
+            .HasMaxLength(50);
+
         builder.Property(u => u.FirstName)
             .IsRequired()
             .HasColumnType("nvarchar(50)")

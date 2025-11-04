@@ -8,13 +8,15 @@ public class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _context;
 
     public IUserRepository UserRepository { get; }
+    public IUserTokenRepository UserTokenRepository { get; }
     public IOrganizationRepository OrganizationRepository { get; }
     public IProjectRepository ProjectRepository { get; }
     public ITaskRepository TaskRepository { get; }
     public ITaskInfoRepository TaskInfoRepository { get; }
 
     public UnitOfWork(ApplicationDbContext context, IUserRepository userRepository, IOrganizationRepository organizationRepository
-        , IProjectRepository projectRepository, ITaskRepository taskRepository, ITaskInfoRepository taskInfoRepository)
+        , IProjectRepository projectRepository, ITaskRepository taskRepository, ITaskInfoRepository taskInfoRepository
+        , IUserTokenRepository userTokenRepository)
     {
         _context = context;
         UserRepository = userRepository;
@@ -22,6 +24,7 @@ public class UnitOfWork : IUnitOfWork
         ProjectRepository = projectRepository;
         TaskRepository = taskRepository;
         TaskInfoRepository = taskInfoRepository;
+        UserTokenRepository = userTokenRepository;
     }
 
     public void Save()
