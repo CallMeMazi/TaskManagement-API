@@ -7,7 +7,7 @@ using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Domin.Entities.BaseEntities;
 
-namespace TaskManagement.Application.Services;
+namespace TaskManagement.Application.Services.Main;
 public class OrganizationService : IOrganizationService
 {
     private readonly IOrganizationRepository _organizationRepository;
@@ -22,7 +22,7 @@ public class OrganizationService : IOrganizationService
         _mapper = mapper;
     }
 
-    
+
 
     public async Task<GeneralResult> CreateOrganizationAsync(CreateOrgAppDto command, CancellationToken cancellationToken)
     {

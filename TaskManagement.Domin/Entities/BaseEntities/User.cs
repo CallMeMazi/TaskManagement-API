@@ -58,6 +58,7 @@ public class User : BaseEntity
             throw new BadRequestException("رمز عبور خالی است!");
 
         PasswordHash = newPassword;
+        ChangeSecurityStamp();
         UpdatedAt = DateTime.Now;
     }
     public void ChangeSecurityStamp()

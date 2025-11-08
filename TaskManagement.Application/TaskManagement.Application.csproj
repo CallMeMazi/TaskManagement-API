@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Folder Include="Interfaces\Services\Log\" />
+    <Folder Include="Services\helper\" />
   </ItemGroup>
 
   <ItemGroup>

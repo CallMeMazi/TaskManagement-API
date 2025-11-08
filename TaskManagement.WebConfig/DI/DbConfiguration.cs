@@ -17,7 +17,8 @@ public static class DbConfiguration
     private static IServiceCollection AddApplicationDbContext(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("ApplicationConnectionString"))
+            options.UseSqlServer(configuration.GetConnectionString("ApplicationConnectionString")),
+            ServiceLifetime.Scoped
         );
 
         return services;
@@ -25,7 +26,8 @@ public static class DbConfiguration
     private static IServiceCollection AddLogDbContext(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<LogDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("ApplicationLogConnectionString"))
+            options.UseSqlServer(configuration.GetConnectionString("ApplicationLogConnectionString")),
+            ServiceLifetime.Scoped
         );
 
         return services;

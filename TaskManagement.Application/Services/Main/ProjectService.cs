@@ -5,7 +5,7 @@ using TaskManagement.Application.Interfaces.Services.Main;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Services;
+namespace TaskManagement.Application.Services.Main;
 public class ProjectService : IProjectService
 {
     private readonly IUnitOfWork _unitOfWork;

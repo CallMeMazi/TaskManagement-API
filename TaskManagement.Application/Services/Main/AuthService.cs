@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
+﻿using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
 using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Halper;
+using TaskManagement.Application.Interfaces.Services.Main;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
@@ -10,8 +10,8 @@ using TaskManagement.Common.Settings;
 using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Enums.Statuses;
 
-namespace TaskManagement.Application.Services;
-public class AuthService
+namespace TaskManagement.Application.Services.Main;
+public class AuthService : IAuthServiec
 {
     private readonly ICommonService _commonService;
     private readonly AppSettings _appSettings;
@@ -26,6 +26,7 @@ public class AuthService
     }
 
 
+    // query services
     public async Task<GeneralResult<List<UserTokenDetails>>> GetUserActiveTokensAsync(int userId, CancellationToken cancellationToken)
     {
         if (userId <= 0)
@@ -43,8 +44,41 @@ public class AuthService
 
         return GeneralResult<List<UserTokenDetails>>.Success(tokens)!;
     }
+    public async Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto command, CancellationToken cancellationToken)
+    {
+        if (command.IsNullParameter())
+            throw new BadRequestException("فرم اعتبارسنجی توکن خالی است!");
+
+        var SecurityStampResult = _commonService.Jwt.GetSecurityStampFromAccessToken(command.AccessToken, command.UserIp, command.UserAgent);
+        if (!SecurityStampResult.IsSuccess)
+            throw new UnAuthorizedException(SecurityStampResult.Message);
+
+        var aceessTokenHash = _commonService.Password.Hash(command.AccessToken);
+
+        var token = await _unitOfWork.UserTokenRepository.
+            GetUserTokenByFilterAsync(ut =>
+                ut.AccessTokenHash == aceessTokenHash,
+                true,
+                cancellationToken
+            );
+
+        if (token.IsNullParameter())
+            throw new Exception($"token not found. in {nameof(ValidateAccessTokenAsync)} method!");
+
+        if (token!.TokenStatus != TokenStatus.Active || token.SecurityStamp != SecurityStampResult.Result)
+            throw new UnAuthorizedException("توکن نامعتبر است، لطفا مجددا لاگین کنید!");
+
+        return GeneralResult.Success();
+    }
+
+    // command services
     public async Task<GeneralResult<UserTokenDto>> RegisterUserAsync(RegisterUserTokenAppDto command, CancellationToken cancellationToken)
     {
+        // This method is used in transaction (TransAction)
+
+        if (command.IsNullParameter())
+            throw new BadRequestException("فرم رجیستر خالی است!");
+
         var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(command.user, command.UserIp, command.UserAgent);
         if (!tokenResult.IsSuccess)
             throw new BadRequestException(tokenResult.Message);
@@ -62,7 +96,6 @@ public class AuthService
         );
 
         await _unitOfWork.UserTokenRepository.AddUserTokenAsync(userToken, cancellationToken);
-        await _unitOfWork.SaveAsync(cancellationToken);
 
         var result = new UserTokenDto()
         {
@@ -112,10 +145,10 @@ public class AuthService
             throw new BadRequestException("فرم لاگ اوت خالی است!");
 
         var token = await _unitOfWork.UserTokenRepository.
-            GetUserTokenByFilterAsync(ut => 
-                ut.TokenStatus == TokenStatus.Active 
-                && ut.UserIp == command.UserIp 
-                && ut.UserAgent == command.UserAgent 
+            GetUserTokenByFilterAsync(ut =>
+                ut.TokenStatus == TokenStatus.Active
+                && ut.UserIp == command.UserIp
+                && ut.UserAgent == command.UserAgent
                 && ut.UserId == command.UserId,
                 true,
                 cancellationToken
@@ -136,7 +169,7 @@ public class AuthService
 
         await _unitOfWork.SaveAsync(cancellationToken);
 
-        return GeneralResult<UserTokenDto>.Success();
+        return GeneralResult.Success();
     }
     public async Task<GeneralResult<UserTokenDto>> RefreshTokenAsync(RefreshUserTokenAppDto command, CancellationToken cancellationToken)
     {
@@ -205,8 +238,10 @@ public class AuthService
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(int userId, CancellationToken cancellationToken)
+    public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(int userId, bool isSaved, CancellationToken cancellationToken)
     {
+        // This method is used in transaction (TransAction)
+
         if (userId <= 0)
             throw new Exception($"the ID of user is invalide. Exception in {nameof(RevokeAllTokensByUserIdAsync)} method!");
 
@@ -224,12 +259,15 @@ public class AuthService
         tokens.ForEach(ut =>
             ut.RevokeToken()
         );
-        await _unitOfWork.SaveAsync(cancellationToken);
+        if (isSaved)
+            await _unitOfWork.SaveAsync(cancellationToken);
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RevokeAllTokensExceptCurrentAsync(RevokeUserTokenAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult> RevokeAllTokensExceptCurrentAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken cancellationToken)
     {
+        // This method is used in transaction (TransAction)
+
         if (command.IsNullParameter())
             throw new Exception($"Date is invalide. Exception in {nameof(RevokeAllTokensExceptCurrentAsync)} method!");
 
@@ -248,33 +286,8 @@ public class AuthService
         tokens.ForEach(ut =>
             ut.RevokeToken()
         );
-        await _unitOfWork.SaveAsync(cancellationToken);
-
-        return GeneralResult.Success();
-    }
-    public async Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto command, CancellationToken cancellationToken)
-    {
-        if (command.IsNullParameter())
-            throw new BadRequestException("فرم اعتبارسنجی توکن خالی است!");
-
-        var SecurityStampResult = _commonService.Jwt.GetSecurityStampFromAccessToken(command.AccessToken, command.UserIp, command.UserAgent);
-        if (!SecurityStampResult.IsSuccess)
-            throw new UnAuthorizedException(SecurityStampResult.Message);
-
-        var aceessTokenHash = _commonService.Password.Hash(command.AccessToken);
-
-        var token = await _unitOfWork.UserTokenRepository.
-            GetUserTokenByFilterAsync(ut =>
-                ut.AccessTokenHash == aceessTokenHash,
-                true,
-                cancellationToken
-            );
-
-        if (token.IsNullParameter())
-            throw new Exception($"token not found. in {nameof(ValidateAccessTokenAsync)} method!");
-
-        if (token!.TokenStatus != TokenStatus.Active || token.SecurityStamp != SecurityStampResult.Result)
-            throw new UnAuthorizedException("توکن نامعتبر است، لطفا مجددا لاگین کنید!");
+        if (isSaved)
+            await _unitOfWork.SaveAsync(cancellationToken);
 
         return GeneralResult.Success();
     }
