@@ -3,6 +3,7 @@
 namespace TaskManagement.Application.Interfaces.UnitOfWork;
 public interface IUnitOfWork
 {
+    IOrganizationMemberShipRepository OrganizationMemberShipRepository { get; }
     IOrganizationRepository OrganizationRepository { get; }
     IProjectRepository ProjectRepository { get; }
     ITaskInfoRepository TaskInfoRepository { get; }

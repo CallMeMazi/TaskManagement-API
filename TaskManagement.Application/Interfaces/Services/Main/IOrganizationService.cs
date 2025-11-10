@@ -5,7 +5,8 @@ using TaskManagement.Common.Classes;
 namespace TaskManagement.Application.Interfaces.Services.Main;
 public interface IOrganizationService
 {
-    Task<GeneralResult<OrgDetailsDto>> GetOrganizationByIdCodeAsync(string orgName, CancellationToken cancellationToken);
+    Task<GeneralResult<OrgDetailsDto>> GetOrganizationByIdAsync(int id, CancellationToken cancellationToken);
+    Task<GeneralResult<OrgDetailsDto>> GetOrganizationByCodeAsync(string orgCode, CancellationToken cancellationToken);
     Task<GeneralResult> CreateOrganizationAsync(CreateOrgAppDto command, CancellationToken cancellationToken);
     Task<GeneralResult> UpdateOrganizationAsync(UpdateOrgAppDto command, CancellationToken cancellationToken);
     Task<GeneralResult> SoftDeleteOrganizationAsync(DeleteOrgAppDto command, CancellationToken cancellationToken);

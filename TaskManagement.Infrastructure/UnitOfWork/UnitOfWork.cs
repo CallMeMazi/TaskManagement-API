@@ -13,10 +13,11 @@ public class UnitOfWork : IUnitOfWork
     public IProjectRepository ProjectRepository { get; }
     public ITaskRepository TaskRepository { get; }
     public ITaskInfoRepository TaskInfoRepository { get; }
+    public IOrganizationMemberShipRepository OrganizationMemberShipRepository { get; }
 
     public UnitOfWork(ApplicationDbContext context, IUserRepository userRepository, IOrganizationRepository organizationRepository
         , IProjectRepository projectRepository, ITaskRepository taskRepository, ITaskInfoRepository taskInfoRepository
-        , IUserTokenRepository userTokenRepository)
+        , IUserTokenRepository userTokenRepository, IOrganizationMemberShipRepository organizationMemberShipRepository)
     {
         _context = context;
         UserRepository = userRepository;
@@ -25,6 +26,7 @@ public class UnitOfWork : IUnitOfWork
         TaskRepository = taskRepository;
         TaskInfoRepository = taskInfoRepository;
         UserTokenRepository = userTokenRepository;
+        OrganizationMemberShipRepository = organizationMemberShipRepository;
     }
 
     public void Save()
