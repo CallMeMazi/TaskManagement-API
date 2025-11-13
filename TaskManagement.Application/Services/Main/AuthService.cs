@@ -27,7 +27,7 @@ public class AuthService : IAuthServiec
 
 
     // query services
-    public async Task<GeneralResult<List<UserTokenDetails>>> GetUserActiveTokensAsync(int userId, CancellationToken cancellationToken)
+    public async Task<GeneralResult<List<UserTokenDetailsDto>>> GetUserActiveTokensAsync(int userId, CancellationToken cancellationToken)
     {
         if (userId <= 0)
             throw new Exception($"the ID of user is invalide. Exception in {nameof(GetUserActiveTokensAsync)} method!");
@@ -42,18 +42,18 @@ public class AuthService : IAuthServiec
         if (tokens.IsNullParameter() || !tokens.Any())
             throw new Exception($"any tokens for {userId} UserId was not found. in {nameof(GetUserActiveTokensAsync)} method!");
 
-        return GeneralResult<List<UserTokenDetails>>.Success(tokens)!;
+        return GeneralResult<List<UserTokenDetailsDto>>.Success(tokens)!;
     }
-    public async Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto query, CancellationToken cancellationToken)
     {
-        if (command.IsNullParameter())
+        if (query.IsNullParameter())
             throw new BadRequestException("فرم اعتبارسنجی توکن خالی است!");
 
-        var SecurityStampResult = _commonService.Jwt.GetSecurityStampFromAccessToken(command.AccessToken, command.UserIp, command.UserAgent);
+        var SecurityStampResult = _commonService.Jwt.GetSecurityStampFromAccessToken(query.AccessToken, query.UserIp, query.UserAgent);
         if (!SecurityStampResult.IsSuccess)
             throw new UnAuthorizedException(SecurityStampResult.Message);
 
-        var aceessTokenHash = _commonService.Password.Hash(command.AccessToken);
+        var aceessTokenHash = _commonService.Password.Hash(query.AccessToken);
 
         var token = await _unitOfWork.UserTokenRepository.
             GetUserTokenByFilterAsync(ut =>
@@ -264,12 +264,12 @@ public class AuthService : IAuthServiec
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RevokeAllTokensExceptCurrentAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken cancellationToken)
+    public async Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken cancellationToken)
     {
         // This method is used in transaction (TransAction)
 
         if (command.IsNullParameter())
-            throw new Exception($"Date is invalide. Exception in {nameof(RevokeAllTokensExceptCurrentAsync)} method!");
+            throw new Exception($"Date is invalide. Exception in {nameof(RevokeAllTokensExceptCurrentByUserIdAsync)} method!");
 
         var tokens = await _unitOfWork.UserTokenRepository.
             GetAllUserTokensByFilterAsync(ut =>

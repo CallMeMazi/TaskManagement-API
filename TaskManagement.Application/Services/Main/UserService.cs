@@ -16,7 +16,6 @@ using TaskManagement.Domin.Entities.BaseEntities;
 namespace TaskManagement.Application.Services.Main;
 public class UserService : IUserService
 {
-    private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly AppSettings _appSettings;
     private readonly ICommonService _commonService;
@@ -24,10 +23,9 @@ public class UserService : IUserService
     private readonly IMapper _mapper;
 
 
-    public UserService(IUserRepository userRepository, IUnitOfWork unitOfWork, ICommonService commonService
+    public UserService(IUnitOfWork unitOfWork, ICommonService commonService
         , IMapper mapper, IEventService eventService, AppSettings appSettings)
     {
-        _userRepository = userRepository;
         _unitOfWork = unitOfWork;
         _commonService = commonService;
         _mapper = mapper;
@@ -42,7 +40,7 @@ public class UserService : IUserService
         if (id.IsNullParameter() || id <= 0)
             throw new BadRequestException("آیدی نامعتبر است!");
 
-        var user = await _userRepository.GetUserDtoByIdAsync(id, cancellationToken);
+        var user = await _unitOfWork.UserRepository.GetUserDtoByIdAsync(id, cancellationToken);
 
         if (user.IsNullParameter())
             throw new NotFoundException("کاربری با این آیدی وجود ندارد!");
@@ -54,7 +52,7 @@ public class UserService : IUserService
         if (mobileNumber.IsNullParameter())
             throw new BadRequestException("شماره موبایل خالی است!");
 
-        var user = await _userRepository.GetUserDtoByFilterAsync(u => u.MobileNumber == mobileNumber, cancellationToken);
+        var user = await _unitOfWork.UserRepository.GetUserDtoByFilterAsync(u => u.MobileNumber == mobileNumber, cancellationToken);
 
         if (user == null)
             throw new NotFoundException("کاربری با این شماره موبایل وجود ندارد!");
@@ -67,14 +65,14 @@ public class UserService : IUserService
     {
         // This method is used in transaction (TransAction)
 
-        if (await _userRepository.IsUserExistByFilterAsync(u => u.MobileNumber == command.MobileNumber, cancellationToken))
+        if (await _unitOfWork.UserRepository.IsUserExistByFilterAsync(u => u.MobileNumber == command.MobileNumber, cancellationToken))
             throw new BadRequestException("کاربری با این شماره موبایل وجود دارد!");
 
         command.Password = _commonService.Password.Hash(command.Password);
 
         var user = _mapper.Map<User>(command);
 
-        await _userRepository.AddUserAsync(user, cancellationToken);
+        await _unitOfWork.UserRepository.AddUserAsync(user, cancellationToken);
         await _unitOfWork.SaveAsync(cancellationToken);
 
         // generate User tokens(regester) after creation (Event)
@@ -92,7 +90,7 @@ public class UserService : IUserService
     }
     public async Task<GeneralResult> UpdateUserAsync(UpdateUserAppDto command, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetUserByIdAsync(command.UserId, true, cancellationToken);
+        var user = await _unitOfWork.UserRepository.GetUserByIdAsync(command.UserId, true, cancellationToken);
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(UpdateUserAsync)} method!");
 
@@ -105,7 +103,7 @@ public class UserService : IUserService
     {
         // This method is used in transaction (TransAction)
 
-        var user = await _userRepository.GetUserByIdAsync(command.UserId, true, cancellationToken);
+        var user = await _unitOfWork.UserRepository.GetUserByIdAsync(command.UserId, true, cancellationToken);
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(SoftDeleteUserAsync)} method!");
 
@@ -113,11 +111,11 @@ public class UserService : IUserService
         user.ChangeSecurityStamp();
 
         // revoke all User tokens (Event)
-        await _eventService.PublishRevokeAllTokensEventAsync(command.UserId, false, cancellationToken);
-        // inactive User Org (Event)
+        await _eventService.PublishRevokeAllTokensByUserIdEventAsync(command.UserId, false, cancellationToken);
+        // delete User Org (Event)
         // remove User from other Orgs (Event)
         // remove user from Projects (Event)
-        // inactive User Tasks (Event)
+        // delete User Tasks (Event)
         // and ...
 
         return GeneralResult.Success();
@@ -126,7 +124,7 @@ public class UserService : IUserService
     {
         // This method is used in transaction (TransAction)
 
-        var user = await _userRepository.GetUserByIdAsync(command.UserId, true, cancellationToken);
+        var user = await _unitOfWork.UserRepository.GetUserByIdAsync(command.UserId, true, cancellationToken);
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(ChangePasswordUserAsync)} method!");
 
@@ -138,7 +136,7 @@ public class UserService : IUserService
         user.ChangeUserPassword(command.NewPassword);
 
         // revoke all User tokens except current (Event)
-        await _eventService.PublishRevokeAllTokensExceptCurrentEventAsync(
+        await _eventService.PublishRevokeAllTokensExceptCurrentByUserIdEventAsync(
             new RevokeUserTokenAppDto()
             {
                 UserId = user.Id,
@@ -156,7 +154,7 @@ public class UserService : IUserService
         if (id.IsNullParameter() || id <= 0)
             throw new BadRequestException("آیدی نامعتبر است!");
 
-        var user = await _userRepository.GetUserByIdAsync(id, true, cancellationToken);
+        var user = await _unitOfWork.UserRepository.GetUserByIdAsync(id, true, cancellationToken);
         if (user.IsNullParameter())
             throw new NotFoundException("کاربری با این آیدی وجود ندارد!");
 
@@ -170,7 +168,7 @@ public class UserService : IUserService
         if (id.IsNullParameter() || id <= 0)
             throw new BadRequestException("آیدی نامعتبر است!");
 
-        var user = await _userRepository.GetUserByIdAsync(id, true, cancellationToken);
+        var user = await _unitOfWork.UserRepository.GetUserByIdAsync(id, true, cancellationToken);
         if (user.IsNullParameter())
             throw new NotFoundException("کاربری با این آیدی وجود ندارد!");
 

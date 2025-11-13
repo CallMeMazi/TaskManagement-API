@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
 using TaskManagement.Application.DTOs.SharedDTOs.Organization;
-using TaskManagement.Application.Interfaces.Repositories;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.Services.Main;
 using TaskManagement.Application.Interfaces.UnitOfWork;
@@ -15,15 +14,12 @@ namespace TaskManagement.Application.Services.Main;
 public class OrganizationService : IOrganizationService
 {
     private readonly ICommonService _commonService;
-    private readonly IOrganizationRepository _organizationRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
 
-    public OrganizationService(IOrganizationRepository organizationRepository, IUnitOfWork unitOfWork, IMapper mapper
-        , ICommonService commonService)
+    public OrganizationService(IUnitOfWork unitOfWork, IMapper mapper, ICommonService commonService)
     {
-        _organizationRepository = organizationRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _commonService = commonService;
@@ -31,7 +27,7 @@ public class OrganizationService : IOrganizationService
 
 
     // query services
-    public async Task<GeneralResult<OrgDetailsDto>> GetOrganizationByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<GeneralResult<OrgDetailsDto>> GetOrgByIdAsync(int id, CancellationToken cancellationToken)
     {
         if (id.IsNullParameter() || id <= 0)
             throw new BadRequestException("شناسه سازمان نامعتبر است!");
@@ -43,7 +39,7 @@ public class OrganizationService : IOrganizationService
 
         return GeneralResult<OrgDetailsDto>.Success(org)!;
     }
-    public async Task<GeneralResult<OrgDetailsDto>> GetOrganizationByCodeAsync(string orgCode, CancellationToken cancellationToken)
+    public async Task<GeneralResult<OrgDetailsDto>> GetOrgByCodeAsync(string orgCode, CancellationToken cancellationToken)
     {
         if (orgCode.IsNullParameter())
             throw new BadRequestException("کد سازمان خالی است!");
@@ -57,19 +53,19 @@ public class OrganizationService : IOrganizationService
     }
 
     // command services
-    public async Task<GeneralResult> CreateOrganizationAsync(CreateOrgAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult> CreateOrgAsync(CreateOrgAppDto command, CancellationToken cancellationToken)
     {
         // This method is used in transaction (TransAction)
 
-        if (await _organizationRepository.IsOrgExistByFilterAsync(o => o.SecondOrgName == command.SecondOrgName, cancellationToken))
+        if (await _unitOfWork.OrganizationRepository.IsOrgExistByFilterAsync(o => o.SecondOrgName == command.SecondOrgName, cancellationToken))
             throw new BadRequestException("سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!");
 
-        if (await _organizationRepository.IsOrgExistByFilterAsync(o => o.OwnerId == command.OwnerId && o.IsActive, cancellationToken))
+        if (await _unitOfWork.OrganizationRepository.IsOrgExistByFilterAsync(o => o.OwnerId == command.OwnerId && o.IsActive, cancellationToken))
             throw new BadRequestException("شما نمیتوانید چندین سازمان فعال داشته باشید، لطفا ابتدا سازمان فعلی خود را غیرفعال کیند");
 
         var org = _mapper.Map<Organization>(command);
 
-        await _organizationRepository.AddOrgAsync(org, cancellationToken);
+        await _unitOfWork.OrganizationRepository.AddOrgAsync(org, cancellationToken);
         await _unitOfWork.SaveAsync(cancellationToken);
 
         // Create relation between owner(User) and Org
@@ -77,16 +73,16 @@ public class OrganizationService : IOrganizationService
 
         return GeneralResult.Success()!;
     }
-    public async Task<GeneralResult> UpdateOrganizationAsync(UpdateOrgAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult> UpdateOrgAsync(UpdateOrgAppDto command, CancellationToken cancellationToken)
     {
-        var org = await _organizationRepository.GetOrgByIdAsync(command.OrgId, true, cancellationToken);
+        var org = await _unitOfWork.OrganizationRepository.GetOrgByIdAsync(command.OrgId, true, cancellationToken);
         if (org.IsNullParameter())
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
         if (org!.OwnerId != command.UserId)
             throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید آن را ویرایش کنید!");
 
-        if (await _organizationRepository.IsOrgExistByFilterAsync(o => o.SecondOrgName == command.SecondOrgName, cancellationToken))
+        if (await _unitOfWork.OrganizationRepository.IsOrgExistByFilterAsync(o => o.SecondOrgName == command.SecondOrgName, cancellationToken))
             throw new BadRequestException("سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!");
 
         org.UpdateOrg(command.OrgName, command.SecondOrgName, command.OrgDescription);
@@ -94,36 +90,68 @@ public class OrganizationService : IOrganizationService
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> SoftDeleteOrganizationAsync(DeleteOrgAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult> SoftDeleteOrgAsync(DeleteOrgAppDto command, CancellationToken cancellationToken)
     {
         // This method is used in transaction (TransAction)
 
-        var org = await _organizationRepository.GetOrgByIdAsync(command.OrgId, true, cancellationToken);
+        var org = await _unitOfWork.OrganizationRepository.GetOrgByIdAsync(command.OrgId, true, cancellationToken);
         if (org.IsNullParameter())
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
         if (org!.OwnerId != command.UserId)
             throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید آن را حذف کنید!");
 
-        await _organizationRepository.LoadReferenceAsync(org, o => o.Owner, cancellationToken);
+        await _unitOfWork.OrganizationRepository.LoadReferenceAsync(org, o => o.Owner, cancellationToken);
 
         if (!_commonService.Password.Verify(org.Owner.PasswordHash, command.UserPassword))
             throw new BadRequestException("رمز عبور اشتباه است!");
 
         org.SoftDelete();
         org.ChangeOrgActivity(false);
-        
-        // remove User From Org (Event)
-        // delete Orgs Projects (Event)
-        // delete Orgs Tasks (Event)
+
+        // remove all Users From Org
+        await RemoveAllOrgMemberShipsByOrgId(org, false, cancellationToken);
+        // delete all Orgs Projects (Event)
+        // delete all Orgs Tasks (Event)
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeOrganizationActivityAsync(ChangeActivityOrgAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult> SoftDeleteAllOrgsByUserIdAsync(int userId, CancellationToken cancellationToken)
     {
         // This method is used in transaction (TransAction)
 
-        var org = await _organizationRepository.GetOrgByIdAsync(command.OrgId, true, cancellationToken);
+        var orgs = await _unitOfWork.OrganizationRepository.GetAllOrgsByFilterAsync(o =>
+            o.OwnerId == userId,
+            true,
+            cancellationToken
+        );
+        if (orgs.IsNullParameter())
+            throw new NotFoundException("شناسه سازمان نامعتبر است!");
+
+        if (orgs!.OwnerId != command.UserId)
+            throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید آن را حذف کنید!");
+
+        await _unitOfWork.OrganizationRepository.LoadReferenceAsync(orgs, o => o.Owner, cancellationToken);
+
+        if (!_commonService.Password.Verify(orgs.Owner.PasswordHash, command.UserPassword))
+            throw new BadRequestException("رمز عبور اشتباه است!");
+
+        orgs.SoftDelete();
+        orgs.ChangeOrgActivity(false);
+
+        // remove all Users From Org
+        await RemoveAllOrgMemberShipsByOrgId(orgs, false, cancellationToken);
+        // delete all Orgs Projects (Event)
+        // delete all Orgs Tasks (Event)
+
+        return GeneralResult.Success();
+    }
+
+    public async Task<GeneralResult> ChangeOrgActivityAsync(ChangeActivityOrgAppDto command, CancellationToken cancellationToken)
+    {
+        // This method is used in transaction (TransAction)
+
+        var org = await _unitOfWork.OrganizationRepository.GetOrgByIdAsync(command.OrgId, true, cancellationToken);
         if (org.IsNullParameter())
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
@@ -137,9 +165,9 @@ public class OrganizationService : IOrganizationService
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> AddUserToOrganizationAsync(AddUserOrgAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult> AddUserToOrgAsync(AddUserOrgAppDto command, CancellationToken cancellationToken)
     {
-        var org = await _organizationRepository.GetOrgByIdAsync(command.OrgId, false, cancellationToken);
+        var org = await _unitOfWork.OrganizationRepository.GetOrgByIdAsync(command.OrgId, false, cancellationToken);
         if (org.IsNullParameter())
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
@@ -168,9 +196,35 @@ public class OrganizationService : IOrganizationService
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RemoveUserFromOrganizationAsync()
+    public async Task<GeneralResult> RemoveUserFromOrgAsync(RemoveUserOrgAppDto command, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // This method is used in transaction (TransAction)
+
+        var org = await _unitOfWork.OrganizationRepository.GetOrgByIdAsync(command.orgId, true, cancellationToken);
+        if (org.IsNullParameter())
+            throw new NotFoundException("شناسه سازمان نامعتبر است!");
+
+        if (org!.OwnerId != command.orgOwnerId)
+            throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید کاربری را اضافه کنید!");
+
+        var orgMemberShip = await _unitOfWork.OrganizationMemberShipRepository
+            .GetOrgMembershipByFilterAsync(om =>
+                om.UserId == command.UserId
+                && om.OrgId == command.orgId
+                && (om.Role == OrganizationRoles.Admin || om.Role == OrganizationRoles.Member),
+                true,
+                cancellationToken
+            );
+        if (orgMemberShip.IsNullParameter())
+            throw new NotFoundException("داده های ورودی اشتباه است!");
+        
+        orgMemberShip!.SoftDelete();
+
+        // remove User from Projects (Event)
+        // delete User Tasks (Event)
+        // delete User owner Projects (Event)
+        
+        return GeneralResult.Success();
     }
 
     private async System.Threading.Tasks.Task CreateOrgMemberShipAsync(int orgId, int ownerId, OrganizationRoles role, CancellationToken cancellationToken)
@@ -178,5 +232,18 @@ public class OrganizationService : IOrganizationService
         var orgMemberShip = new OrganizationMemberShip(orgId, ownerId, role);
 
         await _unitOfWork.OrganizationMemberShipRepository.AddOrgMembershipAsync(orgMemberShip, cancellationToken);
+    }
+    private async System.Threading.Tasks.Task RemoveAllOrgMemberShipsByOrgId(Organization org, bool IsSaved, CancellationToken cancellationToken)
+    {
+        await _unitOfWork.OrganizationRepository.LoadCollectionAsync(org, o => o.Members, cancellationToken);
+
+        if (org.Members.IsNullParameter() || !org!.Members.Any())
+            throw new Exception($"The OrganizationMemberShip List is null or empty, in {nameof(RemoveAllOrgMemberShipsByOrgId)} method!");
+
+        foreach (var membership in org.Members)
+            membership.SoftDelete();
+
+        if (IsSaved)
+            await _unitOfWork.SaveAsync(cancellationToken);
     }
 }

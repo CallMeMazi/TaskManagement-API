@@ -3,15 +3,13 @@ using TaskManagement.Common.Helpers;
 using TaskManagement.Domin.Enums.Statuses;
 
 namespace TaskManagement.Domin.Entities.BaseEntities;
-public class UserToken : IBaseEntity
+public class UserToken : BaseEntity
 {
-    public int Id { get; private set; }
     public int UserId { get; private set; }
     public string AccessTokenHash { get; private set; }
     public string RefreshTokenHash { get; private set; }
     public string SecurityStamp { get; set; }
     public TokenStatus TokenStatus { get; private set; } = TokenStatus.Active;
-    public DateTime CreatedAt { get; private set; } = DateTime.Now;
     public DateTime ExpiredAt { get; private set; }
     public DateTime? RevokedAt { get; private set; }
     public DateTime LastUsedAt { get; private set; } = DateTime.Now;
@@ -58,6 +56,7 @@ public class UserToken : IBaseEntity
 
         TokenStatus = TokenStatus.Revoked;
         RevokedAt = DateTime.Now;
+        UpdatedAt = DateTime.Now;
     }
     public void ExpiredToken()
     {
@@ -68,6 +67,7 @@ public class UserToken : IBaseEntity
             return;
 
         TokenStatus = TokenStatus.Expired;
+        UpdatedAt = DateTime.Now;
     }
 
     public void ValidateUserToken(int userId, string accessToken, string refreshToken

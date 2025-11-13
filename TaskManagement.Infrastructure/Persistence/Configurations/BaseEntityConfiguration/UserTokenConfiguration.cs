@@ -30,11 +30,6 @@ public class UserTokenConfiguration : IBaseConfiguration<UserToken>
             .IsRequired()
             .HasColumnType("tinyint");
 
-        builder.Property(ut => ut.CreatedAt)
-            .IsRequired()
-            .HasColumnType("datetime2(6)")
-            .HasDefaultValueSql("getdate()");
-
         builder.Property(ut => ut.ExpiredAt)
             .IsRequired()
             .HasColumnType("datetime2(6)");
@@ -57,7 +52,23 @@ public class UserTokenConfiguration : IBaseConfiguration<UserToken>
             .HasColumnType("nvarchar(50)")
             .HasMaxLength(50);
 
+        //base property
+        builder.Property(u => u.IsDelete)
+            .IsRequired()
+            .HasColumnType("bit")
+            .HasDefaultValue(false);
+
+        builder.Property(u => u.CreatedAt)
+            .IsRequired()
+            .HasColumnType("datetime2(6)")
+            .HasDefaultValueSql("getdate()");
+
+        builder.Property(u => u.UpdatedAt)
+            .HasColumnType("datetime2(6)");
+
         #endregion
+
+        builder.HasQueryFilter(u => !u.IsDelete);
 
         builder.HasIndex(ut => ut.UserId);
 
