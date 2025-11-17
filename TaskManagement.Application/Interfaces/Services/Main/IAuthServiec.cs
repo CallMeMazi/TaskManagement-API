@@ -5,13 +5,13 @@ using TaskManagement.Common.Classes;
 namespace TaskManagement.Application.Interfaces.Services.Main;
 public interface IAuthServiec
 {
-    Task<GeneralResult<List<UserTokenDetailsDto>>> GetUserActiveTokensAsync(int userId, CancellationToken cancellationToken);
-    Task<GeneralResult<UserTokenDto>> LoginUserAsync(LoginUserAppDto command, CancellationToken cancellationToken);
-    Task<GeneralResult> LogoutUserAsync(LogoutUserAppDto command, CancellationToken cancellationToken);
-    Task<GeneralResult<UserTokenDto>> RefreshTokenAsync(RefreshUserTokenAppDto command, CancellationToken cancellationToken);
-    Task<GeneralResult<UserTokenDto>> RegisterUserAsync(RegisterUserTokenAppDto command, CancellationToken cancellationToken);
-    Task<GeneralResult> RevokeAllTokensByUserIdAsync(int userId, bool isSaved, CancellationToken cancellationToken);
-    Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken cancellationToken);
-    Task<GeneralResult> RevokeTokenByUserIdAndIpAsync(RevokeUserTokenAppDto command, CancellationToken cancellationToken);
-    Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto query, CancellationToken cancellationToken);
+    Task<GeneralResult<List<UserTokenDetailsDto>>> GetUserActiveTokensAsync(int userId, CancellationToken ct);
+    Task<GeneralResult<UserTokenDto>> LoginUserAsync(LoginUserAppDto command, CancellationToken ct);
+    Task<GeneralResult> LogoutUserAsync(LogoutUserAppDto command, CancellationToken ct);
+    Task<GeneralResult<UserTokenDto>> RefreshTokenAsync(RefreshUserTokenAppDto command, CancellationToken ct);
+    Task<GeneralResult<UserTokenDto>> RegisterUserAsync(RegisterUserTokenAppDto command, CancellationToken ct);
+    Task<GeneralResult> RevokeAllTokensByUserIdAsync(int userId, bool isSaved, CancellationToken ct);
+    Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken ct);
+    Task<GeneralResult> RevokeTokenByUserIdAndIpAsync(RevokeUserTokenAppDto command, CancellationToken ct);
+    Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto query, CancellationToken ct);
 }

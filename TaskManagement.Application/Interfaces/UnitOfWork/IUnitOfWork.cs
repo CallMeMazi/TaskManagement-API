@@ -3,16 +3,16 @@
 namespace TaskManagement.Application.Interfaces.UnitOfWork;
 public interface IUnitOfWork
 {
-    IOrganizationMemberShipRepository OrganizationMemberShipRepository { get; }
-    IOrganizationRepository OrganizationRepository { get; }
-    IProjectRepository ProjectRepository { get; }
-    ITaskInfoRepository TaskInfoRepository { get; }
-    ITaskRepository TaskRepository { get; }
-    IUserRepository UserRepository { get; }
-    IUserTokenRepository UserTokenRepository { get; }
+    IOrganizationMemberShipRepository OrganizationMemberShip { get; }
+    IOrganizationRepository Organization { get; }
+    IProjectRepository Project { get; }
+    ITaskInfoRepository TaskInfo { get; }
+    ITaskRepository Task { get; }
+    IUserRepository User { get; }
+    IUserTokenRepository UserToken { get; }
 
     void Save();
     void Save(bool acceptAllChangesOnSuccess);
-    Task SaveAsync(CancellationToken cancellationToken = default);
-    Task SaveAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default);
+    Task SaveAsync(CancellationToken ct = default);
+    Task SaveAsync(bool acceptAllChangesOnSuccess, CancellationToken ct = default);
 }

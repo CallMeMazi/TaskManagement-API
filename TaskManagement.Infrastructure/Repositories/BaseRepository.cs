@@ -6,69 +6,75 @@ using TaskManagement.Application.Interfaces.Repositories;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
+using TaskManagement.Infrastructure.QueryCache;
 
 namespace TaskManagement.Infrastructure.Repositories;
 public class BaseRepository<TEntity, TDto> : IBaseRepository<TEntity, TDto>
     where TEntity : BaseEntity
     where TDto : class
 {
-    protected readonly ApplicationDbContext DbContext;
+    protected readonly ApplicationDbContext _db;
     protected readonly IMapper _mapper;
     protected readonly DbSet<TEntity> Entities;
-    public virtual IQueryable<TEntity> Table => Entities.AsQueryable();
-    public virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking().AsQueryable();
 
 
     public BaseRepository(ApplicationDbContext dbContext, IMapper mapper)
     {
-        DbContext = dbContext;
+        _db = dbContext;
         _mapper = mapper;
-        Entities = DbContext.Set<TEntity>();
+        Entities = _db.Set<TEntity>();
     }
 
 
     #region Async Methods
 
     // Query methods
-    public Task<List<TEntity>> GetAllAsync(bool isTracking = false, CancellationToken cancellationToken = default)
+    public Task<List<TEntity>> GetAllAsync(bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
-        return query.ToListAsync(cancellationToken);
+        return query.ToListAsync(ct);
     }
-    public Task<List<TDto>> GetAllDtoAsync(CancellationToken cancellationToken = default)
+    public Task<List<TDto>> GetAllDtoAsync(CancellationToken ct = default)
     {
         return Entities.AsNoTracking()
             .ProjectTo<TDto>(_mapper.ConfigurationProvider)
-            .ToListAsync(cancellationToken);
+            .ToListAsync(ct);
     }
-    public Task<List<TEntity>> GetAllByFilterAsync(Expression<Func<TEntity, bool>> filter, bool isTracking = false, CancellationToken cancellationToken = default)
+    public Task<List<TEntity>> GetAllByFilterAsync(Expression<Func<TEntity, bool>> filter, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
-        return query.Where(filter).ToListAsync(cancellationToken);
+        return query.Where(filter).ToListAsync(ct);
     }
-    public Task<List<TDto>> GetAllDtoByFilterAsync(Expression<Func<TEntity, bool>> filter, CancellationToken cancellationToken = default)
+    public Task<List<TDto>> GetAllDtoByFilterAsync(Expression<Func<TEntity, bool>> filter, CancellationToken ct = default)
     {
         return Entities.AsNoTracking()
             .Where(filter)
             .ProjectTo<TDto>(_mapper.ConfigurationProvider)
-            .ToListAsync(cancellationToken);
+            .ToListAsync(ct);
     }
-    public Task<TEntity?> GetByIdAsync(int entityId, bool isTracking = false, CancellationToken cancellationToken = default)
+    public async Task<TEntity?> GetByIdAsync(int entityId, bool isTracking = false, CancellationToken ct = default)
+    {
+        //var query = isTracking ? Entities : Entities.AsNoTracking();
+        //return query.FirstOrDefaultAsync(o => o.Id == entityId, ct);
+
+        // With complied query
+        return isTracking ? await BaseCompliedQuery<TEntity, TDto>.GetByIdQuery(_db, entityId)
+            : await BaseCompliedQuery<TEntity, TDto>.GetByIdAsNoTrackingQueryg(_db, entityId);
+    }
+    public async Task<TDto?> GetDtoByIdAsync(int entityId, CancellationToken ct = default)
+    {
+        //return Entities.AsNoTracking()
+        //    .Where(u => u.Id == entityId)
+        //    .ProjectTo<TDto>(_mapper.ConfigurationProvider)
+        //    .FirstOrDefaultAsync(ct);
+
+        // With complied query
+        return await BaseCompliedQuery<TEntity, TDto>.GetDtoByIdQueryg(_db, entityId, _mapper.ConfigurationProvider);
+    }
+    public Task<TEntity?> GetByFilterAsync(Expression<Func<TEntity, bool>> filter, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
-        return query.FirstOrDefaultAsync(o => o.Id == entityId, cancellationToken);
-    }
-    public Task<TDto?> GetDtoByIdAsync(int entityId, CancellationToken cancellationToken = default)
-    {
-        return Entities.AsNoTracking()
-            .Where(u => u.Id == entityId)
-            .ProjectTo<TDto>(_mapper.ConfigurationProvider)
-            .FirstOrDefaultAsync(cancellationToken);
-    }
-    public Task<TEntity?> GetByFilterAsync(Expression<Func<TEntity, bool>> filter, bool isTracking = false, CancellationToken cancellationToken = default)
-    {
-        var query = isTracking ? Entities : Entities.AsNoTracking();
-        return query.FirstOrDefaultAsync(filter, cancellationToken);
+        return query.FirstOrDefaultAsync(filter, ct);
     }
     public Task<TDto?> GetDtoByFilterAsync(Expression<Func<TEntity, bool>> filter, CancellationToken cancellationToken = default)
     {
@@ -77,25 +83,25 @@ public class BaseRepository<TEntity, TDto> : IBaseRepository<TEntity, TDto>
             .ProjectTo<TDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(cancellationToken);
     }
-    public ValueTask<TEntity?> FindByIdsAsync(CancellationToken cancellationToken, params object[] ids)
+    public ValueTask<TEntity?> FindByIdsAsync(CancellationToken ct, params object[] ids)
     {
-        return Entities.FindAsync(ids, cancellationToken);
+        return Entities.FindAsync(ids, ct);
     }
 
     // Command methods
-    public async System.Threading.Tasks.Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+    public async System.Threading.Tasks.Task AddAsync(TEntity entity, CancellationToken ct = default)
     {
         if (entity.IsNullParameter())
             throw new NullReferenceException($"null parameter in {nameof(AddAsync)} method, Type = {typeof(TEntity)}!");
 
-        await Entities.AddAsync(entity, cancellationToken).ConfigureAwait(false);
+        await Entities.AddAsync(entity, ct).ConfigureAwait(false);
     }
-    public async System.Threading.Tasks.Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    public async System.Threading.Tasks.Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken ct = default)
     {
         if (entities.IsNullParameter())
             throw new NullReferenceException($"null parameter in {nameof(AddRangeAsync)} method, Type = {typeof(TEntity)}!");
 
-        await Entities.AddRangeAsync(entities, cancellationToken).ConfigureAwait(false);
+        await Entities.AddRangeAsync(entities, ct).ConfigureAwait(false);
     }
     public void Update(TEntity entity)
     {
@@ -126,6 +132,16 @@ public class BaseRepository<TEntity, TDto> : IBaseRepository<TEntity, TDto>
         Entities.RemoveRange(entities);
     }
 
+    // Costum methods
+    public Task<bool> IsEntityExistByFilterAsync(Expression<Func<TEntity, bool>> filter, CancellationToken ct)
+    {
+        return Entities.AnyAsync(filter, ct);
+    }
+    public Task<int> GetCountByFilterAsync(Expression<Func<TEntity, bool>> filter, CancellationToken ct)
+    {
+        return Entities.CountAsync(filter, ct);
+    }
+
     #endregion
 
 
@@ -136,7 +152,7 @@ public class BaseRepository<TEntity, TDto> : IBaseRepository<TEntity, TDto>
         if (entity.IsNullParameter())
             throw new NullReferenceException($"null parameter in {nameof(Detach)} method!");
 
-        var entry = DbContext.Entry(entity);
+        var entry = _db.Entry(entity);
         if (entry != null)
             entry.State = EntityState.Detached;
     }
@@ -145,7 +161,7 @@ public class BaseRepository<TEntity, TDto> : IBaseRepository<TEntity, TDto>
         if (entity.IsNullParameter())
             throw new NullReferenceException($"null parameter in {nameof(Detach)} method!");
 
-        var entry = DbContext.Entry(entity);
+        var entry = _db.Entry(entity);
         if (entry.State == EntityState.Detached)
             Entities.Attach(entity);
     }
@@ -155,24 +171,24 @@ public class BaseRepository<TEntity, TDto> : IBaseRepository<TEntity, TDto>
 
     #region Explicit Loading
 
-    public virtual async System.Threading.Tasks.Task LoadCollectionAsync<TProperty>(TEntity entity, Expression<Func<TEntity, IEnumerable<TProperty>>> collectionProperty, CancellationToken cancellationToken)
+    public virtual async System.Threading.Tasks.Task LoadCollectionAsync<TProperty>(TEntity entity, Expression<Func<TEntity, IEnumerable<TProperty>>> collectionProperty, CancellationToken ct)
         where TProperty : class
     {
         Attach(entity);
 
-        var collection = DbContext.Entry(entity).Collection(collectionProperty);
+        var collection = _db.Entry(entity).Collection(collectionProperty);
         if (!collection.IsLoaded)
-            await collection.LoadAsync(cancellationToken).ConfigureAwait(false);
+            await collection.LoadAsync(ct).ConfigureAwait(false);
     }
 
-    public virtual async System.Threading.Tasks.Task LoadReferenceAsync<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty?>> referenceProperty, CancellationToken cancellationToken)
+    public virtual async System.Threading.Tasks.Task LoadReferenceAsync<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty?>> referenceProperty, CancellationToken ct)
         where TProperty : class
     {
         Attach(entity);
 
-        var reference = DbContext.Entry(entity).Reference(referenceProperty);
+        var reference = _db.Entry(entity).Reference(referenceProperty);
         if (!reference.IsLoaded)
-            await reference.LoadAsync(cancellationToken).ConfigureAwait(false);
+            await reference.LoadAsync(ct).ConfigureAwait(false);
     }
 
     #endregion

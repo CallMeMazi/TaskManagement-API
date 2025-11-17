@@ -79,6 +79,10 @@ public class ProjectConfiguration : IBaseConfiguration<Project>
             .WithOne(t => t.Project)
             .HasForeignKey(t => t.ProjId);
 
+        builder.HasMany(p => p.TaskAssignments)
+            .WithOne(ta => ta.Project)
+            .HasForeignKey(t => t.ProjId);
+
         #endregion
 
         builder.HasQueryFilter(p => !p.IsDelete);

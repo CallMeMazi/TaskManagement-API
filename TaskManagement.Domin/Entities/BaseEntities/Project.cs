@@ -23,6 +23,7 @@ public class Project : BaseEntity
     public User Creator { get; private set; }
     public ICollection<ProjectMemberShip> ProjMember { get; private set; }
     public ICollection<Task> Tasks { get; private set; }
+    public ICollection<TaskAssignment> TaskAssignments { get; private set; }
 
     #endregion
 

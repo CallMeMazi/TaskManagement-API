@@ -5,7 +5,7 @@ namespace TaskManagement.Application.Interfaces.Services.Halper;
 public interface IEventService
 {
     // Auth service methods
-    Task<UserTokenDto> PublishRegisterUserEventAsync(RegisterUserTokenAppDto command, CancellationToken cancellationToken);
-    Task PublishRevokeAllTokensByUserIdEventAsync(int userId, bool isSaved, CancellationToken cancellationToken);
-    Task PublishRevokeAllTokensExceptCurrentByUserIdEventAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken cancellationToken);
+    Task<UserTokenDto> PublishRegisterUserEventAsync(RegisterUserTokenAppDto command, CancellationToken ct);
+    Task PublishRevokeAllTokensByUserIdEventAsync(int userId, bool isSaved, CancellationToken ct);
+    Task PublishRevokeAllTokensExceptCurrentByUserIdEventAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken ct);
 }

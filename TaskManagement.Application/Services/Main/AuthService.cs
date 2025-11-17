@@ -15,37 +15,40 @@ public class AuthService : IAuthServiec
 {
     private readonly ICommonService _commonService;
     private readonly AppSettings _appSettings;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _uow;
 
 
     public AuthService(ICommonService commonService, IUnitOfWork unitOfWork, AppSettings appSettings)
     {
         _commonService = commonService;
         _appSettings = appSettings;
-        _unitOfWork = unitOfWork;
+        _uow = unitOfWork;
     }
 
 
-    // query services
-    public async Task<GeneralResult<List<UserTokenDetailsDto>>> GetUserActiveTokensAsync(int userId, CancellationToken cancellationToken)
+    // Query methods
+    public async Task<GeneralResult<List<UserTokenDetailsDto>>> GetUserActiveTokensAsync(int userId, CancellationToken ct)
     {
         if (userId <= 0)
             throw new Exception($"the ID of user is invalide. Exception in {nameof(GetUserActiveTokensAsync)} method!");
 
-        var tokens = await _unitOfWork.UserTokenRepository.
-            GetAllUserTokenDtosByFilterAsync(ut =>
-                ut.UserId == userId
-                && ut.TokenStatus == TokenStatus.Active,
-                cancellationToken
-            );
+        var tokens = await _uow.UserToken.GetAllDtoByFilterAsync(ut =>
+            ut.UserId == userId
+            && ut.TokenStatus == TokenStatus.Active,
+            ct
+        );
 
         if (tokens.IsNullParameter() || !tokens.Any())
             throw new Exception($"any tokens for {userId} UserId was not found. in {nameof(GetUserActiveTokensAsync)} method!");
 
         return GeneralResult<List<UserTokenDetailsDto>>.Success(tokens)!;
     }
-    public async Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto query, CancellationToken cancellationToken)
+    public async Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto query, CancellationToken ct)
     {
+        // Validate JWT (Expire date, Signature, algorithm)
+        // Check user ip and agent with ip and agent in token
+        // Check user security stamp with security stamp in token
+
         if (query.IsNullParameter())
             throw new BadRequestException("فرم اعتبارسنجی توکن خالی است!");
 
@@ -55,12 +58,11 @@ public class AuthService : IAuthServiec
 
         var aceessTokenHash = _commonService.Password.Hash(query.AccessToken);
 
-        var token = await _unitOfWork.UserTokenRepository.
-            GetUserTokenByFilterAsync(ut =>
-                ut.AccessTokenHash == aceessTokenHash,
-                true,
-                cancellationToken
-            );
+        var token = await _uow.UserToken.GetByFilterAsync(ut =>
+            ut.AccessTokenHash == aceessTokenHash,
+            false,
+            ct
+        );
 
         if (token.IsNullParameter())
             throw new Exception($"token not found. in {nameof(ValidateAccessTokenAsync)} method!");
@@ -71,8 +73,8 @@ public class AuthService : IAuthServiec
         return GeneralResult.Success();
     }
 
-    // command services
-    public async Task<GeneralResult<UserTokenDto>> RegisterUserAsync(RegisterUserTokenAppDto command, CancellationToken cancellationToken)
+    // Command methods
+    public async Task<GeneralResult<UserTokenDto>> RegisterUserAsync(RegisterUserTokenAppDto command, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
 
@@ -95,7 +97,7 @@ public class AuthService : IAuthServiec
             command.UserAgent
         );
 
-        await _unitOfWork.UserTokenRepository.AddUserTokenAsync(userToken, cancellationToken);
+        await _uow.UserToken.AddAsync(userToken, ct);
 
         var result = new UserTokenDto()
         {
@@ -105,21 +107,25 @@ public class AuthService : IAuthServiec
 
         return GeneralResult<UserTokenDto>.Success(result)!;
     }
-    public async Task<GeneralResult<UserTokenDto>> LoginUserAsync(LoginUserAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult<UserTokenDto>> LoginUserAsync(LoginUserAppDto command, CancellationToken ct)
     {
         if (command.IsNullParameter())
             throw new BadRequestException("فرم لاگین خالی است!");
 
-        var user = await VerifyAndGetUserAsync(command, cancellationToken);
+        var user = await _uow.User.GetByFilterAsync(u => u.MobileNumber == command.MobileNumber, false, ct);
+        if (user.IsNullParameter())
+            throw new NotFoundException("کاربری با این شماره موبایل پیدا نشد!");
 
-        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(user, command.UserIp, command.UserAgent);
+        await VerifyPasswordAndActiveDeviceAsync(command.Password, user!, ct);
+
+        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(user!, command.UserIp, command.UserAgent);
         if (!tokenResult.IsSuccess)
             throw new BadRequestException(tokenResult.Message);
 
         (string accessTokenHashed, string refreshTokenHashed) = HashAcceesTokenAndRefreshToken(tokenResult.Result!.AccessToken, tokenResult.Result.RefreshToken);
 
         var userToken = new UserToken(
-            user.Id,
+            user!.Id,
             accessTokenHashed,
             refreshTokenHashed,
             user.SecurityStamp,
@@ -128,8 +134,8 @@ public class AuthService : IAuthServiec
             command.UserAgent
         );
 
-        await _unitOfWork.UserTokenRepository.AddUserTokenAsync(userToken, cancellationToken);
-        await _unitOfWork.SaveAsync(cancellationToken);
+        await _uow.UserToken.AddAsync(userToken, ct);
+        await _uow.SaveAsync(ct);
 
         var result = new UserTokenDto()
         {
@@ -139,20 +145,19 @@ public class AuthService : IAuthServiec
 
         return GeneralResult<UserTokenDto>.Success(result)!;
     }
-    public async Task<GeneralResult> LogoutUserAsync(LogoutUserAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult> LogoutUserAsync(LogoutUserAppDto command, CancellationToken ct)
     {
         if (command.IsNullParameter())
             throw new BadRequestException("فرم لاگ اوت خالی است!");
 
-        var token = await _unitOfWork.UserTokenRepository.
-            GetUserTokenByFilterAsync(ut =>
-                ut.TokenStatus == TokenStatus.Active
-                && ut.UserIp == command.UserIp
-                && ut.UserAgent == command.UserAgent
-                && ut.UserId == command.UserId,
-                true,
-                cancellationToken
-            );
+        var token = await _uow.UserToken.GetUserByFilterWithUserAsync(ut =>
+            ut.TokenStatus == TokenStatus.Active
+            && ut.UserIp == command.UserIp
+            && ut.UserAgent == command.UserAgent
+            && ut.UserId == command.UserId,
+            true,
+            ct
+        );
 
         if (token.IsNullParameter())
             throw new NotFoundException("توکنی برای شما با این آیپی و اطلاعات یافت نشد!");
@@ -167,23 +172,22 @@ public class AuthService : IAuthServiec
 
         token.RevokeToken();
 
-        await _unitOfWork.SaveAsync(cancellationToken);
+        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult<UserTokenDto>> RefreshTokenAsync(RefreshUserTokenAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult<UserTokenDto>> RefreshTokenAsync(RefreshUserTokenAppDto command, CancellationToken ct)
     {
         if (command.IsNullParameter())
             throw new BadRequestException("فرم رفرش توکن خالی است!");
 
-        var token = await _unitOfWork.UserTokenRepository.
-           GetUserTokenByFilterAsync(ut =>
-               ut.TokenStatus == TokenStatus.Active
-               && ut.UserIp == command.UserIp
-               && ut.UserAgent == command.UserAgent,
-               true,
-               cancellationToken
-           );
+        var token = await _uow.UserToken.GetUserByFilterWithUserAsync(ut =>
+            ut.TokenStatus == TokenStatus.Active
+            && ut.UserIp == command.UserIp
+            && ut.UserAgent == command.UserAgent,
+            true,
+            ct
+        );
 
         if (token.IsNullParameter())
             throw new NotFoundException("برای شما در این دستگاه یا مرورگر توکنی یافت نشد!");
@@ -192,20 +196,19 @@ public class AuthService : IAuthServiec
         if (token!.RefreshTokenHash != commandRefreshTokenHash)
             throw new BadRequestException("رفرش توکن نامعتبر است!");
 
-        var user = await _unitOfWork.UserRepository.GetUserByIdAsync(token.UserId, cancellationToken: cancellationToken);
-        if (user.IsNullParameter())
-            throw new KeyNotFoundException($"Any User with {token.UserId} ID not found! exception in {nameof(RefreshTokenAsync)} method.");
+        if (token.User.IsNullParameter())
+            throw new KeyNotFoundException($"User in token by {token.Id} is null! exception in {nameof(RefreshTokenAsync)} method.");
 
-        await CheckSecurityStampAsync(user!, token, cancellationToken);
+        await CheckSecurityStampAsync(token.User, token, ct);
 
-        var newTokensResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(user!, command.UserIp, command.UserAgent);
+        var newTokensResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(token.User, command.UserIp, command.UserAgent);
         if (!newTokensResult.IsSuccess)
             throw new BadRequestException(newTokensResult.Message);
 
         (string accessToken, string refreshToken) = HashAcceesTokenAndRefreshToken(newTokensResult.Result!.AccessToken, newTokensResult.Result.RefreshToken);
 
         token.RefreshToken(accessToken, refreshToken, _appSettings.JwtSetting.ExpirationDaysRefreshToken);
-        await _unitOfWork.SaveAsync(cancellationToken);
+        await _uow.SaveAsync(ct);
 
         var result = new UserTokenDto()
         {
@@ -215,43 +218,41 @@ public class AuthService : IAuthServiec
 
         return GeneralResult<UserTokenDto>.Success(result)!;
     }
-    public async Task<GeneralResult> RevokeTokenByUserIdAndIpAsync(RevokeUserTokenAppDto command, CancellationToken cancellationToken)
+    public async Task<GeneralResult> RevokeTokenByUserIdAndIpAsync(RevokeUserTokenAppDto command, CancellationToken ct)
     {
         if (command.IsNullParameter())
             throw new BadRequestException("فرم خروج دیوایس خالی است!");
 
-        var token = await _unitOfWork.UserTokenRepository.
-            GetUserTokenByFilterAsync(ut =>
-                ut.UserId == command.UserId
-                && ut.TokenStatus == TokenStatus.Active
-                && ut.UserIp == command.UserIp
-                && ut.UserAgent == command.UserAgent,
-                true,
-                cancellationToken
-            );
+        var token = await _uow.UserToken.GetByFilterAsync(ut =>
+            ut.UserId == command.UserId
+            && ut.TokenStatus == TokenStatus.Active
+            && ut.UserIp == command.UserIp
+            && ut.UserAgent == command.UserAgent,
+            true,
+            ct
+        );
 
         if (token.IsNullParameter())
             throw new NotFoundException("توکنی با این اطلاعات یافت نشد!");
 
         token!.RevokeToken();
-        await _unitOfWork.SaveAsync(cancellationToken);
+        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(int userId, bool isSaved, CancellationToken cancellationToken)
+    public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(int userId, bool isSaved, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
 
         if (userId <= 0)
             throw new Exception($"the ID of user is invalide. Exception in {nameof(RevokeAllTokensByUserIdAsync)} method!");
 
-        var tokens = await _unitOfWork.UserTokenRepository.
-            GetAllUserTokensByFilterAsync(ut =>
-                ut.UserId == userId
-                && ut.TokenStatus == TokenStatus.Active,
-                true,
-                cancellationToken
-            );
+        var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
+            ut.UserId == userId
+            && ut.TokenStatus == TokenStatus.Active,
+            true,
+            ct
+        );
 
         if (tokens.IsNullParameter() || !tokens.Any())
             return GeneralResult.Success();
@@ -259,26 +260,26 @@ public class AuthService : IAuthServiec
         tokens.ForEach(ut =>
             ut.RevokeToken()
         );
+
         if (isSaved)
-            await _unitOfWork.SaveAsync(cancellationToken);
+            await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken cancellationToken)
+    public async Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
 
         if (command.IsNullParameter())
             throw new Exception($"Date is invalide. Exception in {nameof(RevokeAllTokensExceptCurrentByUserIdAsync)} method!");
 
-        var tokens = await _unitOfWork.UserTokenRepository.
-            GetAllUserTokensByFilterAsync(ut =>
-                ut.UserId == command.UserId
-                && (ut.UserIp != command.UserIp || ut.UserAgent != command.UserAgent)
-                && ut.TokenStatus == TokenStatus.Active,
-                true,
-                cancellationToken
-            );
+        var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
+            ut.UserId == command.UserId
+            && (ut.UserIp != command.UserIp || ut.UserAgent != command.UserAgent)
+            && ut.TokenStatus == TokenStatus.Active,
+            true,
+            ct
+        );
 
         if (tokens.IsNullParameter() || !tokens.Any())
             return GeneralResult.Success();
@@ -286,29 +287,29 @@ public class AuthService : IAuthServiec
         tokens.ForEach(ut =>
             ut.RevokeToken()
         );
+
         if (isSaved)
-            await _unitOfWork.SaveAsync(cancellationToken);
+            await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
 
-    private async Task<User> VerifyAndGetUserAsync(LoginUserAppDto command, CancellationToken cancellationToken)
+    private async System.Threading.Tasks.Task VerifyPasswordAndActiveDeviceAsync(string password, User user, CancellationToken ct)
     {
-        var user = await _unitOfWork.UserRepository.GetUserByFilterAsync(u => u.MobileNumber == command.MobileNumber, cancellationToken: cancellationToken);
         if (user.IsNullParameter())
             throw new NotFoundException("شماره موبایل یا رمز عبور اشتباه است!");
 
-        if (!_commonService.Password.Verify(user!.PasswordHash, command.Password))
+        if (!_commonService.Password.Verify(user!.PasswordHash, password))
             throw new NotFoundException("شماره موبایل یا رمز عبور اشتباه است!");
 
-        var userDeviceCount = await GetUserActiveDeviceCountAsync(user.Id);
+        var userDeviceCount = await GetUserActiveDeviceCountAsync(user.Id, ct);
         if (userDeviceCount >= 3)
             throw new BadRequestException("نمیتوانید با بیشتر از سه دستگاه یا مرورگر متفاوت وارد شوید!");
-
-        return user;
     }
-    private Task<int> GetUserActiveDeviceCountAsync(int userId)
-        => _unitOfWork.UserTokenRepository.GetCountByFilterAsync(ut => ut.UserId == userId && ut.TokenStatus == TokenStatus.Active);
+    private Task<int> GetUserActiveDeviceCountAsync(int userId, CancellationToken ct)
+    {
+        return _uow.UserToken.GetCountByFilterAsync(ut => ut.UserId == userId && ut.TokenStatus == TokenStatus.Active, ct);
+    }
     private (string accessToken, string refreshToken) HashAcceesTokenAndRefreshToken(string accessToken, string refreshToken)
     {
         var accessTokenHashed = _commonService.Password.Hash(accessToken);
@@ -321,7 +322,7 @@ public class AuthService : IAuthServiec
         if (user.SecurityStamp != token.SecurityStamp)
         {
             token.RevokeToken();
-            await _unitOfWork.SaveAsync(cancellationToken);
+            await _uow.SaveAsync(cancellationToken);
             throw new BadRequestException("توکن شما معتبر نیست، لطفا دوباره لاگین کنید!");
         }
     }

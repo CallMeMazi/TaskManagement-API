@@ -5,6 +5,7 @@ public class TaskAssignment : BaseEntity
 {
     public int TaskId { get; private set; }
     public int UserId { get; private set; }
+    public int ProjId { get; private set; }
     public byte TotalTimeSpent { get; private set; }
     public byte StartTaskCount { get; private set; }
     public bool IsInProgress { get; private set; } = false;
@@ -14,17 +15,19 @@ public class TaskAssignment : BaseEntity
 
     public Task Task { get; private set; }
     public User User { get; private set; }
+    public Project Project { get; private set; }
     public ICollection<TaskInfo> Info { get; private set; }
 
     #endregion
 
     private TaskAssignment() { }
-    public TaskAssignment(int taskId, int userId)
+    public TaskAssignment(int taskId, int userId, int projId)
     {
-        ValidateTaskAssignmentCreating(taskId, userId);
+        ValidateTaskAssignmentCreating(taskId, userId, projId);
 
         TaskId = taskId;
         UserId = userId;
+        ProjId = projId;
     }
 
 
@@ -41,7 +44,9 @@ public class TaskAssignment : BaseEntity
         UpdatedAt = DateTime.Now;
     }
     public void IncreaseStartTaskCount()
-        => StartTaskCount++;
+    {
+        StartTaskCount++;
+    }
     public void ChangeTaskInProgress(bool isProgress)
     {
         if (IsInProgress == isProgress)
@@ -58,7 +63,7 @@ public class TaskAssignment : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateTaskAssignmentCreating(int taskId, int userId)
+    public void ValidateTaskAssignmentCreating(int taskId, int userId, int projectId)
     {
         var errorMessages = new List<string>();
 
@@ -67,6 +72,9 @@ public class TaskAssignment : BaseEntity
 
         if (userId <= 0)
             errorMessages.Add("آیدی کاربر خالی است!");
+
+        if (projectId <= 0)
+            errorMessages.Add("آیدی پروژه خالی است!");
 
         if (errorMessages.Any())
             throw new BadRequestException("اطلاعات نامعتبر است!", errorMessages);
