@@ -30,11 +30,19 @@ public class UnitOfWork : IUnitOfWork
     }
 
     public void Save()
-        => _context.SaveChanges();
+    {
+        _context.SaveChanges();
+    }
     public void Save(bool acceptAllChangesOnSuccess)
-        => _context.SaveChanges(acceptAllChangesOnSuccess);
-    public Task SaveAsync(CancellationToken ct = default)
-        => _context.SaveChangesAsync(ct);
-    public Task SaveAsync(bool acceptAllChangesOnSuccess, CancellationToken ct = default)
-        => _context.SaveChangesAsync(acceptAllChangesOnSuccess, ct);
+    {
+        _context.SaveChanges(acceptAllChangesOnSuccess);
+    }
+    public async Task SaveAsync(CancellationToken ct = default)
+    {
+       await _context.SaveChangesAsync(ct);
+    }
+    public async Task SaveAsync(bool acceptAllChangesOnSuccess, CancellationToken ct = default)
+    {
+       await _context.SaveChangesAsync(acceptAllChangesOnSuccess, ct);
+    }
 }

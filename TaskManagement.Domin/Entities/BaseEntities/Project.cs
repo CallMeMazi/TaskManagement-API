@@ -63,6 +63,7 @@ public class Project : BaseEntity
         if (IsActive == activity)
             throw new BadRequestException(IsActive ? "پروژه در حال حاضر فعال است!" : "پروژه در حال حاضر غیر فعال است!");
 
+        ProjStatus = activity ? ProjectStatusType.InProgress : ProjectStatusType.Adjournment;
         IsActive = activity;
 
         UpdatedAt = DateTime.Now;
@@ -146,10 +147,7 @@ public class Project : BaseEntity
         ProjProgress = progress;
 
         if (progress == 100)
-        {
             IsActive = false;
-            FinishProj();
-        }
 
         ProjEndAt = DateTime.Now;
     }

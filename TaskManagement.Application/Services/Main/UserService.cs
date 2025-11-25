@@ -11,6 +11,7 @@ using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Common.Settings;
 using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domin.Enums.Roles;
 
 namespace TaskManagement.Application.Services.Main;
 public class UserService : IUserService
@@ -100,23 +101,29 @@ public class UserService : IUserService
     }
     public async Task<GeneralResult> SoftDeleteUserAsync(DeleteUserAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
         // This method use SP (Stored Procedure)
 
-        var user = await _uow.User.GetByIdAsync(command.UserId, true, ct);
+        var user = await _uow.User.GetByIdAsync(command.UserId, false, ct);
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(SoftDeleteUserAsync)} method!");
 
-        user!.SoftDelete();
-        user.ChangeSecurityStamp();
+        if (_commonService.Password.Verify(user!.PasswordHash, command.Password))
+            throw new BadRequestException("رمز عبور اشتلاه است!");
 
-        // Revoke all User tokens (Event)
-        await _eventService.PublishRevokeAllTokensByUserIdEventAsync(command.UserId, false, ct);
-        // Delete User Orgs (Event)
-        // Remove User from other Orgs (Event)
-        // Remove user from Projects (Event)
-        // Relete User Tasks (Event)
-        // and ...
+        var verifyResult = await VerifyUserForDeleteAsync(user.Id, ct);
+        if (!verifyResult.IsSuccess)
+            throw new BadRequestException(verifyResult.Message);
+
+        // Delete User (SP)
+        // Delete all UserTokens By UserId (SP)
+        // Delete All Orgs By UserId (SP)
+        // Delete All OrgMemberships By OrgId (SP)
+        // Delete All Projects By OrgId (SP)
+        // Delete All ProjectMemberships By ProjectId (SP)
+        // Delete All Tasks By ProjectId (SP)
+        // Delete All TaskAssignments By ProjectId (SP)
+        // Delete All TaslInfos By TaskId (SP)
+        await _uow.User.SoftDeleteUserSpAsync(user.Id, ct);
 
         return GeneralResult.Success();
     }
@@ -174,6 +181,22 @@ public class UserService : IUserService
 
         user!.IncreaseOrDecreasePoints(_appSettings.UserSetting.NegativeUserPoints);
         await _uow.SaveAsync(cancellationToken);
+
+        return GeneralResult.Success();
+    }
+
+    private async Task<GeneralResult> VerifyUserForDeleteAsync(int userId, CancellationToken ct)
+    {
+        if (await _uow.Organization.IsEntityExistByFilterAsync(o => o.OwnerId == userId && o.IsActive, ct))
+            return GeneralResult.Failure("شما هنوز سازمان فعال دارید، اول سازمان های خود را غیرفعال کنید!");
+
+        var isUserInOtherOrgs = await _uow.OrganizationMemberShip.IsEntityExistByFilterAsync(om =>
+            om.UserId == userId
+            && om.Role != OrganizationRoles.Owner,
+            ct
+        );
+        if (isUserInOtherOrgs)
+            return GeneralResult.Failure("شما در سازمان های دیگری عضو هستید، ابتدا از تمام سازمان هایی که عضو هستید خارج شوید!");
 
         return GeneralResult.Success();
     }

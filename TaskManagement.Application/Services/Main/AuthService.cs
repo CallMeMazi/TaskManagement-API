@@ -150,7 +150,7 @@ public class AuthService : IAuthServiec
         if (command.IsNullParameter())
             throw new BadRequestException("فرم لاگ اوت خالی است!");
 
-        var token = await _uow.UserToken.GetUserByFilterWithUserAsync(ut =>
+        var token = await _uow.UserToken.GetUserTokenByFilterWithUserAsync(ut =>
             ut.TokenStatus == TokenStatus.Active
             && ut.UserIp == command.UserIp
             && ut.UserAgent == command.UserAgent
@@ -181,7 +181,7 @@ public class AuthService : IAuthServiec
         if (command.IsNullParameter())
             throw new BadRequestException("فرم رفرش توکن خالی است!");
 
-        var token = await _uow.UserToken.GetUserByFilterWithUserAsync(ut =>
+        var token = await _uow.UserToken.GetUserTokenByFilterWithUserAsync(ut =>
             ut.TokenStatus == TokenStatus.Active
             && ut.UserIp == command.UserIp
             && ut.UserAgent == command.UserAgent,
@@ -242,8 +242,6 @@ public class AuthService : IAuthServiec
     }
     public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(int userId, bool isSaved, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         if (userId <= 0)
             throw new Exception($"the ID of user is invalide. Exception in {nameof(RevokeAllTokensByUserIdAsync)} method!");
 

@@ -13,6 +13,7 @@ public class OrganizationRepository
         : base(dbContext, mapper) { }
 
 
+    // Query methods
     public Task<Organization?> GetOrgByIdWithOwnerAsync(int orgId, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
@@ -22,5 +23,12 @@ public class OrganizationRepository
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.Include(ut => ut.Members).FirstOrDefaultAsync(o => o.Id == orgId, ct);
+    }
+
+    // Command methods
+    public Task<int> SoftDeleteOrgSpAsync(int orgId, CancellationToken ct = default)
+    {
+        var query = string.Format("EXEC dbo.sp_SoftDeleteOrg @OrgId = {0}", orgId);
+        return _db.Database.ExecuteSqlRawAsync(query, ct);
     }
 }

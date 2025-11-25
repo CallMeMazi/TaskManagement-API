@@ -9,6 +9,7 @@ using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Enums.Roles;
+using TaskManagement.Domin.Enums.Statuses;
 
 namespace TaskManagement.Application.Services.Main;
 public class OrganizationService : IOrganizationService
@@ -63,6 +64,10 @@ public class OrganizationService : IOrganizationService
         if (await _uow.Organization.IsEntityExistByFilterAsync(o => o.OwnerId == command.OwnerId && o.IsActive, ct))
             throw new BadRequestException("شما نمیتوانید چندین سازمان فعال داشته باشید، لطفا ابتدا سازمان فعلی خود را غیرفعال کیند");
 
+        var userOrgCount = await _uow.Organization.GetCountByFilterAsync(o => o.OwnerId == command.OwnerId, ct);
+        if (userOrgCount == 3)
+            throw new BadRequestException("نمیوتنید بیشتر از 3 سازمان به نام خود داشته باشید!");
+
         var org = _mapper.Map<Organization>(command);
 
         await _uow.Organization.AddAsync(org, ct);
@@ -92,49 +97,55 @@ public class OrganizationService : IOrganizationService
     }
     public async Task<GeneralResult> SoftDeleteOrgAsync(DeleteOrgAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
         // This method use SP (Stored Procedure)
 
-        var org = await _uow.Organization.GetOrgByIdWithOwnerAsync(command.OrgId, true, ct);
+        var org = await _uow.Organization.GetOrgByIdWithOwnerAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
-        if (org!.OwnerId != command.UserId)
+        if (org!.OwnerId != command.OwnerId)
             throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید آن را حذف کنید!");
 
-        if (!_commonService.Password.Verify(org.Owner.PasswordHash, command.UserPassword))
+        if (!_commonService.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
             throw new BadRequestException("رمز عبور اشتباه است!");
 
-        org.SoftDelete();
-        org.ChangeOrgActivity(false);
+        await VerifyOrgAsync(org.Id, ct);
 
-        // remove all Users from Org
-        await RemoveAllOrgMemberShipsByOrgId(org, false, ct);
-        // delete all Orgs Projects (Event)
-        // delete all Orgs Tasks (Event)
+        // Delete Org (SP)
+        // Delete All OrgMemberships By OrgId (SP)
+        // Delete All Projects By OrgId (SP)
+        // Delete All ProjectMemberships By ProjectId (SP)
+        // Delete All Tasks By ProjectId (SP)
+        // Delete All TaskAssignments By ProjectId (SP)
+        // Delete All TaslInfos By TaskId (SP)
+        await _uow.User.SoftDeleteUserSpAsync(org.Id, ct);
 
         return GeneralResult.Success();
     }
     public async Task<GeneralResult> ChangeOrgActivityAsync(ChangeActivityOrgAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
-        var org = await _uow.Organization.GetByIdAsync(command.OrgId, true, ct);
+        var org = await _uow.Organization.GetOrgByIdWithOwnerAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
-        if (org!.OwnerId != command.UserId)
+        if (org!.OwnerId != command.OwnerId)
             throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید آن را ویرایش کنید!");
 
-        org.ChangeOrgActivity(command.Activity);
+        if (!_commonService.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
+            throw new BadRequestException("رمز عبور اشتباه است!");
 
-        // Inactive Orgs Projets (Event)
-        // Inactive Orgs Tasks (Event)
+        if (org.IsActive && !command.Activity)
+            await VerifyOrgAsync(org.Id, ct);
+
+        org.ChangeOrgActivity(command.Activity);
+        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
     public async Task<GeneralResult> AddUserToOrgAsync(AddUserOrgAppDto command, CancellationToken ct)
     {
+        // refactor
+
         var org = await _uow.Organization.GetByIdAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
@@ -161,29 +172,64 @@ public class OrganizationService : IOrganizationService
     }
     public async Task<GeneralResult> RemoveUserFromOrgAsync(RemoveUserOrgAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-        // This method use SP (Stored Procedure)
-
-        var org = await _uow.Organization.GetOrgByIdWithMembersAsync(command.orgId, true, ct);
+        var org = await _uow.Organization.GetOrgByIdWithMembersAsync(command.OrgId, true, ct);
         if (org.IsNullParameter())
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
-        if (org!.OwnerId != command.orgOwnerId)
+        if (org!.OwnerId != command.OrgOwnerId)
             throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید کاربری را اضافه کنید!");
+
+        if (org.OwnerId == command.UserId)
+            throw new BadRequestException("شما مالک سازمانن هستید و نمیتوانید آن را ترک کنید!");
 
         var orgMemberShip = org.Members.FirstOrDefault(om =>
             om.UserId == command.UserId
-            && om.OrgId == command.orgId
             && (om.Role == OrganizationRoles.Admin || om.Role == OrganizationRoles.Member)
         );
         if (orgMemberShip.IsNullParameter())
-            throw new NotFoundException("داده های ورودی اشتباه است!");
+            throw new NotFoundException("کاربر مورد نظر در سازمان وجود ندارد!");
+
+        var isUserInActiveProj = await _uow.Project.IsEntityExistByFilterAsync(p =>
+            p.OrgId == org.Id
+            && (p.ProjStatus == ProjectStatusType.InProgress || p.ProjStatus == ProjectStatusType.Adjournment)
+            && p.ProjMember.Any(pm => pm.UserId == command.UserId),
+            ct
+        );
+        if (isUserInActiveProj)
+            throw new BadRequestException("کاربر مورد نظر در پروژه فعال حضور دارد، ابتدا پروژ] را به اتمام برسانید یا کنسل کنید یا کاربر را از پروژه حذف کنید!");
 
         orgMemberShip!.SoftDelete();
+        await _uow.SaveAsync(ct);
 
-        // remove User from Projects (Event)
-        // delete User Tasks (Event)
-        // delete User owner Projects (Event)
+        return GeneralResult.Success();
+    }
+    public async Task<GeneralResult> LeaveUserFromOrgAsync(LeaveUserOrgAppDto command, CancellationToken ct)
+    {
+        var org = await _uow.Organization.GetOrgByIdWithMembersAsync(command.Orgid, true, ct);
+        if (org.IsNullParameter())
+            throw new NotFoundException("شناسه سازمان نامعتبر است!");
+
+        if (org!.OwnerId == command.UserId)
+            throw new BadRequestException("شما مالک سازمانن هستید و نمیتوانید آن را ترک کنید!");
+
+        var orgMemberShip = org.Members.FirstOrDefault(om =>
+            om.UserId == command.UserId
+            && (om.Role == OrganizationRoles.Admin || om.Role == OrganizationRoles.Member)
+        );
+        if (orgMemberShip.IsNullParameter())
+            throw new NotFoundException("شما د این سازمان حضور ندارید!");
+
+        var isUserInActiveProj = await _uow.Project.IsEntityExistByFilterAsync(p =>
+            p.OrgId == org.Id
+            && (p.ProjStatus == ProjectStatusType.InProgress || p.ProjStatus == ProjectStatusType.Adjournment)
+            && p.ProjMember.Any(pm => pm.UserId == command.UserId),
+            ct
+        );
+        if (isUserInActiveProj)
+            throw new BadRequestException("شما نمیتوانید سازمان را ترک کنید، ابتدا از پروژه های فعالی که در آن حضور دارید خارج شوید!");
+
+        orgMemberShip!.SoftDelete();
+        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -193,5 +239,16 @@ public class OrganizationService : IOrganizationService
         var orgMemberShip = new OrganizationMemberShip(orgId, ownerId, role);
 
         await _uow.OrganizationMemberShip.AddAsync(orgMemberShip, ct);
+    }
+    private async System.Threading.Tasks.Task VerifyOrgAsync(int orgId, CancellationToken ct)
+    {
+        var isProjActive = await _uow.Project.IsEntityExistByFilterAsync(p =>
+            p.OrgId == orgId 
+            && (p.ProjStatus == ProjectStatusType.InProgress || p.ProjStatus == ProjectStatusType.Adjournment),
+            ct
+        );
+        
+        if (isProjActive)
+            throw new BadRequestException("در سازمان شما پروژه فعال وجود دارد، اول آن را کنسل یا به اتمام برسانید!");
     }
 }

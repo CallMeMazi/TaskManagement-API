@@ -1,7 +1,6 @@
 ﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
-public class RemoveUserOrgAppDto
+public class LeaveUserOrgAppDto
 {
-    public int OrgOwnerId { get; set; }
     public int UserId { get; set; }
-    public int OrgId { get; set; }
+    public int Orgid { get; set; }
 }

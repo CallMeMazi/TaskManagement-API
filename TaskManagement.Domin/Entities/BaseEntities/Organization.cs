@@ -74,8 +74,8 @@ public class Organization : BaseEntity
         if (orgDescription.IsNullParameter())
             errorMessages.Add("توضیحات سازمان خالی است!");
 
-        if (maxUser <= 5)
-            errorMessages.Add("حداقل افراد سازمان باید بیشتر از 5 نفر باشد!");
+        if (maxUser <= 5 && maxUser >= 50)
+            errorMessages.Add("افراد سازمان باید بیشتر از 5 نفر و کمتر از 50 نفر باشد!");
 
         if (errorMessages.Any())
             throw new BadRequestException("اطلاعات نامعبر هستند!", errorMessages);

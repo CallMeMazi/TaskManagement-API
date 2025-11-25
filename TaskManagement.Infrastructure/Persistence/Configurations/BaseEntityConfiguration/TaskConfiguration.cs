@@ -72,5 +72,9 @@ public class TaskConfiguration : IBaseConfiguration<Domin.Entities.BaseEntities.
         #endregion
 
         builder.HasQueryFilter(t => !t.IsDelete);
+
+        builder.HasIndex(t => t.CreatorId);
+
+        builder.HasIndex(t => t.ProjId);
     }
 }

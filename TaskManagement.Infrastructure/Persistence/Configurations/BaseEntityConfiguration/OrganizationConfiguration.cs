@@ -72,5 +72,7 @@ public class OrganizationConfiguration : IBaseConfiguration<Organization>
 
         builder.HasIndex(o => o.OrgCode)
             .IsUnique();
+
+        builder.HasIndex(o => o.OwnerId);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManagement.Domin.Entities.BaseEntities;
 
@@ -54,5 +55,11 @@ public class TaskAssignmentConfiguration : IBaseConfiguration<TaskAssignment>
         #endregion
 
         builder.HasQueryFilter(ta => !ta.IsDelete);
+
+        builder.HasIndex(ta => ta.UserId);
+
+        builder.HasIndex(ta => ta.ProjId);
+
+        builder.HasIndex(ta => ta.TaskId);
     }
 }

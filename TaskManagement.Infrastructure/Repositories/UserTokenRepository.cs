@@ -14,10 +14,10 @@ public class UserTokenRepository
         : base(dbContext, mapper) { }
 
 
-    public Task<UserToken?> GetUserByFilterWithUserAsync(Expression<Func<UserToken, bool>> filter, bool isTracking = false, CancellationToken ct = default)
+    // Query methods
+    public Task<UserToken?> GetUserTokenByFilterWithUserAsync(Expression<Func<UserToken, bool>> filter, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.Include(ut => ut.User).FirstOrDefaultAsync(filter, ct);
     }
-
 }

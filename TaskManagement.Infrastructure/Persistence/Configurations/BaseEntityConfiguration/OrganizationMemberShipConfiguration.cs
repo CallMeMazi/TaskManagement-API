@@ -32,5 +32,9 @@ public class OrganizationMemberShipConfiguration : IBaseConfiguration<Organizati
         #endregion
 
         builder.HasQueryFilter(om => !om.IsDelete);
+
+        builder.HasIndex(ut => ut.UserId);
+
+        builder.HasIndex(ut => ut.OrgId);
     }
 }

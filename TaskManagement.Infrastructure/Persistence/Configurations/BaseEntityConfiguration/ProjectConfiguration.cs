@@ -86,5 +86,9 @@ public class ProjectConfiguration : IBaseConfiguration<Project>
         #endregion
 
         builder.HasQueryFilter(p => !p.IsDelete);
+
+        builder.HasIndex(p => p.OrgId);
+
+        builder.HasIndex(p => p.CreatorId);
     }
 }
