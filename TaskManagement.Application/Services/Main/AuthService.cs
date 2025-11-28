@@ -85,7 +85,7 @@ public class AuthService : IAuthServiec
         if (!tokenResult.IsSuccess)
             throw new BadRequestException(tokenResult.Message);
 
-        (string accessTokenHashed, string refreshTokenHashed) = HashAcceesTokenAndRefreshToken(tokenResult.Result!.AccessToken, tokenResult.Result.RefreshToken);
+        (string accessTokenHashed, string refreshTokenHashed) = HashAcceesTokenAndRefreshToken(tokenResult.Result!.AccessTokenHash, tokenResult.Result.RefreshTokenHash);
 
         var userToken = new UserToken(
             command.user.Id,
@@ -101,8 +101,8 @@ public class AuthService : IAuthServiec
 
         var result = new UserTokenDto()
         {
-            AccessToken = tokenResult.Result.AccessToken,
-            RefreshToken = tokenResult.Result.RefreshToken,
+            AccessTokenHash = tokenResult.Result.AccessTokenHash,
+            RefreshTokenHash = tokenResult.Result.RefreshTokenHash,
         };
 
         return GeneralResult<UserTokenDto>.Success(result)!;
@@ -122,7 +122,7 @@ public class AuthService : IAuthServiec
         if (!tokenResult.IsSuccess)
             throw new BadRequestException(tokenResult.Message);
 
-        (string accessTokenHashed, string refreshTokenHashed) = HashAcceesTokenAndRefreshToken(tokenResult.Result!.AccessToken, tokenResult.Result.RefreshToken);
+        (string accessTokenHashed, string refreshTokenHashed) = HashAcceesTokenAndRefreshToken(tokenResult.Result!.AccessTokenHash, tokenResult.Result.RefreshTokenHash);
 
         var userToken = new UserToken(
             user!.Id,
@@ -139,8 +139,8 @@ public class AuthService : IAuthServiec
 
         var result = new UserTokenDto()
         {
-            AccessToken = tokenResult.Result.AccessToken,
-            RefreshToken = tokenResult.Result.RefreshToken,
+            AccessTokenHash = tokenResult.Result.AccessTokenHash,
+            RefreshTokenHash = tokenResult.Result.RefreshTokenHash,
         };
 
         return GeneralResult<UserTokenDto>.Success(result)!;
@@ -205,15 +205,15 @@ public class AuthService : IAuthServiec
         if (!newTokensResult.IsSuccess)
             throw new BadRequestException(newTokensResult.Message);
 
-        (string accessToken, string refreshToken) = HashAcceesTokenAndRefreshToken(newTokensResult.Result!.AccessToken, newTokensResult.Result.RefreshToken);
+        (string accessToken, string refreshToken) = HashAcceesTokenAndRefreshToken(newTokensResult.Result!.AccessTokenHash, newTokensResult.Result.RefreshTokenHash);
 
         token.RefreshToken(accessToken, refreshToken, _appSettings.JwtSetting.ExpirationDaysRefreshToken);
         await _uow.SaveAsync(ct);
 
         var result = new UserTokenDto()
         {
-            AccessToken = newTokensResult.Result.AccessToken,
-            RefreshToken = newTokensResult.Result.RefreshToken,
+            AccessTokenHash = newTokensResult.Result.AccessTokenHash,
+            RefreshTokenHash = newTokensResult.Result.RefreshTokenHash,
         };
 
         return GeneralResult<UserTokenDto>.Success(result)!;

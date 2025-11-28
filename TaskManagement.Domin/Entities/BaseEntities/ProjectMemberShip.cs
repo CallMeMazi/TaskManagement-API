@@ -46,10 +46,10 @@ public class ProjectMemberShip : BaseEntity
         var errorMessages = new List<string>();
 
         if (userId <= 0)
-            errorMessages.Add("آیدی سازمان خالی است!");
+            errorMessages.Add("آیدی کاربر خالی است!");
 
         if (projId <= 0)
-            errorMessages.Add("آیدی کاربر خالی است!");
+            errorMessages.Add("آیدی پروژه خالی است!");
 
         if (errorMessages.Any())
             throw new BadRequestException("اطلاعات نامعبر هستند!", errorMessages);

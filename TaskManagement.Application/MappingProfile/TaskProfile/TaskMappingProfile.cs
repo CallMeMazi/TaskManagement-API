@@ -2,9 +2,9 @@
 using TaskManagement.Application.DTOs.ApplicationDTOs.Task;
 
 namespace TaskManagement.Application.MappingProfile.TaskProfile;
-public class MappingTaskDtoToEntity : Profile
+public class TaskMappingProfile : Profile
 {
-    public MappingTaskDtoToEntity()
+    public TaskMappingProfile()
     {
         CreateMap<CreateTaskAppDto, Domin.Entities.BaseEntities.Task>().ConstructUsing(src =>
         new Domin.Entities.BaseEntities.Task(

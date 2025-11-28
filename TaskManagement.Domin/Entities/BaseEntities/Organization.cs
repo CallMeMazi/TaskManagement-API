@@ -17,6 +17,7 @@ public class Organization : BaseEntity
     public User Owner { get; private set; }
     public ICollection<OrganizationMemberShip> Members { get; private set; }
     public ICollection<Project> Projects { get; private set; }
+    public ICollection<OrganizationInvitation> invitations { get; private set; }
 
     #endregion
 

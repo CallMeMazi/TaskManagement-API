@@ -4,9 +4,9 @@ using TaskManagement.Application.DTOs.SharedDTOs.User;
 using TaskManagement.Domin.Entities.BaseEntities;
 
 namespace TaskManagement.Application.MappingProfile.UserProfile;
-public class MappingUserDtoToEntity : Profile
+public class UserMappingProfile : Profile
 {
-    public MappingUserDtoToEntity()
+    public UserMappingProfile()
     {
         // Command DTOs
         CreateMap<CreateUserAppDto, User>().ConstructUsing(src => 

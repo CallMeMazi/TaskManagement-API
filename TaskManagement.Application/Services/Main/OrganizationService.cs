@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System;
 using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
 using TaskManagement.Application.DTOs.SharedDTOs.Organization;
 using TaskManagement.Application.Interfaces.Services.Halper;
@@ -144,29 +145,17 @@ public class OrganizationService : IOrganizationService
     }
     public async Task<GeneralResult> AddUserToOrgAsync(AddUserOrgAppDto command, CancellationToken ct)
     {
-        // refactor
+        // This method is used in transaction (TransAction)
 
-        var org = await _uow.Organization.GetByIdAsync(command.OrgId, false, ct);
-        if (org.IsNullParameter())
-            throw new NotFoundException("شناسه سازمان نامعتبر است!");
-
-        if (org!.OwnerId != command.OrgOwnerId)
-            throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید کاربری را اضافه کنید!");
-
-        var user = await _uow.User.GetByFilterAsync(u => u.MobileNumber == command.UserMobileNumber, false, ct);
-        if (user.IsNullParameter())
-            throw new NotFoundException("شماره موبایل کاربر نامعتبر است!");
-
-        var isUserInOrg = await _uow.OrganizationMemberShip.IsEntityExistByFilterAsync(om =>
-            om.UserId == user!.Id
-            && om.OrgId == org.Id,
+        var isUserInOrg = await _uow.OrganizationMemberShip.IsEntityExistByFilterAsync(o =>
+            o.OrgId == command.OrgId
+            && o.UserId == command.UserId,
             ct
         );
         if (isUserInOrg)
-            throw new BadRequestException("این کاربر در سازمان وجود دارد!");
+            throw new BadRequestException("شما در این سازمان حضور دارید!");
 
-        await CreateOrgMemberShipAsync(org.Id, user!.Id, OrganizationRoles.Member, ct);
-        await _uow.SaveAsync(ct);
+        await CreateOrgMemberShipAsync(command.OrgId, command.UserId, OrganizationRoles.Member, ct);
 
         return GeneralResult.Success();
     }
@@ -229,6 +218,67 @@ public class OrganizationService : IOrganizationService
             throw new BadRequestException("شما نمیتوانید سازمان را ترک کنید، ابتدا از پروژه های فعالی که در آن حضور دارید خارج شوید!");
 
         orgMemberShip!.SoftDelete();
+        await _uow.SaveAsync(ct);
+
+        return GeneralResult.Success();
+    }
+    public async Task<GeneralResult> ChangeUserRoleToAdminAsync(ChangeUserRoleAppDto command, CancellationToken ct)
+    {
+        var org = await _uow.Organization.GetByIdAsync(command.OrgId, false, ct);
+        if (org.IsNullParameter())
+            throw new NotFoundException("سازمانی با این شناسه یافت نشد!");
+
+        if (org!.OwnerId != command.OrgOwnerId)
+            throw new BadRequestException("شما مالک این سازمان نیستید!");
+
+        var orgMemberShip = await _uow.OrganizationMemberShip.GetByFilterAsync(om =>
+            om.UserId == command.UserId
+            && om.OrgId == command.OrgId,
+            true,
+            ct
+        );
+        if (orgMemberShip.IsNullParameter())
+            throw new NotFoundException("کاربری با این شناسه در سازمان وجود ندارد!");
+
+        if (orgMemberShip!.Role == OrganizationRoles.Admin)
+            throw new BadRequestException("این کاربر در حال حاضر ادمین سازمان هست!");
+
+        orgMemberShip.ChangeUserOrgRole(OrganizationRoles.Admin);
+        await _uow.SaveAsync(ct);
+
+        return GeneralResult.Success();
+    }
+    public async Task<GeneralResult> ChangeUserRoleToMemberAsync(ChangeUserRoleAppDto command, CancellationToken ct)
+    {
+        var org = await _uow.Organization.GetByIdAsync(command.OrgId, false, ct);
+        if (org.IsNullParameter())
+            throw new NotFoundException("سازمانی با این شناسه یافت نشد!");
+
+        if (org!.OwnerId != command.OrgOwnerId)
+            throw new BadRequestException("شما مالک این سازمان نیستید!");
+
+        var orgMemberShip = await _uow.OrganizationMemberShip.GetByFilterAsync(om =>
+            om.UserId == command.UserId
+            && om.OrgId == command.OrgId,
+            true,
+            ct
+        );
+        if (orgMemberShip.IsNullParameter())
+            throw new NotFoundException("کاربری با این شناسه در سازمان وجود ندارد!");
+
+        if (orgMemberShip!.Role == OrganizationRoles.Member)
+            throw new BadRequestException("این کاربر در حال حاضر عضو عادی سازمان هست!");
+
+        var isUserHasActiveOrg = await _uow.Project.IsEntityExistByFilterAsync(p =>
+            p.CreatorId == command.UserId
+            && p.OrgId == command.OrgId
+            && (p.ProjStatus == ProjectStatusType.InProgress || p.ProjStatus == ProjectStatusType.Adjournment),
+            ct
+        );
+        if (isUserHasActiveOrg)
+            throw new BadRequestException("این ادمین دارای پروژه های فعال است!");
+
+        orgMemberShip.ChangeUserOrgRole(OrganizationRoles.Member);
         await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();

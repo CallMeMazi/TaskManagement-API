@@ -66,6 +66,10 @@ public class OrganizationConfiguration : IBaseConfiguration<Organization>
             .WithOne(p => p.Org)
             .HasForeignKey(p => p.OrgId);
 
+        builder.HasMany(o => o.invitations)
+            .WithOne(oi => oi.Org)
+            .HasForeignKey(oi => oi.OrgId);
+
         #endregion
 
         builder.HasQueryFilter(o => !o.IsDelete);

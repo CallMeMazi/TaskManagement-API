@@ -23,6 +23,7 @@ public class User : BaseEntity
     public ICollection<TaskAssignment> MyTasks { get; private set; }
     public ICollection<TaskInfo> MyTaskInfo { get; private set; }
     public ICollection<UserToken> MyTokens { get; private set; }
+    public ICollection<OrganizationInvitation> Invitations { get; private set; }
 
     #endregion
 

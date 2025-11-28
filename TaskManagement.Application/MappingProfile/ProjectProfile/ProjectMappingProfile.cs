@@ -3,9 +3,9 @@ using TaskManagement.Application.DTOs.ApplicationDTOs.Project;
 using TaskManagement.Domin.Entities.BaseEntities;
 
 namespace TaskManagement.Application.MappingProfile.ProjectProfile;
-public class MappingProjectDtoToEntity : Profile
+public class ProjectMappingProfile : Profile
 {
-    public MappingProjectDtoToEntity()
+    public ProjectMappingProfile()
     {
         CreateMap<CreateProjectAppDto, Project>().ConstructUsing(src =>
         new Project(

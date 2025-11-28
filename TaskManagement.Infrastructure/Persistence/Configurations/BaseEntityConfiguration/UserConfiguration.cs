@@ -97,6 +97,10 @@ public class UserConfiguration : IBaseConfiguration<User>
            .WithOne(ut => ut.User)
            .HasForeignKey(ut => ut.UserId);
 
+        builder.HasMany(u => u.Invitations)
+           .WithOne(oi => oi.User)
+           .HasForeignKey(ut => ut.UserId);
+
         #endregion
 
         builder.HasQueryFilter(u => !u.IsDelete);

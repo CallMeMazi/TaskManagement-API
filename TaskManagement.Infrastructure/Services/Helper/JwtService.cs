@@ -88,8 +88,8 @@ public class Jwtservice : IJwtService
             if (refreshTokenResult.IsSuccess)
                 return GeneralResult<UserTokenDto?>.Success(new UserTokenDto()
                 {
-                    AccessToken = accessTokenResult.Result!,
-                    RefreshToken = refreshTokenResult.Result!
+                    AccessTokenHash = accessTokenResult.Result!,
+                    RefreshTokenHash = refreshTokenResult.Result!
                 });
             else
                 return GeneralResult<UserTokenDto?>.Failure(null, refreshTokenResult.Message);

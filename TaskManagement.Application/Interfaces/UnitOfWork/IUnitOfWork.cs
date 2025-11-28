@@ -10,6 +10,7 @@ public interface IUnitOfWork
     ITaskRepository Task { get; }
     IUserRepository User { get; }
     IUserTokenRepository UserToken { get; }
+    IOrganizationInvitationRepository Invitation { get; }
 
 
     void Save();

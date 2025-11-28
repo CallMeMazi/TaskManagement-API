@@ -14,10 +14,12 @@ public class UnitOfWork : IUnitOfWork
     public ITaskRepository Task { get; }
     public ITaskInfoRepository TaskInfo { get; }
     public IOrganizationMemberShipRepository OrganizationMemberShip { get; }
+    public IOrganizationInvitationRepository Invitation { get; }
 
     public UnitOfWork(ApplicationDbContext context, IUserRepository userRepository, IOrganizationRepository organizationRepository
         , IProjectRepository projectRepository, ITaskRepository taskRepository, ITaskInfoRepository taskInfoRepository
-        , IUserTokenRepository userTokenRepository, IOrganizationMemberShipRepository organizationMemberShipRepository)
+        , IUserTokenRepository userTokenRepository, IOrganizationMemberShipRepository organizationMemberShipRepository
+        , IOrganizationInvitationRepository invitation)
     {
         _context = context;
         User = userRepository;
@@ -27,6 +29,7 @@ public class UnitOfWork : IUnitOfWork
         TaskInfo = taskInfoRepository;
         UserToken = userTokenRepository;
         OrganizationMemberShip = organizationMemberShipRepository;
+        Invitation = invitation;
     }
 
     public void Save()
@@ -39,10 +42,10 @@ public class UnitOfWork : IUnitOfWork
     }
     public async Task SaveAsync(CancellationToken ct = default)
     {
-       await _context.SaveChangesAsync(ct);
+        await _context.SaveChangesAsync(ct);
     }
     public async Task SaveAsync(bool acceptAllChangesOnSuccess, CancellationToken ct = default)
     {
-       await _context.SaveChangesAsync(acceptAllChangesOnSuccess, ct);
+        await _context.SaveChangesAsync(acceptAllChangesOnSuccess, ct);
     }
 }

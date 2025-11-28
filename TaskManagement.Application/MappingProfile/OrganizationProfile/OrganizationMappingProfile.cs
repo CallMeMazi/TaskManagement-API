@@ -4,9 +4,9 @@ using TaskManagement.Application.DTOs.SharedDTOs.Organization;
 using TaskManagement.Domin.Entities.BaseEntities;
 
 namespace TaskManagement.Application.MappingProfile.OrganizationProfile;
-public class MappingOrganizationDtoToEntity : Profile
+public class OrganizationMappingProfile : Profile
 {
-    public MappingOrganizationDtoToEntity()
+    public OrganizationMappingProfile()
     {
         // Command DTOs
         CreateMap<CreateOrgAppDto, Organization>().ConstructUsing(src => 
