@@ -11,8 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="DTOs\ProjectionDtos\" />
     <Folder Include="Interfaces\Services\Log\" />
     <Folder Include="Services\helper\" />
+    <Folder Include="Services\Log\" />
   </ItemGroup>
 
   <ItemGroup>

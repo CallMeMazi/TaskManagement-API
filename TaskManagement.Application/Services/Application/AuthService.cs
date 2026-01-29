@@ -46,13 +46,10 @@ public class AuthService : IAuthServiec
     public async Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto query, CancellationToken ct)
     {
         // Validate JWT (Expire date, Signature, algorithm)
-        // Check user ip and agent with ip and agent in token
+        // Check current deviceId with deviceId in token
         // Check user security stamp with security stamp in token
 
-        if (query.IsNullParameter())
-            throw new BadRequestException("فرم اعتبارسنجی توکن خالی است!");
-
-        var SecurityStampResult = _commonService.Jwt.GetSecurityStampFromAccessToken(query.AccessToken, query.UserIp, query.UserAgent);
+        var SecurityStampResult = _commonService.Jwt.GetSecurityStampFromAccessToken(query.AccessToken, query.DeviceId);
         if (!SecurityStampResult.IsSuccess)
             throw new UnAuthorizedException(SecurityStampResult.Message);
 
@@ -78,10 +75,7 @@ public class AuthService : IAuthServiec
     {
         // This method is used in transaction (TransAction)
 
-        if (command.IsNullParameter())
-            throw new BadRequestException("فرم رجیستر خالی است!");
-
-        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(command.user, command.UserIp, command.UserAgent);
+        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(command.user, command.DeviceId);
         if (!tokenResult.IsSuccess)
             throw new BadRequestException(tokenResult.Message);
 
@@ -93,6 +87,7 @@ public class AuthService : IAuthServiec
             refreshTokenHashed,
             command.user.SecurityStamp,
             DateTime.Now.AddDays(_appSettings.JwtSetting.ExpirationDaysRefreshToken),
+            command.DeviceId,
             command.UserIp,
             command.UserAgent
         );
@@ -109,16 +104,13 @@ public class AuthService : IAuthServiec
     }
     public async Task<GeneralResult<UserTokenDto>> LoginUserAsync(LoginUserAppDto command, CancellationToken ct)
     {
-        if (command.IsNullParameter())
-            throw new BadRequestException("فرم لاگین خالی است!");
-
         var user = await _uow.User.GetByFilterAsync(u => u.MobileNumber == command.MobileNumber, false, ct);
         if (user.IsNullParameter())
             throw new NotFoundException("کاربری با این شماره موبایل پیدا نشد!");
 
         await VerifyPasswordAndActiveDeviceAsync(command.Password, user!, ct);
 
-        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(user!, command.UserIp, command.UserAgent);
+        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(user!, command.DeviceId);
         if (!tokenResult.IsSuccess)
             throw new BadRequestException(tokenResult.Message);
 
@@ -130,6 +122,7 @@ public class AuthService : IAuthServiec
             refreshTokenHashed,
             user.SecurityStamp,
             DateTime.Now.AddDays(_appSettings.JwtSetting.ExpirationDaysRefreshToken),
+            command.DeviceId,
             command.UserIp,
             command.UserAgent
         );
@@ -147,22 +140,17 @@ public class AuthService : IAuthServiec
     }
     public async Task<GeneralResult> LogoutUserAsync(LogoutUserAppDto command, CancellationToken ct)
     {
-        if (command.IsNullParameter())
-            throw new BadRequestException("فرم لاگ اوت خالی است!");
-
         var token = await _uow.UserToken.GetUserTokenByFilterWithUserAsync(ut =>
             ut.TokenStatus == TokenStatus.Active
-            && ut.UserIp == command.UserIp
-            && ut.UserAgent == command.UserAgent
+            && ut.DeviceId == command.DeviceId
             && ut.UserId == command.UserId,
             true,
             ct
         );
-
         if (token.IsNullParameter())
-            throw new NotFoundException("توکنی برای شما با این آیپی و اطلاعات یافت نشد!");
+            throw new NotFoundException("توکنی برای شما با این اطلاعات یافت نشد!");
 
-        var validateResult = _commonService.Jwt.ValidateAccessTokenAndGetPrincipal(command.AccessToken, command.UserIp, command.UserAgent, false);
+        var validateResult = _commonService.Jwt.ValidateAccessTokenAndGetPrincipal(command.AccessToken, command.DeviceId);
         if (!validateResult.IsSuccess)
             throw new BadRequestException(validateResult.Message);
 
@@ -171,24 +159,18 @@ public class AuthService : IAuthServiec
             throw new BadRequestException("توکن ارسالی شما نامعتبر است");
 
         token.RevokeToken();
-
         await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
     public async Task<GeneralResult<UserTokenDto>> RefreshTokenAsync(RefreshUserTokenAppDto command, CancellationToken ct)
     {
-        if (command.IsNullParameter())
-            throw new BadRequestException("فرم رفرش توکن خالی است!");
-
         var token = await _uow.UserToken.GetUserTokenByFilterWithUserAsync(ut =>
             ut.TokenStatus == TokenStatus.Active
-            && ut.UserIp == command.UserIp
-            && ut.UserAgent == command.UserAgent,
+            && ut.DeviceId == command.DeviceId,
             true,
             ct
         );
-
         if (token.IsNullParameter())
             throw new NotFoundException("برای شما در این دستگاه یا مرورگر توکنی یافت نشد!");
 
@@ -196,12 +178,9 @@ public class AuthService : IAuthServiec
         if (token!.RefreshTokenHash != commandRefreshTokenHash)
             throw new BadRequestException("رفرش توکن نامعتبر است!");
 
-        if (token.User.IsNullParameter())
-            throw new KeyNotFoundException($"User in token by {token.Id} is null! exception in {nameof(RefreshTokenAsync)} method.");
+        await CheckSecurityStampAsync(token.User.SecurityStamp, token, ct);
 
-        await CheckSecurityStampAsync(token.User, token, ct);
-
-        var newTokensResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(token.User, command.UserIp, command.UserAgent);
+        var newTokensResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(token.User, command.DeviceId);
         if (!newTokensResult.IsSuccess)
             throw new BadRequestException(newTokensResult.Message);
 
@@ -220,18 +199,13 @@ public class AuthService : IAuthServiec
     }
     public async Task<GeneralResult> RevokeTokenByUserIdAndIpAsync(RevokeUserTokenAppDto command, CancellationToken ct)
     {
-        if (command.IsNullParameter())
-            throw new BadRequestException("فرم خروج دیوایس خالی است!");
-
         var token = await _uow.UserToken.GetByFilterAsync(ut =>
             ut.UserId == command.UserId
             && ut.TokenStatus == TokenStatus.Active
-            && ut.UserIp == command.UserIp
-            && ut.UserAgent == command.UserAgent,
+            && ut.DeviceId == command.Deviceid,
             true,
             ct
         );
-
         if (token.IsNullParameter())
             throw new NotFoundException("توکنی با این اطلاعات یافت نشد!");
 
@@ -242,16 +216,12 @@ public class AuthService : IAuthServiec
     }
     public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(int userId, bool isSaved, CancellationToken ct)
     {
-        if (userId <= 0)
-            throw new Exception($"the ID of user is invalide. Exception in {nameof(RevokeAllTokensByUserIdAsync)} method!");
-
         var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == userId
             && ut.TokenStatus == TokenStatus.Active,
             true,
             ct
         );
-
         if (tokens.IsNullParameter() || !tokens.Any())
             return GeneralResult.Success();
 
@@ -268,17 +238,13 @@ public class AuthService : IAuthServiec
     {
         // This method is used in transaction (TransAction)
 
-        if (command.IsNullParameter())
-            throw new Exception($"Date is invalide. Exception in {nameof(RevokeAllTokensExceptCurrentByUserIdAsync)} method!");
-
         var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == command.UserId
-            && (ut.UserIp != command.UserIp || ut.UserAgent != command.UserAgent)
+            && ut.DeviceId != command.Deviceid
             && ut.TokenStatus == TokenStatus.Active,
             true,
             ct
         );
-
         if (tokens.IsNullParameter() || !tokens.Any())
             return GeneralResult.Success();
 
@@ -292,12 +258,9 @@ public class AuthService : IAuthServiec
         return GeneralResult.Success();
     }
 
-    private async System.Threading.Tasks.Task VerifyPasswordAndActiveDeviceAsync(string password, User user, CancellationToken ct)
+    private async System.Threading.Tasks.Task VerifyPasswordAndActiveDeviceAsync(string currentPassword, User user, CancellationToken ct)
     {
-        if (user.IsNullParameter())
-            throw new NotFoundException("شماره موبایل یا رمز عبور اشتباه است!");
-
-        if (!_commonService.Password.Verify(user!.PasswordHash, password))
+        if (!_commonService.Password.Verify(user!.PasswordHash, currentPassword))
             throw new NotFoundException("شماره موبایل یا رمز عبور اشتباه است!");
 
         var userDeviceCount = await GetUserActiveDeviceCountAsync(user.Id, ct);
@@ -315,12 +278,12 @@ public class AuthService : IAuthServiec
 
         return (accessTokenHashed, refreshTokenHashed);
     }
-    private async System.Threading.Tasks.Task CheckSecurityStampAsync(User user, UserToken token, CancellationToken cancellationToken)
+    private async System.Threading.Tasks.Task CheckSecurityStampAsync(string securityStamp, UserToken token, CancellationToken ct)
     {
-        if (user.SecurityStamp != token.SecurityStamp)
+        if (securityStamp != token.SecurityStamp)
         {
             token.RevokeToken();
-            await _uow.SaveAsync(cancellationToken);
+            await _uow.SaveAsync(ct);
             throw new BadRequestException("توکن شما معتبر نیست، لطفا دوباره لاگین کنید!");
         }
     }

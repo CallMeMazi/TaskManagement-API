@@ -1,5 +1,5 @@
 ﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
-public class ChangeUserRoleAppDto
+public class ChangeUserRoleOrgAppDto
 {
     public int OrgOwnerId { get; set; }
     public int OrgId { get; set; }

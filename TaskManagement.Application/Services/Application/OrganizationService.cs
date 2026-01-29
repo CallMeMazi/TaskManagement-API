@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using System;
 using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
 using TaskManagement.Application.DTOs.SharedDTOs.Organization;
 using TaskManagement.Application.Interfaces.Services.Halper;
@@ -86,7 +85,7 @@ public class OrganizationService : IOrganizationService
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
         if (org!.OwnerId != command.UserId)
-            throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید آن را ویرایش کنید!");
+            throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید آن را ویرایش کنید!");
 
         if (await _uow.Organization.IsEntityExistByFilterAsync(o => o.SecondOrgName == command.SecondOrgName && o.Id != org.Id, ct))
             throw new BadRequestException("سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!");
@@ -105,12 +104,14 @@ public class OrganizationService : IOrganizationService
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
         if (org!.OwnerId != command.OwnerId)
-            throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید آن را حذف کنید!");
+            throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید آن را حذف کنید!");
 
         if (!_commonService.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
             throw new BadRequestException("رمز عبور اشتباه است!");
 
-        await VerifyOrgAsync(org.Id, ct);
+        var verifyResult = await VerifyOrgAsync(org.Id, ct);
+        if (!verifyResult.IsSuccess)
+            throw new BadRequestException(verifyResult.Message);
 
         // Delete Org (SP)
         // Delete All OrgMemberships By OrgId (SP)
@@ -130,19 +131,25 @@ public class OrganizationService : IOrganizationService
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
         if (org!.OwnerId != command.OwnerId)
-            throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید آن را ویرایش کنید!");
+            throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید آن را ویرایش کنید!");
 
         if (!_commonService.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
             throw new BadRequestException("رمز عبور اشتباه است!");
 
         if (org.IsActive && !command.Activity)
-            await VerifyOrgAsync(org.Id, ct);
+        {
+            var verifyResult = await VerifyOrgAsync(org.Id, ct);
+            if (!verifyResult.IsSuccess)
+                throw new BadRequestException(verifyResult.Message);
+        }
+
 
         org.ChangeOrgActivity(command.Activity);
         await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
+    // Org MemberShip methods
     public async Task<GeneralResult> AddUserToOrgAsync(AddUserOrgAppDto command, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
@@ -166,7 +173,7 @@ public class OrganizationService : IOrganizationService
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
         if (org!.OwnerId != command.OrgOwnerId)
-            throw new BadRequestException("شما مالک این سازمان نیستید و نمیتوانید کاربری را اضافه کنید!");
+            throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید کاربری را حذف کنید!");
 
         if (org.OwnerId == command.UserId)
             throw new BadRequestException("شما مالک سازمانن هستید و نمیتوانید آن را ترک کنید!");
@@ -185,7 +192,7 @@ public class OrganizationService : IOrganizationService
             ct
         );
         if (isUserInActiveProj)
-            throw new BadRequestException("کاربر مورد نظر در پروژه فعال حضور دارد، ابتدا پروژ] را به اتمام برسانید یا کنسل کنید یا کاربر را از پروژه حذف کنید!");
+            throw new BadRequestException("کاربر مورد نظر در پروژه فعال حضور دارد، ابتدا پروژه را به اتمام برسانید یا کنسل کنید یا کاربر را از پروژه حذف کنید!");
 
         orgMemberShip!.SoftDelete();
         await _uow.SaveAsync(ct);
@@ -199,14 +206,14 @@ public class OrganizationService : IOrganizationService
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
         if (org!.OwnerId == command.UserId)
-            throw new BadRequestException("شما مالک سازمانن هستید و نمیتوانید آن را ترک کنید!");
+            throw new BadRequestException("شما مالک سازمان هستید و نمیتوانید آن را ترک کنید!");
 
         var orgMemberShip = org.Members.FirstOrDefault(om =>
             om.UserId == command.UserId
             && (om.Role == OrganizationRoles.Admin || om.Role == OrganizationRoles.Member)
         );
         if (orgMemberShip.IsNullParameter())
-            throw new NotFoundException("شما د این سازمان حضور ندارید!");
+            throw new NotFoundException("شما در این سازمان حضور ندارید!");
 
         var isUserInActiveProj = await _uow.Project.IsEntityExistByFilterAsync(p =>
             p.OrgId == org.Id
@@ -222,14 +229,14 @@ public class OrganizationService : IOrganizationService
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeUserRoleToAdminAsync(ChangeUserRoleAppDto command, CancellationToken ct)
+    public async Task<GeneralResult> ChangeUserRoleToAdminAsync(ChangeUserRoleOrgAppDto command, CancellationToken ct)
     {
         var org = await _uow.Organization.GetByIdAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
             throw new NotFoundException("سازمانی با این شناسه یافت نشد!");
 
         if (org!.OwnerId != command.OrgOwnerId)
-            throw new BadRequestException("شما مالک این سازمان نیستید!");
+            throw new ForbiddenException("شما مالک این سازمان نیستید!");
 
         var orgMemberShip = await _uow.OrganizationMemberShip.GetByFilterAsync(om =>
             om.UserId == command.UserId
@@ -248,14 +255,14 @@ public class OrganizationService : IOrganizationService
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeUserRoleToMemberAsync(ChangeUserRoleAppDto command, CancellationToken ct)
+    public async Task<GeneralResult> ChangeUserRoleToMemberAsync(ChangeUserRoleOrgAppDto command, CancellationToken ct)
     {
         var org = await _uow.Organization.GetByIdAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
             throw new NotFoundException("سازمانی با این شناسه یافت نشد!");
 
         if (org!.OwnerId != command.OrgOwnerId)
-            throw new BadRequestException("شما مالک این سازمان نیستید!");
+            throw new ForbiddenException("شما مالک این سازمان نیستید!");
 
         var orgMemberShip = await _uow.OrganizationMemberShip.GetByFilterAsync(om =>
             om.UserId == command.UserId
@@ -284,21 +291,23 @@ public class OrganizationService : IOrganizationService
         return GeneralResult.Success();
     }
 
-    private async System.Threading.Tasks.Task CreateOrgMemberShipAsync(int orgId, int ownerId, OrganizationRoles role, CancellationToken ct)
+    private async System.Threading.Tasks.Task CreateOrgMemberShipAsync(int orgId, int userId, OrganizationRoles role, CancellationToken ct)
     {
-        var orgMemberShip = new OrganizationMemberShip(orgId, ownerId, role);
+        var orgMemberShip = new OrganizationMemberShip(orgId, userId, role);
 
         await _uow.OrganizationMemberShip.AddAsync(orgMemberShip, ct);
     }
-    private async System.Threading.Tasks.Task VerifyOrgAsync(int orgId, CancellationToken ct)
+    private async Task<GeneralResult> VerifyOrgAsync(int orgId, CancellationToken ct)
     {
         var isProjActive = await _uow.Project.IsEntityExistByFilterAsync(p =>
-            p.OrgId == orgId 
+            p.OrgId == orgId
             && (p.ProjStatus == ProjectStatusType.InProgress || p.ProjStatus == ProjectStatusType.Adjournment),
             ct
         );
-        
+
         if (isProjActive)
-            throw new BadRequestException("در سازمان شما پروژه فعال وجود دارد، اول آن را کنسل یا به اتمام برسانید!");
+            return GeneralResult.Failure("در سازمان شما پروژه فعال وجود دارد، اول آن را کنسل یا به اتمام برسانید!");
+
+        return GeneralResult.Success();
     }
 }

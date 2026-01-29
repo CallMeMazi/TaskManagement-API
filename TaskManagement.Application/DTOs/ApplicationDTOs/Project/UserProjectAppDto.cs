@@ -1,6 +1,7 @@
 ﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Project;
 public class UserProjectAppDto
 {
-    public int UserId { get; set; }
-    public int ProjectId { get; set; }
+    public int OwnerId { get; set; }
+    public required string UserPassword { get; set; }
+    public int ProjId { get; set; }
 }

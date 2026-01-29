@@ -11,6 +11,7 @@ public interface IUnitOfWork
     IUserRepository User { get; }
     IUserTokenRepository UserToken { get; }
     IOrganizationInvitationRepository Invitation { get; }
+    IProjectMemberShipRepository ProjectMemberShip { get; }
 
 
     void Save();

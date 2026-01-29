@@ -7,4 +7,5 @@ public class CreateProjectAppDto
     public int CreatorId { get; set; }
     public byte MaxUser { get; set; }
     public byte MaxTask { get; set; }
+    public List<int>? UserIds { get; set; }
 }

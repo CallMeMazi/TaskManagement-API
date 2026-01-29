@@ -63,6 +63,12 @@ public class Project : BaseEntity
         if (IsActive == activity)
             throw new BadRequestException(IsActive ? "پروژه در حال حاضر فعال است!" : "پروژه در حال حاضر غیر فعال است!");
 
+        if (!IsActive && ProjStatus == ProjectStatusType.InProgress)
+            throw new Exception($"Project with {Id} ID is DeActive and the ProjStatus is InProgress, Error in {nameof(ChangeProjActivity)} method!");
+
+        if (IsActive && ProjStatus == ProjectStatusType.Adjournment)
+            throw new Exception($"Project with {Id} ID is Active and the ProjStatus is Adjournment, Error in {nameof(ChangeProjActivity)} method!");
+
         ProjStatus = activity ? ProjectStatusType.InProgress : ProjectStatusType.Adjournment;
         IsActive = activity;
 
@@ -71,7 +77,10 @@ public class Project : BaseEntity
     public void ChangeProjStatusToInProgress()
     {
         if (ProjStatus == ProjectStatusType.InProgress)
-            return;
+            throw new BadRequestException("وضعیت پروژه شما در حال حاضر در حال انجام است!");
+
+        if (IsActive)
+            throw new Exception($"Project with {Id} ID is Active, Error in {nameof(ChangeProjStatusToInProgress)} method!");
 
         if (ProjStatus == ProjectStatusType.Cancel)
             throw new BadRequestException("پروژه کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
@@ -87,7 +96,10 @@ public class Project : BaseEntity
     public void ChangeProjStatusToAdjournment()
     {
         if (ProjStatus == ProjectStatusType.Adjournment)
-            return;
+            throw new BadRequestException("وضعیت پروژه شما در حال حاضر در تعویق است!");
+
+        if (!IsActive)
+            throw new Exception($"Project with {Id} ID is DeActive, Error in {nameof(ChangeProjStatusToAdjournment)} method!");
 
         if (ProjStatus == ProjectStatusType.Cancel)
             throw new BadRequestException("پروژه کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
@@ -99,12 +111,11 @@ public class Project : BaseEntity
         IsActive = false;
 
         UpdatedAt = DateTime.Now;
-
     }
     public void CancelProj()
     {
         if (ProjStatus == ProjectStatusType.Cancel)
-            return;
+            throw new BadRequestException("وضعیت پروژه شما از قبل کنسل شده است!");
 
         if (ProjStatus == ProjectStatusType.Finished)
             throw new BadRequestException("پروژه به اتمام رسیده، نمیتوانید وضعیتت آن را تغییر دهید!");
@@ -118,7 +129,7 @@ public class Project : BaseEntity
     public void FinishProj()
     {
         if (ProjStatus == ProjectStatusType.Finished)
-            return;
+            throw new BadRequestException("وضعیت پروژه شما از قبل به پایان رسیده است!");
 
         if (ProjStatus == ProjectStatusType.Cancel)
             throw new BadRequestException("پروژه کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
@@ -132,22 +143,13 @@ public class Project : BaseEntity
     }
     public void ChangeProjProgress(byte progress)
     {
-        if (!IsActive)
-            throw new BadRequestException("پروژه فعال نیست، نمیتوانید میزان پیشرفت را تغییر دهید!");
-
         if (ProjProgress == progress)
             return;
 
         if (progress <= 0 || progress > 100)
             throw new BadRequestException("نمیتوانید میزان پیشرفت را کمتر از 0 و بیشتر از 100 وارد کنید!");
 
-        if (ProjProgress > progress)
-            throw new BadRequestException("نمیتوانید میزان پیشرفت را کمتر از میزان فعلی اعمال کنید!");
-
         ProjProgress = progress;
-
-        if (progress == 100)
-            IsActive = false;
 
         ProjEndAt = DateTime.Now;
     }

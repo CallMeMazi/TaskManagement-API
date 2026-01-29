@@ -17,12 +17,12 @@ public class OrganizationRepository
     public Task<Organization?> GetOrgByIdWithOwnerAsync(int orgId, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
-        return query.Include(ut => ut.Owner).FirstOrDefaultAsync(o => o.Id == orgId, ct);
+        return query.Include(o => o.Owner).FirstOrDefaultAsync(o => o.Id == orgId, ct);
     }
     public Task<Organization?> GetOrgByIdWithMembersAsync(int orgId, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
-        return query.Include(ut => ut.Members).FirstOrDefaultAsync(o => o.Id == orgId, ct);
+        return query.Include(o => o.Members).FirstOrDefaultAsync(o => o.Id == orgId, ct);
     }
 
     // Command methods

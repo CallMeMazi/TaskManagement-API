@@ -2,6 +2,5 @@
 public class RevokeUserTokenAppDto
 {
     public int UserId { get; set; }
-    public required string UserIp { get; set; }
-    public required string UserAgent { get; set; }
+    public required string Deviceid { get; set; }
 }

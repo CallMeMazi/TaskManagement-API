@@ -2,6 +2,7 @@
 using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
 using TaskManagement.Application.DTOs.SharedDTOs.Invitation;
 using TaskManagement.Application.Interfaces.Services.Halper;
+using TaskManagement.Application.Interfaces.Services.Main;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
@@ -10,7 +11,7 @@ using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Enums.Statuses;
 
 namespace TaskManagement.Application.Services.Main;
-public class InvitationService
+public class InvitationService : IInvitationService
 {
     private readonly IUnitOfWork _uow;
     private readonly IEventService _eventService;
@@ -102,7 +103,7 @@ public class InvitationService
             ct
         );
         if (isInvitationExist)
-            throw new BadRequestException("شما برای این کاربر لینک دعوت فعال دارید!");
+            throw new ForbiddenException("شما برای این کاربر لینک دعوت فعال دارید!");
 
         var isUserInOrg = await _uow.OrganizationMemberShip.IsEntityExistByFilterAsync(om =>
             om.OrgId == org.Id
@@ -160,7 +161,7 @@ public class InvitationService
             throw new NotFoundException("درخواست دعوت فعالی با این شناسه پیدا نشد!");
 
         if (invitation!.Org.OwnerId != command.OrgOwnerId)
-            throw new BadRequestException("شما مالک این سازمان نیستید!");
+            throw new ForbiddenException("شما مالک این سازمان نیستید!");
 
         invitation.RevokedInvite();
         await _uow.SaveAsync(ct);

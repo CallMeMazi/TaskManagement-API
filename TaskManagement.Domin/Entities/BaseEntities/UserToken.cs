@@ -13,24 +13,30 @@ public class UserToken : BaseEntity
     public DateTime ExpiredAt { get; private set; }
     public DateTime? RevokedAt { get; private set; }
     public DateTime LastUsedAt { get; private set; } = DateTime.Now;
+    public string DeviceId { get; private set; }
     public string UserIp { get; private set; }
     public string UserAgent { get; private set; }
 
+    #region Navigation Prop
+
     public User User { get; private set; }
+
+    #endregion
 
 
     private UserToken() { }
     public UserToken(int userId, string accessToken, string refreshToken
-        , string securityStamp, DateTime expiredAt, string userIp
-        , string userAgent)
+        , string securityStamp, DateTime expiredAt, string deviceId
+        , string userIp, string userAgent)
     {
-        ValidateUserToken(userId, accessToken, refreshToken, securityStamp, expiredAt, userIp, userAgent);
+        ValidateUserToken(userId, accessToken, refreshToken, securityStamp, expiredAt, deviceId, userIp, userAgent);
 
         UserId = userId;
         AccessTokenHash = accessToken;
         RefreshTokenHash = refreshToken;
         SecurityStamp = securityStamp;
         ExpiredAt = expiredAt;
+        DeviceId = deviceId;
         UserIp = userIp;
         UserAgent = userAgent;
     }
@@ -71,8 +77,8 @@ public class UserToken : BaseEntity
     }
 
     public void ValidateUserToken(int userId, string accessToken, string refreshToken
-        , string securityStamp, DateTime expiredAt, string userIp
-        , string userAgent)
+        , string securityStamp, DateTime expiredAt, string deviceId
+        , string userIp, string userAgent)
     {
         var errorMessages = new List<string>();
 
@@ -90,6 +96,9 @@ public class UserToken : BaseEntity
 
         if (expiredAt <= DateTime.Now)
             errorMessages.Add("تاریخ انقضا نامعتبر است!");
+
+        if (deviceId.IsNullParameter())
+            throw new Exception($"deviceId is null, error in {nameof(ValidateUserToken)} method!");
 
         if (userIp.IsNullParameter())
             errorMessages.Add("آیپی کابر خالی است!");

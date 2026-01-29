@@ -1,8 +1,8 @@
 ﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Project;
-public class UpdateProjectAppDto
+public class AddRemoveUserProjectAppDto
 {
+    public int UserId { get; set; }
     public int ProjId { get; set; }
     public int OwnerId { get; set; }
-    public required string ProjName { get; set; }
-    public required string ProjDescription { get; set; }
+    public int OrgId { get; set; }
 }

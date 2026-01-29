@@ -47,6 +47,11 @@ public class UserTokenConfiguration : IBaseConfiguration<UserToken>
             .HasColumnType("nvarchar(50)")
             .HasMaxLength(50);
 
+        builder.Property(ut => ut.DeviceId)
+            .IsRequired()
+            .HasColumnType("nvarchar(50)")
+            .HasMaxLength(50);
+
         builder.Property(ut => ut.UserAgent)
             .IsRequired()
             .HasColumnType("nvarchar(50)")
@@ -79,5 +84,7 @@ public class UserTokenConfiguration : IBaseConfiguration<UserToken>
             .IsUnique();
 
         builder.HasIndex(ut => ut.TokenStatus);
+
+        builder.HasIndex(ut => ut.DeviceId);
     }
 }

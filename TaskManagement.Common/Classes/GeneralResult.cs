@@ -26,8 +26,8 @@ public class GeneralResult<T> : GeneralResult
         Result = result;
     }
 
-    public static GeneralResult<T?> Success(T? result, string message = "عملیات با موفقیت انجام شد.") =>
-        new GeneralResult<T?>(result, true, message);
-    public static GeneralResult<T?> Failure(T? result, string message = "عملیات ناموفق بود!") =>
-        new GeneralResult<T?>(result ?? default, false, message);
+    public static GeneralResult<T> Success(T result, string message = "عملیات با موفقیت انجام شد.") =>
+        new GeneralResult<T>(result, true, message);
+    public static GeneralResult<T> Failure(T? result, string message = "عملیات ناموفق بود!") =>
+        new GeneralResult<T>(result ?? default, false, message);
 }
