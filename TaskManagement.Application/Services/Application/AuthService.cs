@@ -1,7 +1,8 @@
-﻿using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
+﻿using AutoMapper;
+using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
 using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
+using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Application.Interfaces.Services.Main;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
@@ -10,44 +11,46 @@ using TaskManagement.Common.Settings;
 using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Enums.Statuses;
 
-namespace TaskManagement.Application.Services.Main;
+namespace TaskManagement.Application.Services.Application;
 public class AuthService : IAuthServiec
 {
     private readonly ICommonService _commonService;
     private readonly AppSettings _appSettings;
     private readonly IUnitOfWork _uow;
+    private readonly IMapper _mapper;
 
 
-    public AuthService(ICommonService commonService, IUnitOfWork unitOfWork, AppSettings appSettings)
+    public AuthService(ICommonService commonService, IUnitOfWork unitOfWork, AppSettings appSettings, IMapper mapper)
     {
         _commonService = commonService;
         _appSettings = appSettings;
         _uow = unitOfWork;
+        _mapper = mapper;
     }
 
 
     // Query methods
     public async Task<GeneralResult<List<UserTokenDetailsDto>>> GetUserActiveTokensAsync(int userId, CancellationToken ct)
     {
-        if (userId <= 0)
-            throw new Exception($"the ID of user is invalide. Exception in {nameof(GetUserActiveTokensAsync)} method!");
-
-        var tokens = await _uow.UserToken.GetAllDtoByFilterAsync(ut =>
+        var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == userId
             && ut.TokenStatus == TokenStatus.Active,
+            false,
             ct
         );
 
         if (tokens.IsNullParameter() || !tokens.Any())
             throw new Exception($"any tokens for {userId} UserId was not found. in {nameof(GetUserActiveTokensAsync)} method!");
 
-        return GeneralResult<List<UserTokenDetailsDto>>.Success(tokens)!;
+        var tokensDto = _mapper.Map<List<UserTokenDetailsDto>>(tokens);
+
+        return GeneralResult<List<UserTokenDetailsDto>>.Success(tokensDto);
     }
     public async Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto query, CancellationToken ct)
     {
         // Validate JWT (Expire date, Signature, algorithm)
-        // Check current deviceId with deviceId in token
-        // Check user security stamp with security stamp in token
+        // Check current DeviceId(DB) with DeviceId in token
+        // Check user security stamp(DB) with security stamp in token
 
         var SecurityStampResult = _commonService.Jwt.GetSecurityStampFromAccessToken(query.AccessToken, query.DeviceId);
         if (!SecurityStampResult.IsSuccess)
@@ -62,7 +65,7 @@ public class AuthService : IAuthServiec
         );
 
         if (token.IsNullParameter())
-            throw new Exception($"token not found. in {nameof(ValidateAccessTokenAsync)} method!");
+            throw new UnAuthorizedException("توکن نامعتبر است، لطفا مجددا لاگین کنید!");
 
         if (token!.TokenStatus != TokenStatus.Active || token.SecurityStamp != SecurityStampResult.Result)
             throw new UnAuthorizedException("توکن نامعتبر است، لطفا مجددا لاگین کنید!");
@@ -100,7 +103,7 @@ public class AuthService : IAuthServiec
             RefreshTokenHash = tokenResult.Result.RefreshTokenHash,
         };
 
-        return GeneralResult<UserTokenDto>.Success(result)!;
+        return GeneralResult<UserTokenDto>.Success(result);
     }
     public async Task<GeneralResult<UserTokenDto>> LoginUserAsync(LoginUserAppDto command, CancellationToken ct)
     {
@@ -136,7 +139,7 @@ public class AuthService : IAuthServiec
             RefreshTokenHash = tokenResult.Result.RefreshTokenHash,
         };
 
-        return GeneralResult<UserTokenDto>.Success(result)!;
+        return GeneralResult<UserTokenDto>.Success(result);
     }
     public async Task<GeneralResult> LogoutUserAsync(LogoutUserAppDto command, CancellationToken ct)
     {
@@ -195,9 +198,9 @@ public class AuthService : IAuthServiec
             RefreshTokenHash = newTokensResult.Result.RefreshTokenHash,
         };
 
-        return GeneralResult<UserTokenDto>.Success(result)!;
+        return GeneralResult<UserTokenDto>.Success(result);
     }
-    public async Task<GeneralResult> RevokeTokenByUserIdAndIpAsync(RevokeUserTokenAppDto command, CancellationToken ct)
+    public async Task<GeneralResult> RevokeTokenByDeviceIdAsync(RevokeUserTokenAppDto command, CancellationToken ct)
     {
         var token = await _uow.UserToken.GetByFilterAsync(ut =>
             ut.UserId == command.UserId

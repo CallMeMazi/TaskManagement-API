@@ -1,4 +1,4 @@
-﻿using TaskManagement.Application.Interfaces.Repositories;
+﻿using TaskManagement.Domin.Interface.Repository;
 
 namespace TaskManagement.Application.Interfaces.UnitOfWork;
 public interface IUnitOfWork

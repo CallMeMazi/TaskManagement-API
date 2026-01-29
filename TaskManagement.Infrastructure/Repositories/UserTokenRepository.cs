@@ -1,17 +1,15 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
-using TaskManagement.Application.Interfaces.Repositories;
 using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domin.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManagement.Infrastructure.Repositories;
 public class UserTokenRepository 
-    : BaseRepository<UserToken, UserTokenDetailsDto>, IUserTokenRepository
+    : BaseRepository<UserToken>, IUserTokenRepository
 {
-    public UserTokenRepository(ApplicationDbContext dbContext, IMapper mapper)
-        : base(dbContext, mapper) { }
+    public UserTokenRepository(ApplicationDbContext dbContext)
+        : base(dbContext) { }
 
 
     // Query methods

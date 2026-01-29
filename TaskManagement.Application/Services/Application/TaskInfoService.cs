@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.TaskInfo;
 using TaskManagement.Application.DTOs.SharedDTOs.TaskInfo;
-using TaskManagement.Application.Interfaces.Services.Main;
+using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Services.Main;
+namespace TaskManagement.Application.Services.Application;
 public class TaskInfoService : ITaskInfoService
 {
     private readonly IUnitOfWork _unitOfWork;

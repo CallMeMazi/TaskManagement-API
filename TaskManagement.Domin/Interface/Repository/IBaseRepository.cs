@@ -1,23 +1,17 @@
 ﻿using System.Linq.Expressions;
-using TaskManagement.Application.DTOs.SharedDTOs.Organization;
 using TaskManagement.Domin.Entities.BaseEntities;
 
-namespace TaskManagement.Application.Interfaces.Repositories;
-public interface IBaseRepository<TEntity, TDto>
+namespace TaskManagement.Domin.Interface.Repository;
+public interface IBaseRepository<TEntity>
     where TEntity : BaseEntity
-    where TDto : class
 {
     #region Async methods
 
     // Query methods
     Task<List<TEntity>> GetAllAsync(bool isTracking = false, CancellationToken ct = default);
-    Task<List<TDto>> GetAllDtoAsync(CancellationToken ct = default);
     Task<List<TEntity>> GetAllByFilterAsync(Expression<Func<TEntity, bool>> filter, bool isTracking = false, CancellationToken ct = default);
-    Task<List<TDto>> GetAllDtoByFilterAsync(Expression<Func<TEntity, bool>> filter, CancellationToken ct = default);
     Task<TEntity?> GetByIdAsync(int entityId, bool isTracking = false, CancellationToken ct = default);
-    Task<TDto?> GetDtoByIdAsync(int entityId, CancellationToken ct = default);
     Task<TEntity?> GetByFilterAsync(Expression<Func<TEntity, bool>> filter, bool isTracking = false, CancellationToken ct = default);
-    Task<TDto?> GetDtoByFilterAsync(Expression<Func<TEntity, bool>> filter, CancellationToken ct = default);
     ValueTask<TEntity?> FindByIdsAsync(CancellationToken ct, params object[] ids);
 
     // Command methods
@@ -45,7 +39,7 @@ public interface IBaseRepository<TEntity, TDto>
 
     #region Explicit Loading
 
-    System.Threading.Tasks.Task LoadCollectionAsync<TProperty>(TEntity entity, Expression<Func<TEntity, IEnumerable<TProperty>>> collectionProperty, CancellationToken ct) 
+    System.Threading.Tasks.Task LoadCollectionAsync<TProperty>(TEntity entity, Expression<Func<TEntity, IEnumerable<TProperty>>> collectionProperty, CancellationToken ct)
         where TProperty : class;
     System.Threading.Tasks.Task LoadReferenceAsync<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty?>> referenceProperty, CancellationToken ct)
         where TProperty : class;

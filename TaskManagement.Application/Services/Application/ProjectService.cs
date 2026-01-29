@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
 using TaskManagement.Application.DTOs.ApplicationDTOs.Project;
+using TaskManagement.Application.DTOs.SharedDTOs.Invitation;
 using TaskManagement.Application.DTOs.SharedDTOs.Project;
+using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Application.Interfaces.Services.Main;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
@@ -12,7 +13,7 @@ using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Enums.Roles;
 using TaskManagement.Domin.Enums.Statuses;
 
-namespace TaskManagement.Application.Services.Main;
+namespace TaskManagement.Application.Services.Application;
 public class ProjectService : IProjectService
 {
     private readonly IUnitOfWork _uow;
@@ -31,15 +32,14 @@ public class ProjectService : IProjectService
     // Query methods
     public async Task<GeneralResult<ProjectDetailsDto>> GetProjectByIdAsync(int projId, CancellationToken ct)
     {
-        if (projId.IsNullParameter() || projId <= 0)
-            throw new BadRequestException("شناسه پروژه نامعتبر است!");
-
-        var project = await _uow.Project.GetDtoByIdAsync(projId, ct);
+        var project = await _uow.Project.GetByIdAsync(projId, false, ct);
 
         if (project.IsNullParameter())
             throw new NotFoundException("پروژه ای با این شناسه یافت نشد!");
 
-        return GeneralResult<ProjectDetailsDto>.Success(project)!;
+        var projectDto = _mapper.Map<ProjectDetailsDto>(project);
+
+        return GeneralResult<ProjectDetailsDto>.Success(projectDto);
     }
 
     // Command methods

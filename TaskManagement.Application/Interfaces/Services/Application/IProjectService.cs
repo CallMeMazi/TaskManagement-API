@@ -2,8 +2,8 @@
 using TaskManagement.Application.DTOs.SharedDTOs.Project;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Interfaces.Services.Main;
+namespace TaskManagement.Application.Interfaces.Services.Application;
 public interface IProjectService
 {
-   
+
 }

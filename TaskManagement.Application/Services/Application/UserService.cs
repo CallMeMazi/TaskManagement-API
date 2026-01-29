@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.User;
 using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
+using TaskManagement.Application.DTOs.SharedDTOs.Organization;
 using TaskManagement.Application.DTOs.SharedDTOs.User;
 using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
+using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Application.Interfaces.Services.Main;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
@@ -13,7 +14,7 @@ using TaskManagement.Common.Settings;
 using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Enums.Roles;
 
-namespace TaskManagement.Application.Services.Main;
+namespace TaskManagement.Application.Services.Application;
 public class UserService : IUserService
 {
     private readonly IUnitOfWork _uow;
@@ -37,27 +38,25 @@ public class UserService : IUserService
     // Query methods
     public async Task<GeneralResult<UserDetailsDto>> GetUserByIdAsync(int id, CancellationToken ct)
     {
-        if (id.IsNullParameter() || id <= 0)
-            throw new BadRequestException("آیدی نامعتبر است!");
-
-        var user = await _uow.User.GetDtoByIdAsync(id, ct);
+        var user = await _uow.User.GetByIdAsync(id, false, ct);
 
         if (user.IsNullParameter())
             throw new NotFoundException("کاربری با این آیدی وجود ندارد!");
 
-        return GeneralResult<UserDetailsDto>.Success(user)!;
+        var userDto = _mapper.Map<UserDetailsDto>(user);
+
+        return GeneralResult<UserDetailsDto>.Success(userDto);
     }
     public async Task<GeneralResult<UserDetailsDto>> GetUserByMobileNumberAsync(string mobileNumber, CancellationToken ct)
     {
-        if (mobileNumber.IsNullParameter())
-            throw new BadRequestException("شماره موبایل خالی است!");
-
-        var user = await _uow.User.GetDtoByFilterAsync(u => u.MobileNumber == mobileNumber, ct);
+        var user = await _uow.User.GetByFilterAsync(u => u.MobileNumber == mobileNumber, false, ct);
 
         if (user == null)
             throw new NotFoundException("کاربری با این شماره موبایل وجود ندارد!");
 
-        return GeneralResult<UserDetailsDto>.Success(user)!;
+        var userDto = _mapper.Map<UserDetailsDto>(user);
+
+        return GeneralResult<UserDetailsDto>.Success(userDto);
     }
 
     // Command methods
@@ -80,13 +79,14 @@ public class UserService : IUserService
             new RegisterUserTokenAppDto()
             {
                 user = user,
+                DeviceId = command.DeviceId,
                 UserAgent = command.UserAgent,
                 UserIp = command.UserIp,
             },
             ct
         );
 
-        return GeneralResult<UserTokenDto>.Success(tokens)!;
+        return GeneralResult<UserTokenDto>.Success(tokens);
     }
     public async Task<GeneralResult> UpdateUserAsync(UpdateUserAppDto command, CancellationToken ct)
     {
@@ -147,8 +147,7 @@ public class UserService : IUserService
             new RevokeUserTokenAppDto()
             {
                 UserId = user.Id,
-                UserIp = command.UserIp,
-                UserAgent = command.UserAgent
+                Deviceid = command.DeviceId
             },
             false,
             ct
@@ -158,12 +157,9 @@ public class UserService : IUserService
     }
     public async Task<GeneralResult> IncreaseUserPointsAsync(int id, CancellationToken ct)
     {
-        if (id.IsNullParameter() || id <= 0)
-            throw new BadRequestException("آیدی نامعتبر است!");
-
         var user = await _uow.User.GetByIdAsync(id, true, ct);
         if (user.IsNullParameter())
-            throw new NotFoundException("کاربری با این آیدی وجود ندارد!");
+            throw new Exception($"user by {id} ID was not found. in {nameof(IncreaseUserPointsAsync)} method!");
 
         user!.IncreaseOrDecreasePoints(_appSettings.UserSetting.PositiveUserPoints);
         await _uow.SaveAsync(ct);
@@ -172,12 +168,9 @@ public class UserService : IUserService
     }
     public async Task<GeneralResult> DecreaseUserPointsAsync(int id, CancellationToken cancellationToken)
     {
-        if (id.IsNullParameter() || id <= 0)
-            throw new BadRequestException("آیدی نامعتبر است!");
-
         var user = await _uow.User.GetByIdAsync(id, true, cancellationToken);
         if (user.IsNullParameter())
-            throw new NotFoundException("کاربری با این آیدی وجود ندارد!");
+            throw new Exception($"user by {id} ID was not found. in {nameof(DecreaseUserPointsAsync)} method!");
 
         user!.IncreaseOrDecreasePoints(_appSettings.UserSetting.NegativeUserPoints);
         await _uow.SaveAsync(cancellationToken);

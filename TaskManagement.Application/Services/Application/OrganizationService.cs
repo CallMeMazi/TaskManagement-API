@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
+using TaskManagement.Application.DTOs.SharedDTOs.Invitation;
 using TaskManagement.Application.DTOs.SharedDTOs.Organization;
+using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Application.Interfaces.Services.Main;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
@@ -11,7 +12,7 @@ using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Enums.Roles;
 using TaskManagement.Domin.Enums.Statuses;
 
-namespace TaskManagement.Application.Services.Main;
+namespace TaskManagement.Application.Services.Application;
 public class OrganizationService : IOrganizationService
 {
     private readonly ICommonService _commonService;
@@ -30,27 +31,25 @@ public class OrganizationService : IOrganizationService
     // Query methods
     public async Task<GeneralResult<OrgDetailsDto>> GetOrgByIdAsync(int id, CancellationToken ct)
     {
-        if (id.IsNullParameter() || id <= 0)
-            throw new BadRequestException("شناسه سازمان نامعتبر است!");
-
-        var org = await _uow.Organization.GetDtoByIdAsync(id, ct);
+        var org = await _uow.Organization.GetByIdAsync(id, false, ct);
 
         if (org.IsNullParameter())
             throw new NotFoundException("سازمانی با این شناسه یافت نشد!");
 
-        return GeneralResult<OrgDetailsDto>.Success(org)!;
+        var orgDto = _mapper.Map<OrgDetailsDto>(org);
+
+        return GeneralResult<OrgDetailsDto>.Success(orgDto);
     }
     public async Task<GeneralResult<OrgDetailsDto>> GetOrgByCodeAsync(string orgCode, CancellationToken ct)
     {
-        if (orgCode.IsNullParameter())
-            throw new BadRequestException("کد سازمان خالی است!");
-
-        var org = await _uow.Organization.GetDtoByFilterAsync(o => o.OrgCode == orgCode, ct);
+        var org = await _uow.Organization.GetByFilterAsync(o => o.OrgCode == orgCode, false, ct);
 
         if (org.IsNullParameter())
             throw new NotFoundException("سازمانی با این کد یافت نشد!");
 
-        return GeneralResult<OrgDetailsDto>.Success(org)!;
+        var orgDto = _mapper.Map<OrgDetailsDto>(org);
+
+        return GeneralResult<OrgDetailsDto>.Success(orgDto);
     }
 
     // command services

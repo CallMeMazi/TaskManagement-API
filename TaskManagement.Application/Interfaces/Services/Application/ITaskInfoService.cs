@@ -3,7 +3,7 @@ using TaskManagement.Application.DTOs.ApplicationDTOs.TaskInfo;
 using TaskManagement.Application.DTOs.SharedDTOs.TaskInfo;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Interfaces.Services.Main;
+namespace TaskManagement.Application.Interfaces.Services.Application;
 public interface ITaskInfoService
 {
     Task<GeneralResult<TaskInfoDetailsDto>> GetTaskInfoByIdAsync(int taskInfoId, CancellationToken ct);

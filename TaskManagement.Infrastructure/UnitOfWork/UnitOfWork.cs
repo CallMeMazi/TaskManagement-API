@@ -1,5 +1,5 @@
-﻿using TaskManagement.Application.Interfaces.Repositories;
-using TaskManagement.Application.Interfaces.UnitOfWork;
+﻿using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Domin.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManagement.Infrastructure.UnitOfWork;

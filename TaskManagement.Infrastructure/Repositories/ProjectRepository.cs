@@ -1,16 +1,14 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using TaskManagement.Application.DTOs.SharedDTOs.Project;
-using TaskManagement.Application.Interfaces.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
 using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domin.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManagement.Infrastructure.Repositories;
 public class ProjectRepository 
-    : BaseRepository<Project, ProjectDetailsDto>, IProjectRepository
+    : BaseRepository<Project>, IProjectRepository
 {
-    public ProjectRepository(ApplicationDbContext dbContext, IMapper mapper)
-        : base(dbContext, mapper) { }
+    public ProjectRepository(ApplicationDbContext dbContext)
+        : base(dbContext) { }
 
 
     // Query methods

@@ -59,7 +59,7 @@ public class Jwtservice : IJwtService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         var refreshtoken = Convert.ToBase64String(randomNumber);
-        return GeneralResult<string>.Success(refreshtoken)!;
+        return GeneralResult<string>.Success(refreshtoken);
     }
     public GeneralResult<UserTokenDto> GenerateAccessTokenAndRefreshToken(User user, string deviceId)
     {

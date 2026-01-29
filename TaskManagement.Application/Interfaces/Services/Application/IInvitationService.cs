@@ -2,7 +2,7 @@
 using TaskManagement.Application.DTOs.SharedDTOs.Invitation;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Interfaces.Services.Main;
+namespace TaskManagement.Application.Interfaces.Services.Application;
 public interface IInvitationService
 {
     Task<GeneralResult> AcceptInvitationAsync(AcceptOrgInvitationAppDto command, CancellationToken ct);

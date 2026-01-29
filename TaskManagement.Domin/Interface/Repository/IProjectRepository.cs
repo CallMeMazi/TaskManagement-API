@@ -1,8 +1,7 @@
-﻿using TaskManagement.Application.DTOs.SharedDTOs.Project;
-using TaskManagement.Domin.Entities.BaseEntities;
+﻿using TaskManagement.Domin.Entities.BaseEntities;
 
-namespace TaskManagement.Application.Interfaces.Repositories;
-public interface IProjectRepository : IBaseRepository<Project, ProjectDetailsDto>
+namespace TaskManagement.Domin.Interface.Repository;
+public interface IProjectRepository : IBaseRepository<Project>
 {
     Task<Project?> GetProjectByIdWithMembersAsync(int projId, bool isTracking = false, CancellationToken ct = default);
     Task<Project?> GetProjectByIdWithOrgAsync(int projId, bool isTracking = false, CancellationToken ct = default);

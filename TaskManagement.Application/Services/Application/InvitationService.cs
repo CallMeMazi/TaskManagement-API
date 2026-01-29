@@ -1,8 +1,9 @@
-﻿using TaskManagement.Application.DTOs.ApplicationDTOs.Invitatoin;
+﻿using AutoMapper;
+using TaskManagement.Application.DTOs.ApplicationDTOs.Invitatoin;
 using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
 using TaskManagement.Application.DTOs.SharedDTOs.Invitation;
+using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Application.Interfaces.Services.Main;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
@@ -10,76 +11,76 @@ using TaskManagement.Common.Helpers;
 using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Enums.Statuses;
 
-namespace TaskManagement.Application.Services.Main;
+namespace TaskManagement.Application.Services.Application;
 public class InvitationService : IInvitationService
 {
     private readonly IUnitOfWork _uow;
     private readonly IEventService _eventService;
+    private readonly IMapper _mapper;
 
 
-    public InvitationService(IUnitOfWork uow, IEventService eventService)
+    public InvitationService(IUnitOfWork uow, IEventService eventService, IMapper mapper)
     {
         _uow = uow;
         _eventService = eventService;
+        _mapper = mapper;
     }
 
 
     // Query methods
     public async Task<GeneralResult<OrgInvitationDetailsDto>> GetOrgInvitationByIdAsync(int id, CancellationToken ct)
     {
-        if (id.IsNullParameter() || id <= 0)
-            throw new BadRequestException("آیدی نامعتبر است!");
-
-        var invitation = await _uow.Invitation.GetDtoByIdAsync(id, ct);
+        var invitation = await _uow.Invitation.GetByIdAsync(id, false, ct);
 
         if (invitation.IsNullParameter())
             throw new NotFoundException("درخواست دعوتی با این آیدی وجود ندارد!");
 
-        return GeneralResult<OrgInvitationDetailsDto>.Success(invitation)!;
+        var invitationDto = _mapper.Map<OrgInvitationDetailsDto>(invitation);
+
+        return GeneralResult<OrgInvitationDetailsDto>.Success(invitationDto);
     }
     public async Task<GeneralResult<OrgInvitationDetailsDto>> GetPendingOrgInvitationByIdAsync(int id, CancellationToken ct)
     {
-        if (id.IsNullParameter() || id <= 0)
-            throw new BadRequestException("آیدی نامعتبر است!");
-
-        var invitation = await _uow.Invitation.GetDtoByFilterAsync(oi =>
+        var invitation = await _uow.Invitation.GetByFilterAsync(oi =>
             oi.Id == id
             && oi.Status == OrgInvitationStatus.Pending,
+            false,
             ct
         );
 
         if (invitation.IsNullParameter())
             throw new NotFoundException("درخواست دعوت فعالی با این آیدی وجود ندارد!");
 
-        return GeneralResult<OrgInvitationDetailsDto>.Success(invitation)!;
+        var invitationDto = _mapper.Map<OrgInvitationDetailsDto>(invitation);
+
+        return GeneralResult<OrgInvitationDetailsDto>.Success(invitationDto);
     }
     public async Task<GeneralResult<List<OrgInvitationDetailsDto>>> GetAllOrgInvitationByOrgIdAsync(int orgId, CancellationToken ct)
     {
-        if (orgId.IsNullParameter() || orgId <= 0)
-            throw new BadRequestException("آیدی نامعتبر است!");
-
-        var invitations = await _uow.Invitation.GetAllDtoByFilterAsync(oi => oi.OrgId == orgId, ct);
+        var invitations = await _uow.Invitation.GetAllByFilterAsync(oi => oi.OrgId == orgId, false, ct);
 
         if (invitations.IsNullParameter() || !invitations.Any())
             throw new NotFoundException("درخواست دعوتی با این آیدی سازمان وجود ندارد!");
 
-        return GeneralResult<List<OrgInvitationDetailsDto>>.Success(invitations)!;
+        var invitationsDto = _mapper.Map<List<OrgInvitationDetailsDto>>(invitations);
+
+        return GeneralResult<List<OrgInvitationDetailsDto>>.Success(invitationsDto);
     }
     public async Task<GeneralResult<List<OrgInvitationDetailsDto>>> GetAllPendingOrgInvitationByOrgIdAsync(int orgId, CancellationToken ct)
     {
-        if (orgId.IsNullParameter() || orgId <= 0)
-            throw new BadRequestException("آیدی نامعتبر است!");
-
-        var invitations = await _uow.Invitation.GetAllDtoByFilterAsync(oi =>
+        var invitations = await _uow.Invitation.GetAllByFilterAsync(oi =>
             oi.OrgId == orgId
             && oi.Status == OrgInvitationStatus.Pending,
+            false,
             ct
         );
 
         if (invitations.IsNullParameter() || !invitations.Any())
             throw new NotFoundException("درخواست دعوت فعالی با این آیدی سازمان وجود ندارد!");
 
-        return GeneralResult<List<OrgInvitationDetailsDto>>.Success(invitations)!;
+        var invitationsDto = _mapper.Map<List<OrgInvitationDetailsDto>>(invitations);
+
+        return GeneralResult<List<OrgInvitationDetailsDto>>.Success(invitationsDto);
     }
 
     // Command methods
@@ -118,7 +119,7 @@ public class InvitationService : IInvitationService
         await _uow.Invitation.AddAsync(invatation, ct);
         await _uow.SaveAsync(ct);
 
-        return GeneralResult<string>.Success(invatation.Token)!;
+        return GeneralResult<string>.Success(invatation.Token);
     }
     public async Task<GeneralResult> AcceptInvitationAsync(AcceptOrgInvitationAppDto command, CancellationToken ct)
     {

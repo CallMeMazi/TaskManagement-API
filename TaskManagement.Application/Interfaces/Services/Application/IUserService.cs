@@ -3,7 +3,7 @@ using TaskManagement.Application.DTOs.SharedDTOs.User;
 using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Interfaces.Services.Main;
+namespace TaskManagement.Application.Interfaces.Services.Application;
 public interface IUserService
 {
     Task<GeneralResult<UserDetailsDto>> GetUserByIdAsync(int id, CancellationToken ct);

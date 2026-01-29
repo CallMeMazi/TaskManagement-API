@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using TaskManagement.Application.Interfaces.Repositories;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Settings;
+using TaskManagement.Domin.Interface.Repository;
 using TaskManagement.Infrastructure.Repositories;
 using TaskManagement.Infrastructure.UnitOfWork;
 
@@ -28,7 +28,7 @@ public static class CustomConfiguration
     }
     private static IServiceCollection AddRepositoriesConfig(this IServiceCollection services)
     {
-        services.AddScoped(typeof(IBaseRepository<,>), typeof(BaseRepository<,>));
+        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserTokenRepository, UserTokenRepository>();
         services.AddScoped<IOrganizationRepository, OrganizationRepository>();

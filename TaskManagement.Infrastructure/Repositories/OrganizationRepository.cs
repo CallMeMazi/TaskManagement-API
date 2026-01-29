@@ -1,16 +1,14 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using TaskManagement.Application.DTOs.SharedDTOs.Organization;
-using TaskManagement.Application.Interfaces.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
 using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domin.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManagement.Infrastructure.Repositories;
 public class OrganizationRepository 
-    : BaseRepository<Organization, OrgDetailsDto>, IOrganizationRepository
+    : BaseRepository<Organization>, IOrganizationRepository
 {
-    public OrganizationRepository(ApplicationDbContext dbContext, IMapper mapper)
-        : base(dbContext, mapper) { }
+    public OrganizationRepository(ApplicationDbContext dbContext)
+        : base(dbContext) { }
 
 
     // Query methods

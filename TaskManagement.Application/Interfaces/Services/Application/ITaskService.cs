@@ -2,7 +2,7 @@
 using TaskManagement.Application.DTOs.SharedDTOs.Task;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Interfaces.Services.Main;
+namespace TaskManagement.Application.Interfaces.Services.Application;
 public interface ITaskService
 {
     Task<GeneralResult<TaskDetailsDto>> GetTaskByIdAsync(int taskId, CancellationToken ct);

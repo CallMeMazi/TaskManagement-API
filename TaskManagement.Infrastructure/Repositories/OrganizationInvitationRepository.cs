@@ -1,17 +1,15 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using TaskManagement.Application.DTOs.SharedDTOs.Invitation;
-using TaskManagement.Application.Interfaces.Repositories;
 using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domin.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManagement.Infrastructure.Repositories;
 public class OrganizationInvitationRepository
-    : BaseRepository<OrganizationInvitation, OrgInvitationDetailsDto>, IOrganizationInvitationRepository
+    : BaseRepository<OrganizationInvitation>, IOrganizationInvitationRepository
 {
-    public OrganizationInvitationRepository(ApplicationDbContext dbContext, IMapper mapper)
-        : base(dbContext, mapper) { }
+    public OrganizationInvitationRepository(ApplicationDbContext dbContext)
+        : base(dbContext) { }
 
 
     public Task<OrganizationInvitation?> GetByFilterWithOrgAsync(Expression<Func<OrganizationInvitation, bool>> filter, bool isTracking = false, CancellationToken ct = default)
