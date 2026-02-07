@@ -12,25 +12,15 @@ public class ProjectRepository
 
 
     // Query methods
-    public Task<Project?> GetProjectByIdWithMembersAsync(int projId, bool isTracking = false, CancellationToken ct = default)
-    {
-        var query = isTracking ? Entities : Entities.AsNoTracking();
-        return query.Include(p => p.ProjMember).FirstOrDefaultAsync(p => p.Id == projId, ct);
-    }
     public Task<Project?> GetProjectByIdWithOrgAsync(int projId, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.Include(p => p.Org).FirstOrDefaultAsync(p => p.Id == projId, ct);
     }
-    public Task<Project?> GetProjectByIdWithOrgAndCreatorAsync(int projId, bool isTracking = false, CancellationToken ct = default)
+    public Task<Project?> GetProjectByIdWithMembersAsync(int projId, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
-        return query.Include(p => p.Org).Include(p => p.Creator).FirstOrDefaultAsync(p => p.Id == projId, ct);
-    }
-    public Task<Project?> GetProjectByIdWithOrgAndMembersAsync(int projId, bool isTracking = false, CancellationToken ct = default)
-    {
-        var query = isTracking ? Entities : Entities.AsNoTracking();
-        return query.Include(p => p.Org).Include(p => p.ProjMember).FirstOrDefaultAsync(p => p.Id == projId, ct);
+        return query.Include(p => p.ProjMember).FirstOrDefaultAsync(p => p.Id == projId, ct);
     }
 
     // Command methods

@@ -10,19 +10,23 @@ using TaskManagement.Common.Helpers;
 using TaskManagement.Common.Settings;
 using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Enums.Statuses;
+using TaskManagement.Domin.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
 public class AuthService : IAuthServiec
 {
     private readonly ICommonService _commonService;
+    private readonly IUserTokenDomainService _tokenDomainService;
     private readonly AppSettings _appSettings;
     private readonly IUnitOfWork _uow;
     private readonly IMapper _mapper;
 
 
-    public AuthService(ICommonService commonService, IUnitOfWork unitOfWork, AppSettings appSettings, IMapper mapper)
+    public AuthService(ICommonService commonService, IUserTokenDomainService tokenDomainService, IUnitOfWork unitOfWork
+        , AppSettings appSettings, IMapper mapper)
     {
         _commonService = commonService;
+        _tokenDomainService = tokenDomainService;
         _appSettings = appSettings;
         _uow = unitOfWork;
         _mapper = mapper;
@@ -111,7 +115,10 @@ public class AuthService : IAuthServiec
         if (user.IsNullParameter())
             throw new NotFoundException("کاربری با این شماره موبایل پیدا نشد!");
 
-        await VerifyPasswordAndActiveDeviceAsync(command.Password, user!, ct);
+        if (!_commonService.Password.Verify(user!.PasswordHash, command.Password))
+            throw new NotFoundException("شماره موبایل یا رمز عبور اشتباه است!");
+
+        await _tokenDomainService.EnsureCanLoginAsync(user.Id, ct);
 
         var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(user!, command.DeviceId);
         if (!tokenResult.IsSuccess)
@@ -261,19 +268,6 @@ public class AuthService : IAuthServiec
         return GeneralResult.Success();
     }
 
-    private async System.Threading.Tasks.Task VerifyPasswordAndActiveDeviceAsync(string currentPassword, User user, CancellationToken ct)
-    {
-        if (!_commonService.Password.Verify(user!.PasswordHash, currentPassword))
-            throw new NotFoundException("شماره موبایل یا رمز عبور اشتباه است!");
-
-        var userDeviceCount = await GetUserActiveDeviceCountAsync(user.Id, ct);
-        if (userDeviceCount >= 3)
-            throw new BadRequestException("نمیتوانید با بیشتر از سه دستگاه یا مرورگر متفاوت وارد شوید!");
-    }
-    private Task<int> GetUserActiveDeviceCountAsync(int userId, CancellationToken ct)
-    {
-        return _uow.UserToken.GetCountByFilterAsync(ut => ut.UserId == userId && ut.TokenStatus == TokenStatus.Active, ct);
-    }
     private (string accessToken, string refreshToken) HashAcceesTokenAndRefreshToken(string accessToken, string refreshToken)
     {
         var accessTokenHashed = _commonService.Password.Hash(accessToken);

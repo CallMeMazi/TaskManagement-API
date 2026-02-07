@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.User;
 using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
-using TaskManagement.Application.DTOs.SharedDTOs.Organization;
 using TaskManagement.Application.DTOs.SharedDTOs.User;
 using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
@@ -12,22 +11,24 @@ using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Common.Settings;
 using TaskManagement.Domin.Entities.BaseEntities;
-using TaskManagement.Domin.Enums.Roles;
+using TaskManagement.Domin.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
 public class UserService : IUserService
 {
     private readonly IUnitOfWork _uow;
+    private readonly IUserDomainService _userDomainService;
     private readonly AppSettings _appSettings;
     private readonly ICommonService _commonService;
     private readonly IEventService _eventService;
     private readonly IMapper _mapper;
 
 
-    public UserService(IUnitOfWork unitOfWork, ICommonService commonService
+    public UserService(IUnitOfWork unitOfWork, IUserDomainService userDomainService, ICommonService commonService
         , IMapper mapper, IEventService eventService, AppSettings appSettings)
     {
         _uow = unitOfWork;
+        _userDomainService = userDomainService;
         _commonService = commonService;
         _mapper = mapper;
         _eventService = eventService;
@@ -64,8 +65,7 @@ public class UserService : IUserService
     {
         // This method is used in transaction (TransAction)
 
-        if (await _uow.User.IsEntityExistByFilterAsync(u => u.MobileNumber == command.MobileNumber, ct))
-            throw new BadRequestException("کاربری با این شماره موبایل وجود دارد!");
+        await _userDomainService.EnsureCanCreateUserAsync(command.MobileNumber, ct);
 
         command.Password = _commonService.Password.Hash(command.Password);
 
@@ -110,9 +110,7 @@ public class UserService : IUserService
         if (_commonService.Password.Verify(user!.PasswordHash, command.Password))
             throw new BadRequestException("رمز عبور اشتلاه است!");
 
-        var verifyResult = await VerifyUserForDeleteAsync(user.Id, ct);
-        if (!verifyResult.IsSuccess)
-            throw new BadRequestException(verifyResult.Message);
+        await _userDomainService.EnsureCanDeleteUserAsync(command.UserId, ct);
 
         // Delete User (SP)
         // Delete all UserTokens By UserId (SP)
@@ -138,9 +136,7 @@ public class UserService : IUserService
         if (!_commonService.Password.Verify(user!.PasswordHash, command.OldPassword))
             throw new BadRequestException("رمز عبور اشتباه است!");
 
-        command.NewPassword = _commonService.Password.Hash(command.NewPassword);
-
-        user.ChangeUserPassword(command.NewPassword);
+        user.ChangeUserPassword(_commonService.Password.Hash(command.NewPassword));
 
         // revoke all User tokens except current (Event)
         await _eventService.PublishRevokeAllTokensExceptCurrentByUserIdEventAsync(
@@ -174,22 +170,6 @@ public class UserService : IUserService
 
         user!.IncreaseOrDecreasePoints(_appSettings.UserSetting.NegativeUserPoints);
         await _uow.SaveAsync(cancellationToken);
-
-        return GeneralResult.Success();
-    }
-
-    private async Task<GeneralResult> VerifyUserForDeleteAsync(int userId, CancellationToken ct)
-    {
-        if (await _uow.Organization.IsEntityExistByFilterAsync(o => o.OwnerId == userId && o.IsActive, ct))
-            return GeneralResult.Failure("شما هنوز سازمان فعال دارید، اول سازمان های خود را غیرفعال کنید!");
-
-        var isUserInOtherOrgs = await _uow.OrganizationMemberShip.IsEntityExistByFilterAsync(om =>
-            om.UserId == userId
-            && om.Role != OrganizationRoles.Owner,
-            ct
-        );
-        if (isUserInOtherOrgs)
-            return GeneralResult.Failure("شما در سازمان های دیگری عضو هستید، ابتدا از تمام سازمان هایی که عضو هستید خارج شوید!");
 
         return GeneralResult.Success();
     }

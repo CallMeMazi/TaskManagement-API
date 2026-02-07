@@ -2,7 +2,6 @@
 public class ChangeUserRoleProjectAppDto
 {
     public int OwnerId { get; set; }
-    public int OrgId { get; set; }
     public int ProjId { get; set; }
     public int UserId { get; set; }
 }
