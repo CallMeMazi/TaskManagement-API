@@ -26,10 +26,6 @@ public class UserTokenDomainService : IUserTokenDomainService
             ct
         );
         if (activeDevice >= 3)
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "نمیتوانید با بیشتر از سه دستگاه یا مرورگر متفاوت وارد شوید!"
-            );
+            throw new BadRequestException("نمیتوانید با بیشتر از سه دستگاه یا مرورگر متفاوت وارد شوید!");
     }
 }

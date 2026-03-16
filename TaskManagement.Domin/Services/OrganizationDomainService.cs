@@ -25,35 +25,19 @@ public class OrganizationDomainService : IOrganizationDomainService
     public async Task EnsureCanCreateOrgAsync(string secondOrgName, int ownerId, CancellationToken ct)
     {
         if (await _orgRepository.IsEntityExistByFilterAsync(o => o.SecondOrgName == secondOrgName, ct))
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!"
-            );
+            throw new BadRequestException("سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!");
 
         if (await _orgRepository.IsEntityExistByFilterAsync(o => o.OwnerId == ownerId && o.IsActive, ct))
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "شما نمیتوانید چندین سازمان فعال داشته باشید، لطفا ابتدا سازمان فعلی خود را غیرفعال کیند"
-            );
+            throw new BadRequestException("شما نمیتوانید چندین سازمان فعال داشته باشید، لطفا ابتدا سازمان فعلی خود را غیرفعال کیند");
 
         var userOrgCount = await _orgRepository.GetCountByFilterAsync(o => o.OwnerId == ownerId, ct);
         if (userOrgCount == 3)
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "نمیوتنید بیشتر از 3 سازمان به نام خود داشته باشید!"
-            );
+            throw new BadRequestException("نمیوتنید بیشتر از 3 سازمان به نام خود داشته باشید!");
     }
     public async Task EnsureCanUpdateOrgAsync(string secondOrgName, int orgId, CancellationToken ct)
     {
         if (await _orgRepository.IsEntityExistByFilterAsync(o => o.SecondOrgName == secondOrgName && o.Id != orgId, ct))
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!"
-            );
+            throw new BadRequestException("سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!");
     }
     public async Task EnsureCanDeactiveOrgAsync(int orgId, CancellationToken ct)
     {
@@ -63,11 +47,7 @@ public class OrganizationDomainService : IOrganizationDomainService
             ct
         );
         if (isProjActive)
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "در سازمان شما پروژه فعال وجود دارد، اول آن را کنسل یا به اتمام برسانید!"
-            );
+            throw new BadRequestException("در سازمان شما پروژه فعال وجود دارد، اول آن را کنسل یا به اتمام برسانید!");
     }
     // Org Membership methods
     public async Task EnsureCanUserAddToOrgAsync(int orgId, int userId, CancellationToken ct)
@@ -78,11 +58,7 @@ public class OrganizationDomainService : IOrganizationDomainService
             ct
         );
         if (isUserInOrg)
-            throw new AppException(
-                HttpStatusCode.BadGateway,
-                ResultStatus.BadRequest,
-                "شما در این سازمان حضور دارید!"
-            );
+            throw new BadRequestException("شما در این سازمان حضور دارید!");
     }
     public async Task EnsureCanRemoveUserFromOrgAsync(int orgId, int userId, CancellationToken ct)
     {
@@ -93,11 +69,7 @@ public class OrganizationDomainService : IOrganizationDomainService
             ct
         );
         if (isUserInActiveProj)
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "کاربر مورد نظر در پروژه فعال حضور دارد، ابتدا پروژه را به اتمام برسانید یا کنسل کنید یا کاربر را از پروژه حذف کنید!"
-            );
+            throw new BadRequestException("کاربر مورد نظر در پروژه فعال حضور دارد، ابتدا پروژه را به اتمام برسانید یا کنسل کنید یا کاربر را از پروژه حذف کنید!");
     }
     public async Task EnsureCanChangeRoleToMemberAsync(int userId, int orgId, CancellationToken ct)
     {
@@ -108,10 +80,6 @@ public class OrganizationDomainService : IOrganizationDomainService
             ct
         );
         if (isUserHasActiveProj)
-            throw new AppException(
-                HttpStatusCode.BadRequest, 
-                ResultStatus.BadRequest,
-                "این ادمین دارای پروژه های فعال است!"
-            );
+            throw new BadRequestException("این ادمین دارای پروژه های فعال است!");
     }
 }

@@ -25,16 +25,12 @@ public class UserDomainService : IUserDomainService
     public async Task EnsureCanCreateUserAsync(string mobileNumber, CancellationToken ct)
     {
         if (await _userRepository.IsEntityExistByFilterAsync(u => u.MobileNumber == mobileNumber, ct))
-            throw new AppException(HttpStatusCode.BadRequest, ResultStatus.BadRequest, "کاربری با این شماره موبایل وجود دارد!");
+            throw new BadRequestException("کاربری با این شماره موبایل وجود دارد!");
     }
     public async Task EnsureCanDeleteUserAsync(int userId, CancellationToken ct)
     {
         if (await _orgRepository.IsEntityExistByFilterAsync(o => o.OwnerId == userId && o.IsActive, ct))
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "شما هنوز سازمان فعال دارید، اول سازمان های خود را غیرفعال کنید!"
-            );
+            throw new BadRequestException("شما هنوز سازمان فعال دارید، اول سازمان های خود را غیرفعال کنید!");
 
         var isUserInOtherOrgs = await _orgMemberShipRepository.IsEntityExistByFilterAsync(om =>
             om.UserId == userId
@@ -42,10 +38,6 @@ public class UserDomainService : IUserDomainService
             ct
         );
         if (isUserInOtherOrgs)
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "شما در سازمان های دیگری عضو هستید، ابتدا از تمام سازمان هایی که عضو هستید خارج شوید!"
-            );
+            throw new BadRequestException("شما در سازمان های دیگری عضو هستید، ابتدا از تمام سازمان هایی که عضو هستید خارج شوید!");
     }
 }

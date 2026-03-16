@@ -1,5 +1,4 @@
 ﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Common.Helpers;
 
 namespace TaskManagement.Domin.Entities.BaseEntities;
 public class TaskInfo : BaseEntity
@@ -22,29 +21,25 @@ public class TaskInfo : BaseEntity
 
 
     private TaskInfo() { }
-    public TaskInfo(int taskId, int userId, int taskAssignmentId)
+    public TaskInfo(int taskId, int userId, int taskAssignmentId
+        , DateTime startedTaskAt, DateTime endedTaskAt)
     {
-        ValidateTaskInfo(taskId, userId, taskAssignmentId);
+        ValidateTaskInfo(taskId, userId, taskAssignmentId, startedTaskAt, endedTaskAt);
 
         TaskId = taskId;
         UserId = userId;
         TaskAssignmentId = taskAssignmentId;
+        StartedTaskAt = startedTaskAt;
+        EndedTaskAt = endedTaskAt;
+        TotalHours = GetTotalHours();
     }
 
 
-    public void EndTask(string taskInfoDescription)
-    {
-        if (taskInfoDescription.IsNullParameter())
-            throw new BadRequestException("توضیحات تسک خالی است!");
-       
-        TaskInfoDescription = taskInfoDescription;
-        EndedTaskAt = DateTime.Now;
-        TotalHours = GetTotalHours(StartedTaskAt);
+    public byte GetTotalHours() =>
+        Convert.ToByte((EndedTaskAt! - StartedTaskAt).Value.TotalHours);
 
-        UpdatedAt = DateTime.Now;
-    }
-
-    public void ValidateTaskInfo(int taskId, int userId, int taskAssignmentId)
+    public void ValidateTaskInfo(int taskId, int userId, int taskAssignmentId
+        , DateTime startedTaskAt, DateTime endedTaskAt)
     {
         var errorMessages = new List<string>();
 
@@ -57,9 +52,13 @@ public class TaskInfo : BaseEntity
         if (taskAssignmentId <= 0)
             errorMessages.Add("آیدی تسک کاربر خالی است!");
 
+        if (startedTaskAt >= DateTime.Now)
+            errorMessages.Add("زمان شروع تسک مربوط به آینده است!");
+
+        if (endedTaskAt >= DateTime.Now)
+            errorMessages.Add("زمان پایان تسک مربوط به آینده است!");
+
         if (errorMessages.Any())
             throw new BadRequestException("اطلاعات نامعتبر است!", errorMessages);
     }
-    public byte GetTotalHours(DateTime startrdTaskAt) =>
-        Convert.ToByte((EndedTaskAt! - startrdTaskAt).Value.TotalHours);
 }

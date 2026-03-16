@@ -1,4 +1,5 @@
-﻿using TaskManagement.Domin.Interface.Repository;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManagement.Domin.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManagement.Infrastructure.Repositories;
@@ -7,4 +8,12 @@ public class TaskRepository
 {
     public TaskRepository(ApplicationDbContext dbContext)
         : base(dbContext) { }
+
+
+    // command methods
+    public Task<int> SoftDeleteTaskSpAsync(int taskId, CancellationToken ct)
+    {
+        var query = string.Format("EXEC dbo.sp_SoftDeleteTask @TaskId = {0}", taskId);
+        return _db.Database.ExecuteSqlRawAsync(query, ct);
+    }
 }

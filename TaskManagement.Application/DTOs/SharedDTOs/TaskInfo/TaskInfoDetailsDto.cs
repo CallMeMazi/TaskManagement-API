@@ -5,5 +5,4 @@ public class TaskInfoDetailsDto
     public DateTime StartedTaskAt { get; set; }
     public DateTime EndedTaskAt { get; set; }
     public byte TotalHours { get; set; }
-    public DateTime CreateAt { get; set; }
 }

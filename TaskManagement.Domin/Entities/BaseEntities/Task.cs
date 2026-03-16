@@ -72,7 +72,7 @@ public class Task : BaseEntity
     public void CancelTask()
     {
         if (TaskStatus == TaskStatusType.Cancel)
-            return;
+            throw new BadRequestException("تسک از قبل کنسل شده است!");
 
         if (TaskStatus == TaskStatusType.Dead)
             throw new BadRequestException("زمان تسک اتمام رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
@@ -88,7 +88,7 @@ public class Task : BaseEntity
     public void FinishTask()
     {
         if (TaskStatus == TaskStatusType.Finished)
-            return;
+            throw new BadRequestException("تسک از قبل تمام شده است!");
 
         if (TaskStatus == TaskStatusType.Dead)
             throw new BadRequestException("زمان تسک اتمام رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
@@ -105,7 +105,7 @@ public class Task : BaseEntity
     public void DeadTask()
     {
         if (TaskStatus == TaskStatusType.Finished)
-            return;
+            throw new BadRequestException("زمان تسک از قبل تمام شده است!");
 
         if (TaskDeadline <= DateTime.Now)
         {
@@ -130,11 +130,11 @@ public class Task : BaseEntity
 
         TaskProgress = progress;
 
-        if (progress == 100)
-        {
-            IsActive = false;
-            FinishTask();
-        }
+        UpdatedAt = DateTime.Now;
+    }
+    public void ChangeTaskType()
+    {
+        TaskType = TaskType == TaskType.Single ? TaskType.Group : TaskType.Single;
 
         UpdatedAt = DateTime.Now;
     }

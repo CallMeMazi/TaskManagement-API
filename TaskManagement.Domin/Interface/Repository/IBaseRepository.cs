@@ -13,6 +13,8 @@ public interface IBaseRepository<TEntity>
     Task<TEntity?> GetByIdAsync(int entityId, bool isTracking = false, CancellationToken ct = default);
     Task<TEntity?> GetByFilterAsync(Expression<Func<TEntity, bool>> filter, bool isTracking = false, CancellationToken ct = default);
     ValueTask<TEntity?> FindByIdsAsync(CancellationToken ct, params object[] ids);
+    Task<T?> GetFieldByIdAsync<T>(int entityId, Expression<Func<TEntity, T>> filedExpression, CancellationToken ct = default);
+    Task<T?> GetFieldByFilterAsync<T>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, T>> filedExpression, CancellationToken ct = default);
 
     // Command methods
     System.Threading.Tasks.Task AddAsync(TEntity entity, CancellationToken ct = default);

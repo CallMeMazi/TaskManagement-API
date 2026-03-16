@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Linq.Expressions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domin.Entities.BaseEntities;
@@ -51,6 +52,14 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity>
     public ValueTask<TEntity?> FindByIdsAsync(CancellationToken ct, params object[] ids)
     {
         return Entities.FindAsync(ids, ct);
+    }
+    public Task<T?> GetFieldByIdAsync<T>(int entityId, Expression<Func<TEntity, T>> filedExpression, CancellationToken ct = default)
+    {
+        return Entities.AsNoTracking().Where(e => e.Id == entityId).Select(filedExpression).FirstOrDefaultAsync(ct);
+    }
+    public Task<T?> GetFieldByFilterAsync<T>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, T>> filedExpression, CancellationToken ct = default)
+    {
+        return Entities.AsNoTracking().Where(expression).Select(filedExpression).FirstOrDefaultAsync(ct);
     }
 
     // Command methods

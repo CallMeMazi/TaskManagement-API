@@ -16,11 +16,13 @@ public class UnitOfWork : IUnitOfWork
     public IOrganizationMemberShipRepository OrganizationMemberShip { get; }
     public IOrganizationInvitationRepository Invitation { get; }
     public IProjectMemberShipRepository ProjectMemberShip { get; }
+    public ITaskAssignmentRepository TaskAssignment { get; }
 
     public UnitOfWork(ApplicationDbContext context, IUserRepository userRepository, IOrganizationRepository organizationRepository
         , IProjectRepository projectRepository, ITaskRepository taskRepository, ITaskInfoRepository taskInfoRepository
         , IUserTokenRepository userTokenRepository, IOrganizationMemberShipRepository organizationMemberShipRepository
-        , IOrganizationInvitationRepository invitation, IProjectMemberShipRepository projectMemberShip)
+        , IOrganizationInvitationRepository invitation, IProjectMemberShipRepository projectMemberShip
+        , ITaskAssignmentRepository taskAssignment)
     {
         _context = context;
         User = userRepository;
@@ -32,6 +34,7 @@ public class UnitOfWork : IUnitOfWork
         OrganizationMemberShip = organizationMemberShipRepository;
         Invitation = invitation;
         ProjectMemberShip = projectMemberShip;
+        TaskAssignment = taskAssignment;
     }
 
     public void Save()

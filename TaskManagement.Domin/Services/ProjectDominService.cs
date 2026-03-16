@@ -31,11 +31,7 @@ public class ProjectDominService : IProjectDominService
             ct
         );
         if (!isOwnerInOrg)
-            throw new AppException(
-                HttpStatusCode.Forbidden,
-                ResultStatus.Forbidden,
-                "شما به این پروژه دسترسی ندارید!"
-            );
+            throw new ForbiddenException("شما به این پروژه دسترسی ندارید!");
     }
     public async System.Threading.Tasks.Task CheakProjectActiveTaskAsync(int projectId, CancellationToken ct)
     {
@@ -45,11 +41,7 @@ public class ProjectDominService : IProjectDominService
             ct
         );
         if (isProjHasActiveTask)
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "شما در پروژه تسک های فعال دارید، ابتدا آن ها را عیرفعال کنید!"
-            );
+            throw new BadRequestException("شما در پروژه تسک های فعال دارید، ابتدا آن ها را عیرفعال کنید!");
     }
     // Project Member Ship methods
     public async System.Threading.Tasks.Task EnsureCanAddUserToProjectAsync(Project project,int userId, int orgId, CancellationToken ct)
@@ -63,11 +55,7 @@ public class ProjectDominService : IProjectDominService
             ct
         );
         if (!isUserInOrg)
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "گاربر مورد نظر در سازمان وجود ندارد!"
-            );
+            throw new BadRequestException("گاربر مورد نظر در سازمان وجود ندارد!");
     }
     public async System.Threading.Tasks.Task EnsureCanRemoveUserFromProjectAsync(Project project, int userId, CancellationToken ct)
     {
@@ -81,10 +69,6 @@ public class ProjectDominService : IProjectDominService
             ct
         );
         if (isUserHasActiveTask)
-            throw new AppException(
-                HttpStatusCode.BadRequest,
-                ResultStatus.BadRequest,
-                "کاربر مورد نظر در تسک فعال حضور دارد، ابتدا تسک را به اتمام برسانید یا کنسل کنید!"
-            );
+            throw new BadRequestException("کاربر مورد نظر در تسک فعال حضور دارد، ابتدا تسک را به اتمام برسانید یا کنسل کنید!");
     }
 }

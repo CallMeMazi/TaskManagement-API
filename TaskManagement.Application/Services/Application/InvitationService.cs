@@ -10,18 +10,22 @@ using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domin.Entities.BaseEntities;
 using TaskManagement.Domin.Enums.Statuses;
+using TaskManagement.Domin.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
 public class InvitationService : IInvitationService
 {
     private readonly IUnitOfWork _uow;
+    private readonly IInvitationDominService _invitationDominService;
     private readonly IEventService _eventService;
     private readonly IMapper _mapper;
 
 
-    public InvitationService(IUnitOfWork uow, IEventService eventService, IMapper mapper)
+    public InvitationService(IUnitOfWork uow, IEventService eventService, IMapper mapper
+        , IInvitationDominService invitationDominService)
     {
         _uow = uow;
+        _invitationDominService = invitationDominService;
         _eventService = eventService;
         _mapper = mapper;
     }
@@ -31,7 +35,6 @@ public class InvitationService : IInvitationService
     public async Task<GeneralResult<OrgInvitationDetailsDto>> GetOrgInvitationByIdAsync(int id, CancellationToken ct)
     {
         var invitation = await _uow.Invitation.GetByIdAsync(id, false, ct);
-
         if (invitation.IsNullParameter())
             throw new NotFoundException("درخواست دعوتی با این آیدی وجود ندارد!");
 
@@ -47,7 +50,6 @@ public class InvitationService : IInvitationService
             false,
             ct
         );
-
         if (invitation.IsNullParameter())
             throw new NotFoundException("درخواست دعوت فعالی با این آیدی وجود ندارد!");
 
@@ -58,7 +60,6 @@ public class InvitationService : IInvitationService
     public async Task<GeneralResult<List<OrgInvitationDetailsDto>>> GetAllOrgInvitationByOrgIdAsync(int orgId, CancellationToken ct)
     {
         var invitations = await _uow.Invitation.GetAllByFilterAsync(oi => oi.OrgId == orgId, false, ct);
-
         if (invitations.IsNullParameter() || !invitations.Any())
             throw new NotFoundException("درخواست دعوتی با این آیدی سازمان وجود ندارد!");
 
@@ -74,7 +75,6 @@ public class InvitationService : IInvitationService
             false,
             ct
         );
-
         if (invitations.IsNullParameter() || !invitations.Any())
             throw new NotFoundException("درخواست دعوت فعالی با این آیدی سازمان وجود ندارد!");
 
@@ -90,31 +90,9 @@ public class InvitationService : IInvitationService
         if (user.IsNullParameter())
             throw new NotFoundException("شماره موبایل کاربر نامعتبر است!");
 
-        var org = await _uow.Organization.GetByIdAsync(command.OrgId, false, ct);
-        if (org.IsNullParameter())
-            throw new NotFoundException("شناسه سازمان نامعتبر است!");
+        await _invitationDominService.EnsureCanGenerateInviteLinkAsync(command.OrgId, command.OrgOwnerId, user!.Id, ct);
 
-        if (org!.OwnerId != command.OrgOwnerId)
-            throw new BadRequestException("فقط مالک سازمان میتواند لینک دعوت بسازد!");
-
-        var isInvitationExist = await _uow.Invitation.IsEntityExistByFilterAsync(oi =>
-            oi.UserId == user!.Id
-            && oi.OrgId == org.Id
-            && oi.Status == OrgInvitationStatus.Pending,
-            ct
-        );
-        if (isInvitationExist)
-            throw new ForbiddenException("شما برای این کاربر لینک دعوت فعال دارید!");
-
-        var isUserInOrg = await _uow.OrganizationMemberShip.IsEntityExistByFilterAsync(om =>
-            om.OrgId == org.Id
-            & om.UserId == user!.Id,
-            ct
-        );
-        if (isUserInOrg)
-            throw new BadRequestException("این کاربر در حال حاضر در سازمان وجود دارد!");
-
-        var invatation = new OrganizationInvitation(org.Id, user!.Id);
+        var invatation = new OrganizationInvitation(command.OrgId, user!.Id);
 
         await _uow.Invitation.AddAsync(invatation, ct);
         await _uow.SaveAsync(ct);

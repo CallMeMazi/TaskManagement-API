@@ -34,7 +34,7 @@ public class TaskAssignment : BaseEntity
     public void IncreaseTotalTimeSpent(byte totalTime)
     {
         if (totalTime <= 0)
-            throw new BadRequestException("نمیتوانید کمتر از 0 به مجموع ساعت کاری این تسک اضافه کنید!");
+            throw new BadRequestException("نمیتوانید کمتر از 0 ساعت به مجموع ساعت کاری این تسک اضافه کنید!");
 
         if (totalTime > 24)
             throw new BadRequestException("نمیتوانید بیشتر از 24 ساعت به مجموع ساعت کاری این تسک اضافه کنید!");
@@ -58,6 +58,11 @@ public class TaskAssignment : BaseEntity
         {
             LastStartedAt = DateTime.Now;
             IncreaseStartTaskCount();
+        }
+        else
+        {
+            byte totalInProgressTime = Convert.ToByte(DateTime.Now.Hour - LastStartedAt!.Value.Hour);
+            IncreaseTotalTimeSpent(totalInProgressTime);
         }
 
         UpdatedAt = DateTime.Now;

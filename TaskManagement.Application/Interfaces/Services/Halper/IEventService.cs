@@ -1,4 +1,5 @@
 ﻿using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
+using TaskManagement.Application.DTOs.ApplicationDTOs.TaskInfo;
 using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
 using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 
@@ -11,4 +12,7 @@ public interface IEventService
 
     // Org service methods
     Task PublishAddUserToOrgEventAsync(AddUserOrgAppDto command, CancellationToken ct);
+
+    // TaskInfo service methods
+    Task PublishCreateTaskInfoAsync(CreateTaskInfoAppDto command, CancellationToken ct);
 }
