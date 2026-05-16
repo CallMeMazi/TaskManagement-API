@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Infrastructure.Persistence.Configurations.BaseEntityConfiguration;
-public class TaskConfiguration : IBaseConfiguration<Domin.Entities.BaseEntities.Task>
+public class TaskConfiguration : IBaseConfiguration<Domain.Entities.BaseEntities.Task>
 {
-    public void Configure(EntityTypeBuilder<Domin.Entities.BaseEntities.Task> builder)
+    public void Configure(EntityTypeBuilder<Domain.Entities.BaseEntities.Task> builder)
     {
         #region Types
 

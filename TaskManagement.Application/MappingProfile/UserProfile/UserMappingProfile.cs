@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.User;
 using TaskManagement.Application.DTOs.SharedDTOs.User;
-using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Application.MappingProfile.UserProfile;
 public class UserMappingProfile : Profile

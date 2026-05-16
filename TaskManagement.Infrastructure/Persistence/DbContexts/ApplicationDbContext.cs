@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Infrastructure.Persistence.Configurations.BaseEntityConfiguration;
 using TaskManagement.Infrastructure.Utilities;
 
@@ -12,10 +12,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         base.OnModelCreating(modelBuilder);
 
-        var dominAssembly = typeof(BaseEntity).Assembly;
+        var DomainAssembly = typeof(BaseEntity).Assembly;
         var infrastructureAssembly = typeof(ApplicationDbContext).Assembly;
 
-        modelBuilder.RegisterAllEntities<IBaseEntity>(dominAssembly);
+        modelBuilder.RegisterAllEntities<IBaseEntity>(DomainAssembly);
         modelBuilder.RegisterEntityTypeConfiguration(typeof(IBaseConfiguration<>), infrastructureAssembly);
         modelBuilder.AddRestrictDeleteBehaviorConvention();
         modelBuilder.AddPluralizingTableNameConvention();

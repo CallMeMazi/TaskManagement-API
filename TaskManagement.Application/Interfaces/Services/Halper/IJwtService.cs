@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 using TaskManagement.Common.Classes;
-using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Application.Interfaces.Services.Halper;
 public interface IJwtService

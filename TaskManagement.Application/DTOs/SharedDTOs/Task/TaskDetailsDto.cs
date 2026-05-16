@@ -1,5 +1,5 @@
-﻿using TaskManagement.Domin.Enums;
-using TaskManagement.Domin.Enums.Statuses;
+﻿using TaskManagement.Domain.Enums;
+using TaskManagement.Domain.Enums.Statuses;
 
 namespace TaskManagement.Application.DTOs.SharedDTOs.Task;
 public class TaskDetailsDto

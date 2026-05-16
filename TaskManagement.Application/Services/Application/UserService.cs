@@ -10,8 +10,8 @@ using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Common.Settings;
-using TaskManagement.Domin.Entities.BaseEntities;
-using TaskManagement.Domin.Interface.Services;
+using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Domain.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
 public class UserService : IUserService
@@ -65,6 +65,7 @@ public class UserService : IUserService
     {
         // This method is used in transaction (TransAction)
 
+        // Check mobile number exist
         await _userDomainService.EnsureCanCreateUserAsync(command.MobileNumber, ct);
 
         command.Password = _commonService.Password.Hash(command.Password);
@@ -107,9 +108,10 @@ public class UserService : IUserService
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(SoftDeleteUserAsync)} method!");
 
-        if (_commonService.Password.Verify(user!.PasswordHash, command.Password))
-            throw new BadRequestException("رمز عبور اشتلاه است!");
+        _commonService.Password.VerifyAndCheck(user!.PasswordHash, command.Password, "رمز عبور اشتلاه است!");
 
+        // Check user has org
+        // Check user in org
         await _userDomainService.EnsureCanDeleteUserAsync(command.UserId, ct);
 
         // Delete User (SP)
@@ -133,8 +135,7 @@ public class UserService : IUserService
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(ChangePasswordUserAsync)} method!");
 
-        if (!_commonService.Password.Verify(user!.PasswordHash, command.OldPassword))
-            throw new BadRequestException("رمز عبور اشتباه است!");
+        _commonService.Password.VerifyAndCheck(user!.PasswordHash, command.OldPassword, "رمز عبور اشتباه است!");
 
         user.ChangeUserPassword(_commonService.Password.Hash(command.NewPassword));
 

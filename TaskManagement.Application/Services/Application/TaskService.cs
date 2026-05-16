@@ -8,9 +8,9 @@ using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Entities.BaseEntities;
-using TaskManagement.Domin.Enums;
-using TaskManagement.Domin.Interface.Services;
+using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Domain.Enums;
+using TaskManagement.Domain.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
 public class TaskService : ITaskService
@@ -52,7 +52,7 @@ public class TaskService : ITaskService
 
         await _taskDomainService.EnsureCanCreateTaskAsync(project!, command.UserId, ct);
 
-        var task = _mapper.Map<Domin.Entities.BaseEntities.Task>(command);
+        var task = _mapper.Map<Domain.Entities.BaseEntities.Task>(command);
 
         await _uow.Task.AddAsync(task, ct);
         await _uow.SaveAsync(ct);

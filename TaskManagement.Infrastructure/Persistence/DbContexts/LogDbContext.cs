@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Entities.LogEntities;
+using TaskManagement.Domain.Entities.LogEntities;
 using TaskManagement.Infrastructure.Persistence.Configurations.LogEntityConfiguration;
 using TaskManagement.Infrastructure.Utilities;
 
@@ -12,10 +12,10 @@ public class LogDbContext(DbContextOptions<LogDbContext> options) : DbContext(op
     {
         base.OnModelCreating(modelBuilder);
 
-        var dominAssembly = typeof(LogBaseEntity).Assembly;
+        var DomainAssembly = typeof(LogBaseEntity).Assembly;
         var infrastructureAssembly = typeof(LogDbContext).Assembly;
 
-        modelBuilder.RegisterAllEntities<LogBaseEntity>(dominAssembly);
+        modelBuilder.RegisterAllEntities<LogBaseEntity>(DomainAssembly);
         modelBuilder.RegisterEntityTypeConfiguration(typeof(ILogConfigyration<>), infrastructureAssembly);
         modelBuilder.AddRestrictDeleteBehaviorConvention();
         modelBuilder.AddPluralizingTableNameConvention();

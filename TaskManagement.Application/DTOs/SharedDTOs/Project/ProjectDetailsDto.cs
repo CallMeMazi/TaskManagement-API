@@ -1,4 +1,4 @@
-﻿using TaskManagement.Domin.Enums.Statuses;
+﻿using TaskManagement.Domain.Enums.Statuses;
 
 namespace TaskManagement.Application.DTOs.SharedDTOs.Project;
 public class ProjectDetailsDto

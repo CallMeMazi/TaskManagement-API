@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TaskManagement.Domin.Entities.LogEntities;
+using TaskManagement.Domain.Entities.LogEntities;
 
 namespace TaskManagement.Infrastructure.Persistence.Configurations.LogEntityConfiguration;
 public class EntityLogConfiguration : ILogConfigyration<EntityLog>

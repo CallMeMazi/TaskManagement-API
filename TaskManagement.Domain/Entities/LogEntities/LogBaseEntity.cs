@@ -1,0 +1,7 @@
+﻿namespace TaskManagement.Domain.Entities.LogEntities;
+public abstract class LogBaseEntity
+{
+    public int Id { get; set; }
+    public required string LogDescription { get; set; }
+    public required DateTime CreatedAt { get; set; } = DateTime.Now;
+}

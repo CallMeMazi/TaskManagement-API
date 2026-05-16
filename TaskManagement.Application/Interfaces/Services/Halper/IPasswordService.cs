@@ -3,4 +3,5 @@ public interface IPasswordService
 {
     string Hash(string password);
     bool Verify(string hashedPassword, string providedPassword);
+    void VerifyAndCheck(string hashedPassword, string providedPassword, string message);
 }

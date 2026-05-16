@@ -7,10 +7,10 @@ using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Entities.BaseEntities;
-using TaskManagement.Domin.Enums.Roles;
-using TaskManagement.Domin.Enums.Statuses;
-using TaskManagement.Domin.Interface.Services;
+using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Domain.Enums.Roles;
+using TaskManagement.Domain.Enums.Statuses;
+using TaskManagement.Domain.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
 public class OrganizationService : IOrganizationService

@@ -8,24 +8,24 @@ using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Entities.BaseEntities;
-using TaskManagement.Domin.Enums.Statuses;
-using TaskManagement.Domin.Interface.Services;
+using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Domain.Enums.Statuses;
+using TaskManagement.Domain.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
 public class InvitationService : IInvitationService
 {
     private readonly IUnitOfWork _uow;
-    private readonly IInvitationDominService _invitationDominService;
+    private readonly IInvitationDomainService _invitationDomainService;
     private readonly IEventService _eventService;
     private readonly IMapper _mapper;
 
 
     public InvitationService(IUnitOfWork uow, IEventService eventService, IMapper mapper
-        , IInvitationDominService invitationDominService)
+        , IInvitationDomainService invitationDomainService)
     {
         _uow = uow;
-        _invitationDominService = invitationDominService;
+        _invitationDomainService = invitationDomainService;
         _eventService = eventService;
         _mapper = mapper;
     }
@@ -90,7 +90,7 @@ public class InvitationService : IInvitationService
         if (user.IsNullParameter())
             throw new NotFoundException("شماره موبایل کاربر نامعتبر است!");
 
-        await _invitationDominService.EnsureCanGenerateInviteLinkAsync(command.OrgId, command.OrgOwnerId, user!.Id, ct);
+        await _invitationDomainService.EnsureCanGenerateInviteLinkAsync(command.OrgId, command.OrgOwnerId, user!.Id, ct);
 
         var invatation = new OrganizationInvitation(command.OrgId, user!.Id);
 

@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Linq.Expressions;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Entities.BaseEntities;
-using TaskManagement.Domin.Interface.Repository;
+using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 using TaskManagement.Infrastructure.QueryCache;
 

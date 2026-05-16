@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.Project;
 using TaskManagement.Application.DTOs.SharedDTOs.Project;
-using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Application.MappingProfile.ProjectProfile;
 public class ProjectMappingProfile : Profile

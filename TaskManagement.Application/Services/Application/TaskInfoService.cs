@@ -6,7 +6,7 @@ using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Application.Services.Application;
 public class TaskInfoService : ITaskInfoService

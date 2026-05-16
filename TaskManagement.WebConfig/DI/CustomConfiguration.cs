@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Settings;
-using TaskManagement.Domin.Interface.Repository;
+using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Infrastructure.Repositories;
 using TaskManagement.Infrastructure.UnitOfWork;
 

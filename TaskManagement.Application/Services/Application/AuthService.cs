@@ -8,9 +8,9 @@ using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Common.Settings;
-using TaskManagement.Domin.Entities.BaseEntities;
-using TaskManagement.Domin.Enums.Statuses;
-using TaskManagement.Domin.Interface.Services;
+using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Domain.Enums.Statuses;
+using TaskManagement.Domain.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
 public class AuthService : IAuthServiec
@@ -42,7 +42,6 @@ public class AuthService : IAuthServiec
             false,
             ct
         );
-
         if (tokens.IsNullParameter() || !tokens.Any())
             throw new Exception($"any tokens for {userId} UserId was not found. in {nameof(GetUserActiveTokensAsync)} method!");
 
@@ -115,9 +114,9 @@ public class AuthService : IAuthServiec
         if (user.IsNullParameter())
             throw new NotFoundException("کاربری با این شماره موبایل پیدا نشد!");
 
-        if (!_commonService.Password.Verify(user!.PasswordHash, command.Password))
-            throw new NotFoundException("شماره موبایل یا رمز عبور اشتباه است!");
+        _commonService.Password.VerifyAndCheck(user!.PasswordHash, command.Password, "شماره موبایل یا رمز عبور اشتباه است!");
 
+        // Check user active device count
         await _tokenDomainService.EnsureCanLoginAsync(user.Id, ct);
 
         var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(user!, command.DeviceId);

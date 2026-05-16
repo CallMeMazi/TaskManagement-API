@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TaskManagement.Domin.Interface.Repository;
+using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManagement.Infrastructure.Repositories;
 public class TaskRepository 
-    : BaseRepository<Domin.Entities.BaseEntities.Task>, ITaskRepository
+    : BaseRepository<Domain.Entities.BaseEntities.Task>, ITaskRepository
 {
     public TaskRepository(ApplicationDbContext dbContext)
         : base(dbContext) { }

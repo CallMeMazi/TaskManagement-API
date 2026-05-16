@@ -7,25 +7,25 @@ using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Domin.Entities.BaseEntities;
-using TaskManagement.Domin.Enums.Roles;
-using TaskManagement.Domin.Enums.Statuses;
-using TaskManagement.Domin.Interface.Services;
+using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Domain.Enums.Roles;
+using TaskManagement.Domain.Enums.Statuses;
+using TaskManagement.Domain.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
 public class ProjectService : IProjectService
 {
     private readonly IUnitOfWork _uow;
-    private readonly IProjectDominService _projectDominService;
+    private readonly IProjectDomainService _projectDomainService;
     private readonly ICommonService _commonService;
     private readonly IMapper _mapper;
 
 
-    public ProjectService(IUnitOfWork uow, IProjectDominService projectDominService, ICommonService commonService
+    public ProjectService(IUnitOfWork uow, IProjectDomainService projectDomainService, ICommonService commonService
         , IMapper mapper)
     {
         _uow = uow;
-        _projectDominService = projectDominService;
+        _projectDomainService = projectDomainService;
         _commonService = commonService;
         _mapper = mapper;
     }
@@ -86,7 +86,7 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات وارد شده نامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         project!.UpdateProject(command.ProjName, command.ProjDescription);
         await _uow.SaveAsync(ct);
@@ -101,7 +101,7 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی نامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         if (project!.IsActive
             && (project.ProjStatus == ProjectStatusType.InProgress || project.ProjStatus == ProjectStatusType.Adjournment))
@@ -109,7 +109,7 @@ public class ProjectService : IProjectService
 
         await CheckUserPasswordAsync(project, command.OwnerId, command.UserPassword, ct);
 
-        await _projectDominService.CheakProjectActiveTaskAsync(project.Id, ct);
+        await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         // Delete Project (SP)
         // Delete All ProjectMemberships By ProjectId (SP)
@@ -126,14 +126,14 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی مامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         if (project!.IsActive == command.Activity)
             throw new BadRequestException(project.IsActive ? "پروژه در حال حاضر فعال است!" : "پروژه در حال حاضر غیر فعال است!");
 
         await CheckUserPasswordAsync(project, command.OwnerId, command.UserPassword, ct);
 
-        await _projectDominService.CheakProjectActiveTaskAsync(project.Id, ct);
+        await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.ChangeProjActivity(command.Activity);
         await _uow.SaveAsync(ct);
@@ -146,14 +146,14 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی مامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         if (project.IsActive)
             throw new BadRequestException("پروژه شما درحال حاضر فعال است!");
 
         await CheckUserPasswordAsync(project, command.OwnerId, command.UserPassword, ct);
 
-        await _projectDominService.CheakProjectActiveTaskAsync(project.Id, ct);
+        await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.ChangeProjStatusToInProgress();
         await _uow.SaveAsync(ct);
@@ -166,14 +166,14 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی مامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         if (!project!.IsActive)
             throw new BadRequestException("پروژه شما درحال حاضر غیرفعال است!");
 
         await CheckUserPasswordAsync(project, command.OwnerId, command.UserPassword, ct);
 
-        await _projectDominService.CheakProjectActiveTaskAsync(project.Id, ct);
+        await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.ChangeProjStatusToAdjournment();
         await _uow.SaveAsync(ct);
@@ -186,11 +186,11 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی مامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         await CheckUserPasswordAsync(project!, command.OwnerId, command.UserPassword, ct);
 
-        await _projectDominService.CheakProjectActiveTaskAsync(project.Id, ct);
+        await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.CancelProj();
         await _uow.SaveAsync(ct);
@@ -203,11 +203,11 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی مامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         await CheckUserPasswordAsync(project!, command.OwnerId, command.UserPassword, ct);
 
-        await _projectDominService.CheakProjectActiveTaskAsync(project.Id, ct);
+        await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.FinishProj();
         await _uow.SaveAsync(ct);
@@ -220,7 +220,7 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی مامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         project!.ChangeProjProgress(command.ProjectProgress);
         await _uow.SaveAsync(ct);
@@ -234,13 +234,13 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی مامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         var isUserInProject = project!.ProjMember.Any(pm => pm.UserId == command.UserId);
         if (isUserInProject)
             throw new BadRequestException("کاربر مورد نظر در پروژه وجود دارد!");
 
-        await _projectDominService.EnsureCanAddUserToProjectAsync(project, command.UserId, project.OrgId, ct);
+        await _projectDomainService.EnsureCanAddUserToProjectAsync(project, command.UserId, project.OrgId, ct);
 
         await CreateProjectMemberShipAsync(project.Id, command.UserId, ProjectRoles.Member, ct);
         await _uow.SaveAsync(ct);
@@ -253,7 +253,7 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی مامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
 
         var projectMemberShip = project.ProjMember.FirstOrDefault(pm =>
@@ -263,7 +263,7 @@ public class ProjectService : IProjectService
         if (projectMemberShip.IsNullParameter())
             throw new NotFoundException("کاربر مورد نظر در پروژه وجود ندارد!");
 
-        await _projectDominService.EnsureCanRemoveUserFromProjectAsync(project, command.UserId, ct);
+        await _projectDomainService.EnsureCanRemoveUserFromProjectAsync(project, command.UserId, ct);
 
         projectMemberShip!.SoftDelete();
         await _uow.SaveAsync(ct);
@@ -276,7 +276,7 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی مامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         var ProjectMemberShip = await _uow.ProjectMemberShip.GetByFilterAsync(om =>
             om.UserId == command.UserId
@@ -298,7 +298,7 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("اطلاعات ورودی مامعتبر است!");
 
-        await _projectDominService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
+        await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         var ProjectMemberShip = await _uow.ProjectMemberShip.GetByFilterAsync(om =>
             om.UserId == command.UserId

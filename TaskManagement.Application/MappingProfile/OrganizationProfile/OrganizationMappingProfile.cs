@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
 using TaskManagement.Application.DTOs.SharedDTOs.Organization;
-using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Application.MappingProfile.OrganizationProfile;
 public class OrganizationMappingProfile : Profile

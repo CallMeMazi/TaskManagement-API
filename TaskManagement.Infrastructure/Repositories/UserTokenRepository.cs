@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using TaskManagement.Domin.Entities.BaseEntities;
-using TaskManagement.Domin.Interface.Repository;
+using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManagement.Infrastructure.Repositories;

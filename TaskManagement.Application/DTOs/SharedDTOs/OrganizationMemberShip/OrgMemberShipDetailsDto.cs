@@ -1,4 +1,4 @@
-﻿using TaskManagement.Domin.Enums.Roles;
+﻿using TaskManagement.Domain.Enums.Roles;
 
 namespace TaskManagement.Application.DTOs.SharedDTOs.OrganizationMemberShip;
 public class OrgMemberShipDetailsDto

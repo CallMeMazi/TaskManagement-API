@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.TaskInfo;
 using TaskManagement.Application.DTOs.SharedDTOs.TaskInfo;
-using TaskManagement.Domin.Entities.BaseEntities;
+using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Application.MappingProfile.TaskInfoProfile;
 public class TaskInfoMappingProfile : Profile

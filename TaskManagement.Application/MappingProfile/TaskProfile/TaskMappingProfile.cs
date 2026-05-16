@@ -8,8 +8,8 @@ public class TaskMappingProfile : Profile
     public TaskMappingProfile()
     {
         // Command DTOs
-        CreateMap<CreateTaskAppDto, Domin.Entities.BaseEntities.Task>().ConstructUsing(src =>
-        new Domin.Entities.BaseEntities.Task(
+        CreateMap<CreateTaskAppDto, Domain.Entities.BaseEntities.Task>().ConstructUsing(src =>
+        new Domain.Entities.BaseEntities.Task(
             src.ProjId,
             src.UserId,
             src.TaskName,

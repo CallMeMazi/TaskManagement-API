@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.Common", "TaskManagement.Common\TaskManagement.Common.csproj", "{B080BC6E-6683-40F3-AB03-F1AADAEFFFF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.Domin", "TaskManagement.Domin\TaskManagement.Domin.csproj", "{9C42E1DB-AEDB-4DD3-A8E7-E77F4BCF3353}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.Domain", "TaskManagement.Domain\TaskManagement.Domain.csproj", "{9C42E1DB-AEDB-4DD3-A8E7-E77F4BCF3353}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.Application", "TaskManagement.Application\TaskManagement.Application.csproj", "{3178C0A6-0FF4-44C9-BF58-FE72E03B4180}"
 EndProject
