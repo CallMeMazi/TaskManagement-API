@@ -14,6 +14,7 @@ using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
+
 public class UserService : IUserService
 {
     private readonly IUnitOfWork _uow;
@@ -22,7 +23,6 @@ public class UserService : IUserService
     private readonly ICommonService _commonService;
     private readonly IEventService _eventService;
     private readonly IMapper _mapper;
-
 
     public UserService(IUnitOfWork unitOfWork, IUserDomainService userDomainService, ICommonService commonService
         , IMapper mapper, IEventService eventService, AppSettings appSettings)
@@ -34,7 +34,6 @@ public class UserService : IUserService
         _eventService = eventService;
         _appSettings = appSettings;
     }
-
 
     // Query methods
     public async Task<GeneralResult<UserDetailsDto>> GetUserByIdAsync(int id, CancellationToken ct)
@@ -48,6 +47,7 @@ public class UserService : IUserService
 
         return GeneralResult<UserDetailsDto>.Success(userDto);
     }
+
     public async Task<GeneralResult<UserDetailsDto>> GetUserByMobileNumberAsync(string mobileNumber, CancellationToken ct)
     {
         var user = await _uow.User.GetByFilterAsync(u => u.MobileNumber == mobileNumber, false, ct);
@@ -89,6 +89,7 @@ public class UserService : IUserService
 
         return GeneralResult<UserTokenDto>.Success(tokens);
     }
+
     public async Task<GeneralResult> UpdateUserAsync(UpdateUserAppDto command, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(command.UserId, true, ct);
@@ -100,6 +101,7 @@ public class UserService : IUserService
 
         return GeneralResult.Success();
     }
+
     public async Task<GeneralResult> SoftDeleteUserAsync(DeleteUserAppDto command, CancellationToken ct)
     {
         // This method use SP (Stored Procedure)
@@ -127,6 +129,7 @@ public class UserService : IUserService
 
         return GeneralResult.Success();
     }
+
     public async Task<GeneralResult> ChangePasswordUserAsync(ChangePasswordUserAppDto command, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
@@ -152,6 +155,7 @@ public class UserService : IUserService
 
         return GeneralResult.Success();
     }
+
     public async Task<GeneralResult> IncreaseUserPointsAsync(int id, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(id, true, ct);
@@ -163,6 +167,7 @@ public class UserService : IUserService
 
         return GeneralResult.Success();
     }
+
     public async Task<GeneralResult> DecreaseUserPointsAsync(int id, CancellationToken cancellationToken)
     {
         var user = await _uow.User.GetByIdAsync(id, true, cancellationToken);

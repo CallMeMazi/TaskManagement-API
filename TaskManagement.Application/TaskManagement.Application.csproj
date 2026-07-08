@@ -7,16 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interfaces\Services\Log\**" />
+    <Compile Remove="Services\Log\**" />
+    <EmbeddedResource Remove="Interfaces\Services\Log\**" />
+    <EmbeddedResource Remove="Services\Log\**" />
+    <None Remove="Interfaces\Services\Log\**" />
+    <None Remove="Services\Log\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TaskManagement.Domain\TaskManagement.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\Services\Log\" />
-    <Folder Include="Services\Log\" />
+    <Folder Include="Features\User\Query\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="15.0.1" />
+    <PackageReference Include="MediatR" Version="14.2.0" />
   </ItemGroup>
 
 </Project>
