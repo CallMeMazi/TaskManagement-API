@@ -1,8 +1,0 @@
-﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Project;
-public class ChangeProjectActivityAppDto
-{
-    public int OwnerId { get; set; }
-    public int ProjId { get; set; }
-    public required string UserPassword { get; set; }
-    public bool Activity { get; set; }
-}

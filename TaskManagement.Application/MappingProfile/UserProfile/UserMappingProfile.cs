@@ -14,11 +14,11 @@ public class UserMappingProfile : Profile
     public UserMappingProfile()
     {
         // Command DTOs
-        CreateMap<CreateUserAppDto, User>().ConstructUsing(src =>
+        CreateMap<CreateUserAppDto, User>().ConstructUsing((src, context) =>
         new User(
             src.MobileNumber,
             src.Email,
-            src.Password,
+            (string)context.Items["PasswordHash"],
             src.FirstName,
             src.LastName
         ));

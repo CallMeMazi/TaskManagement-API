@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using TaskManagement.Application.DTOs.ApplicationDTOs.User;
+using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
 using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
@@ -11,18 +12,26 @@ public class CreateUserHandler
     : IRequestHandler<CreateUserCommand, GeneralResult<UserTokenDto>>
 {
     private readonly IUserService _userService;
+    private readonly IAuthServiec _authService;
     private readonly IMapper _mapper;
 
-    public CreateUserHandler(IUserService userService, IMapper mapper)
+    public CreateUserHandler(IUserService userService, IAuthServiec authServiec, IMapper mapper)
     {
         _userService = userService;
+        _authService = authServiec;
         _mapper = mapper;
     }
 
-    public Task<GeneralResult<UserTokenDto>> Handle(CreateUserCommand request, CancellationToken ct)
+    public async Task<GeneralResult<UserTokenDto>> Handle(CreateUserCommand request, CancellationToken ct)
     {
+        // TransActional
+
         var dto = _mapper.Map<CreateUserAppDto>(request);
 
-        return _userService.CreateUserAsync(dto, ct);
+        var createUserRes = await _userService.CreateUserAsync(dto, ct);
+
+        // Generate User tokens(regester) after creation
+        return await _authService.RegisterUserAsync
+            (new RegisterUserTokenAppDto(createUserRes.Result, request.DeviceId, request.UserIp, request.UserAgent), ct);
     }
 }

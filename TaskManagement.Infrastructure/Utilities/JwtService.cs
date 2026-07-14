@@ -6,6 +6,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using TaskManagement.Application.DTOs.InternalDTOs.UserToken;
 using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Common.Classes;
@@ -13,7 +14,6 @@ using TaskManagement.Common.Enums;
 using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Common.Settings;
-using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Infrastructure.Utilities;
 public class Jwtservice : IJwtService
@@ -27,7 +27,7 @@ public class Jwtservice : IJwtService
     }
 
 
-    public GeneralResult<string> GenerateAccessToken(User user, string deviceId)
+    public GeneralResult<string> GenerateAccessToken(GenerateTokensInternalDto tokenDto)
     {
         var secretKey = Convert.FromBase64String(_appSettings.JwtSetting.SecretKey);
         var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature);
@@ -44,7 +44,7 @@ public class Jwtservice : IJwtService
             NotBefore = DateTime.Now.AddMinutes(_appSettings.JwtSetting.NotBeforeMinutes),
             SigningCredentials = signingCredentials,
             EncryptingCredentials = encryptingCredentials,
-            Subject = new ClaimsIdentity(GetClaims(user, deviceId))
+            Subject = new ClaimsIdentity(GetClaims(tokenDto))
         };
 
         var handler = new JwtSecurityTokenHandler();
@@ -61,9 +61,9 @@ public class Jwtservice : IJwtService
         var refreshtoken = Convert.ToBase64String(randomNumber);
         return GeneralResult<string>.Success(refreshtoken);
     }
-    public GeneralResult<UserTokenDto> GenerateAccessTokenAndRefreshToken(User user, string deviceId)
+    public GeneralResult<UserTokenDto> GenerateAccessTokenAndRefreshToken(GenerateTokensInternalDto tokenDto)
     {
-        var accessTokenResult = GenerateAccessToken(user, deviceId);
+        var accessTokenResult = GenerateAccessToken(tokenDto);
         if (!accessTokenResult.IsSuccess)
             return GeneralResult<UserTokenDto>.Failure(null, accessTokenResult.Message);
 
@@ -71,11 +71,7 @@ public class Jwtservice : IJwtService
         if (refreshTokenResult.IsSuccess)
             return GeneralResult<UserTokenDto>.Failure(null, refreshTokenResult.Message);
 
-        return GeneralResult<UserTokenDto>.Success(new UserTokenDto()
-        {
-            AccessTokenHash = accessTokenResult.Result!,
-            RefreshTokenHash = refreshTokenResult.Result!
-        });
+        return GeneralResult<UserTokenDto>.Success(new UserTokenDto(accessTokenResult.Result!, refreshTokenResult.Result!));
     }
     public GeneralResult<ClaimsPrincipal> ValidateAccessTokenAndGetPrincipal(string token, string deviceId)
     {
@@ -160,12 +156,12 @@ public class Jwtservice : IJwtService
         return GeneralResult<string>.Success(claim!);
     }
 
-    private IEnumerable<Claim> GetClaims(User user, string deviceId)
+    private IEnumerable<Claim> GetClaims(GenerateTokensInternalDto tokenDto)
     {
-        yield return new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString());
-        yield return new Claim(ClaimTypes.MobilePhone, user.MobileNumber);
-        yield return new Claim(new ClaimsIdentityOptions().SecurityStampClaimType, user.SecurityStamp);
-        yield return new Claim("deviceId", deviceId);
+        yield return new Claim(JwtRegisteredClaimNames.Sub, tokenDto.UserId.ToString());
+        yield return new Claim(ClaimTypes.MobilePhone, tokenDto.MobileNumber);
+        yield return new Claim(new ClaimsIdentityOptions().SecurityStampClaimType, tokenDto.SecurityStamp);
+        yield return new Claim("deviceId", tokenDto.DeviceId);
     }
     private TokenValidationParameters GetTokenValidationParameters()
     {

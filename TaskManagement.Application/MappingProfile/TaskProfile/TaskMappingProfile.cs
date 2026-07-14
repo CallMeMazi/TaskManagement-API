@@ -15,7 +15,7 @@ public class TaskMappingProfile : Profile
             src.TaskName,
             src.TaskDescription,
             src.TaskType,
-            src.TaskDeadline
+            src.TaskDeadLine
         ));
 
         // Query DTOs

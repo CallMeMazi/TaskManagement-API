@@ -9,7 +9,6 @@ using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Enums.Roles;
-using TaskManagement.Domain.Enums.Statuses;
 using TaskManagement.Domain.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
@@ -167,7 +166,7 @@ public class OrganizationService : IOrganizationService
         if (orgMemberShip.IsNullParameter())
             throw new NotFoundException("کاربر مورد نظر در سازمان وجود ندارد!");
 
-       await _orgDomainService.EnsureCanRemoveUserFromOrgAsync(command.OrgId, command.UserId, ct);
+        await _orgDomainService.EnsureCanRemoveUserFromOrgAsync(command.OrgId, command.UserId, ct);
 
         orgMemberShip!.SoftDelete();
         await _uow.SaveAsync(ct);

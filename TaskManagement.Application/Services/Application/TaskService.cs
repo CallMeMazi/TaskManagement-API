@@ -92,7 +92,7 @@ public class TaskService : ITaskService
 
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
-        task!.UpdateTask(command.TaskName, command.TaskDescription, command.TaskDeadline);
+        task!.UpdateTask(command.TaskName, command.TaskDescription, command.TaskDeadLine);
         await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
@@ -263,17 +263,8 @@ public class TaskService : ITaskService
         taskAssignment!.ChangeTaskInProgress(false);
 
         // Create taskinfo after ended task (Event)
-        await _eventService.PublishCreateTaskInfoAsync(
-            new CreateTaskInfoAppDto()
-            {
-                TaskId = command.TaskId,
-                UserId = command.UserId,
-                TaskAssignmentId = taskAssignment.Id,
-                StartedTaskAt = (DateTime) taskAssignment.LastStartedAt!,
-                EndedTaskAt = DateTime.Now
-            },
-            ct
-        );
+        await _eventService.PublishCreateTaskInfoAsync
+            (new CreateTaskInfoAppDto(command.TaskId, command.UserId, taskAssignment.Id, (DateTime)taskAssignment.LastStartedAt!, DateTime.Now), ct);
 
         return GeneralResult.Success();
     }

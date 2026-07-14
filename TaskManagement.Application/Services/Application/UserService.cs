@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.User;
-using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
 using TaskManagement.Application.DTOs.SharedDTOs.User;
-using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWork;
@@ -21,17 +19,15 @@ public class UserService : IUserService
     private readonly IUserDomainService _userDomainService;
     private readonly AppSettings _appSettings;
     private readonly ICommonService _commonService;
-    private readonly IEventService _eventService;
     private readonly IMapper _mapper;
 
     public UserService(IUnitOfWork unitOfWork, IUserDomainService userDomainService, ICommonService commonService
-        , IMapper mapper, IEventService eventService, AppSettings appSettings)
+        , IMapper mapper, AppSettings appSettings)
     {
         _uow = unitOfWork;
         _userDomainService = userDomainService;
         _commonService = commonService;
         _mapper = mapper;
-        _eventService = eventService;
         _appSettings = appSettings;
     }
 
@@ -47,7 +43,6 @@ public class UserService : IUserService
 
         return GeneralResult<UserDetailsDto>.Success(userDto);
     }
-
     public async Task<GeneralResult<UserDetailsDto>> GetUserByMobileNumberAsync(string mobileNumber, CancellationToken ct)
     {
         var user = await _uow.User.GetByFilterAsync(u => u.MobileNumber == mobileNumber, false, ct);
@@ -61,35 +56,21 @@ public class UserService : IUserService
     }
 
     // Command methods
-    public async Task<GeneralResult<UserTokenDto>> CreateUserAsync(CreateUserAppDto command, CancellationToken ct)
+    public async Task<GeneralResult<int>> CreateUserAsync(CreateUserAppDto command, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
 
         // Check mobile number exist
         await _userDomainService.EnsureCanCreateUserAsync(command.MobileNumber, ct);
 
-        command.Password = _commonService.Password.Hash(command.Password);
-
-        var user = _mapper.Map<User>(command);
+        var userPassHash = _commonService.Password.Hash(command.Password);
+        var user = _mapper.Map<User>(command, opt => opt.Items["PasswordHash"] = userPassHash);
 
         await _uow.User.AddAsync(user, ct);
         await _uow.SaveAsync(ct);
 
-        // Generate User tokens(regester) after creation (Event)
-        var tokens = await _eventService.PublishRegisterUserEventAsync(
-            new RegisterUserTokenAppDto()
-            {
-                user = user,
-                DeviceId = command.DeviceId,
-                UserAgent = command.UserAgent,
-                UserIp = command.UserIp,
-            },
-            ct
-        );
-
-        return GeneralResult<UserTokenDto>.Success(tokens);
+        return GeneralResult<int>.Success(user.Id);
     }
-
     public async Task<GeneralResult> UpdateUserAsync(UpdateUserAppDto command, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(command.UserId, true, ct);
@@ -101,7 +82,6 @@ public class UserService : IUserService
 
         return GeneralResult.Success();
     }
-
     public async Task<GeneralResult> SoftDeleteUserAsync(DeleteUserAppDto command, CancellationToken ct)
     {
         // This method use SP (Stored Procedure)
@@ -129,7 +109,6 @@ public class UserService : IUserService
 
         return GeneralResult.Success();
     }
-
     public async Task<GeneralResult> ChangePasswordUserAsync(ChangePasswordUserAppDto command, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
@@ -142,20 +121,8 @@ public class UserService : IUserService
 
         user.ChangeUserPassword(_commonService.Password.Hash(command.NewPassword));
 
-        // revoke all User tokens except current (Event)
-        await _eventService.PublishRevokeAllTokensExceptCurrentByUserIdEventAsync(
-            new RevokeUserTokenAppDto()
-            {
-                UserId = user.Id,
-                Deviceid = command.DeviceId
-            },
-            false,
-            ct
-        );
-
         return GeneralResult.Success();
     }
-
     public async Task<GeneralResult> IncreaseUserPointsAsync(int id, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(id, true, ct);
@@ -167,7 +134,6 @@ public class UserService : IUserService
 
         return GeneralResult.Success();
     }
-
     public async Task<GeneralResult> DecreaseUserPointsAsync(int id, CancellationToken cancellationToken)
     {
         var user = await _uow.User.GetByIdAsync(id, true, cancellationToken);

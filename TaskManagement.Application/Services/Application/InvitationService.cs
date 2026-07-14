@@ -122,7 +122,7 @@ public class InvitationService : IInvitationService
 
         // Create Relation between User And Org (Event)
         await _eventService.PublishAddUserToOrgEventAsync(
-            new AddUserOrgAppDto() { OrgId = invitation.OrgId, UserId = command.UserId },
+            new AddUserOrgAppDto(command.UserId, invitation.OrgId),
             ct
         );
 

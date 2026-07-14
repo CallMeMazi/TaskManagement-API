@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
+using TaskManagement.Application.DTOs.InternalDTOs.UserToken;
 using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
@@ -49,7 +50,7 @@ public class AuthService : IAuthServiec
 
         return GeneralResult<List<UserTokenDetailsDto>>.Success(tokensDto);
     }
-    public async Task<GeneralResult> ValidateAccessTokenAsync(validateUserTokenAppDto query, CancellationToken ct)
+    public async Task<GeneralResult> ValidateAccessTokenAsync(VlidateUserTokenAppDto query, CancellationToken ct)
     {
         // Validate JWT (Expire date, Signature, algorithm)
         // Check current DeviceId(DB) with DeviceId in token
@@ -81,17 +82,21 @@ public class AuthService : IAuthServiec
     {
         // This method is used in transaction (TransAction)
 
-        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(command.user, command.DeviceId);
+        var user = await _uow.User.GetByIdAsync(command.UserId, false, ct);
+
+        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken
+            (new GenerateTokensInternalDto(user!.Id, user.MobileNumber, user.SecurityStamp, command.DeviceId));
+
         if (!tokenResult.IsSuccess)
             throw new BadRequestException(tokenResult.Message);
 
         (string accessTokenHashed, string refreshTokenHashed) = HashAcceesTokenAndRefreshToken(tokenResult.Result!.AccessTokenHash, tokenResult.Result.RefreshTokenHash);
 
         var userToken = new UserToken(
-            command.user.Id,
+            command.UserId,
             accessTokenHashed,
             refreshTokenHashed,
-            command.user.SecurityStamp,
+            user.SecurityStamp,
             DateTime.Now.AddDays(_appSettings.JwtSetting.ExpirationDaysRefreshToken),
             command.DeviceId,
             command.UserIp,
@@ -100,11 +105,7 @@ public class AuthService : IAuthServiec
 
         await _uow.UserToken.AddAsync(userToken, ct);
 
-        var result = new UserTokenDto()
-        {
-            AccessTokenHash = tokenResult.Result.AccessTokenHash,
-            RefreshTokenHash = tokenResult.Result.RefreshTokenHash,
-        };
+        var result = new UserTokenDto(tokenResult.Result.AccessTokenHash, tokenResult.Result.RefreshTokenHash);
 
         return GeneralResult<UserTokenDto>.Success(result);
     }
@@ -119,7 +120,9 @@ public class AuthService : IAuthServiec
         // Check user active device count
         await _tokenDomainService.EnsureCanLoginAsync(user.Id, ct);
 
-        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(user!, command.DeviceId);
+        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken
+            (new GenerateTokensInternalDto(user.Id, command.MobileNumber, user.SecurityStamp, command.DeviceId));
+
         if (!tokenResult.IsSuccess)
             throw new BadRequestException(tokenResult.Message);
 
@@ -139,11 +142,7 @@ public class AuthService : IAuthServiec
         await _uow.UserToken.AddAsync(userToken, ct);
         await _uow.SaveAsync(ct);
 
-        var result = new UserTokenDto()
-        {
-            AccessTokenHash = tokenResult.Result.AccessTokenHash,
-            RefreshTokenHash = tokenResult.Result.RefreshTokenHash,
-        };
+        var result = new UserTokenDto(tokenResult.Result.AccessTokenHash, tokenResult.Result.RefreshTokenHash);
 
         return GeneralResult<UserTokenDto>.Success(result);
     }
@@ -189,7 +188,9 @@ public class AuthService : IAuthServiec
 
         await CheckSecurityStampAsync(token.User.SecurityStamp, token, ct);
 
-        var newTokensResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken(token.User, command.DeviceId);
+        var newTokensResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken
+            (new GenerateTokensInternalDto(token.User.Id, token.User.MobileNumber, token.User.SecurityStamp, command.DeviceId));
+
         if (!newTokensResult.IsSuccess)
             throw new BadRequestException(newTokensResult.Message);
 
@@ -198,11 +199,7 @@ public class AuthService : IAuthServiec
         token.RefreshToken(accessToken, refreshToken, _appSettings.JwtSetting.ExpirationDaysRefreshToken);
         await _uow.SaveAsync(ct);
 
-        var result = new UserTokenDto()
-        {
-            AccessTokenHash = newTokensResult.Result.AccessTokenHash,
-            RefreshTokenHash = newTokensResult.Result.RefreshTokenHash,
-        };
+        var result = new UserTokenDto(newTokensResult.Result.AccessTokenHash, newTokensResult.Result.RefreshTokenHash);
 
         return GeneralResult<UserTokenDto>.Success(result);
     }
@@ -211,7 +208,7 @@ public class AuthService : IAuthServiec
         var token = await _uow.UserToken.GetByFilterAsync(ut =>
             ut.UserId == command.UserId
             && ut.TokenStatus == TokenStatus.Active
-            && ut.DeviceId == command.Deviceid,
+            && ut.DeviceId == command.DeviceId,
             true,
             ct
         );
@@ -249,7 +246,7 @@ public class AuthService : IAuthServiec
 
         var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == command.UserId
-            && ut.DeviceId != command.Deviceid
+            && ut.DeviceId != command.DeviceId
             && ut.TokenStatus == TokenStatus.Active,
             true,
             ct
