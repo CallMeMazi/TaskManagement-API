@@ -1,5 +1,5 @@
 ﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
-public record VlidateUserTokenAppDto(
+public record ValidateUserTokenAppDto(
     string AccessToken,
     string DeviceId
 );

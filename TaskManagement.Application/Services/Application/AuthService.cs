@@ -50,7 +50,7 @@ public class AuthService : IAuthServiec
 
         return GeneralResult<List<UserTokenDetailsDto>>.Success(tokensDto);
     }
-    public async Task<GeneralResult> ValidateAccessTokenAsync(VlidateUserTokenAppDto query, CancellationToken ct)
+    public async Task<GeneralResult> ValidateAccessTokenAsync(ValidateUserTokenAppDto query, CancellationToken ct)
     {
         // Validate JWT (Expire date, Signature, algorithm)
         // Check current DeviceId(DB) with DeviceId in token

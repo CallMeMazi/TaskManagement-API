@@ -13,5 +13,5 @@ public interface IAuthServiec
     Task<GeneralResult> RevokeAllTokensByUserIdAsync(int userId, bool isSaved, CancellationToken ct);
     Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken ct);
     Task<GeneralResult> RevokeTokenByDeviceIdAsync(RevokeUserTokenAppDto command, CancellationToken ct);
-    Task<GeneralResult> ValidateAccessTokenAsync(VlidateUserTokenAppDto query, CancellationToken ct);
+    Task<GeneralResult> ValidateAccessTokenAsync(ValidateUserTokenAppDto query, CancellationToken ct);
 }

@@ -29,7 +29,7 @@ public record ChangePasswordUserHandler
 
         await _userService.ChangePasswordUserAsync(dto, ct);
 
-        // revoke all User tokens except current (Event)
+        // revoke all User tokens except current
         return await _authService.RevokeAllTokensExceptCurrentByUserIdAsync
             (new RevokeUserTokenAppDto(request.UserId, request.DeviceId), false, ct);
     }
