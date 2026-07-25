@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.ApplicationDTOs.Invitatoin;
-using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
 using TaskManagement.Application.DTOs.SharedDTOs.Invitation;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
@@ -99,7 +98,7 @@ public class InvitationService : IInvitationService
 
         return GeneralResult<string>.Success(invatation.Token);
     }
-    public async Task<GeneralResult> AcceptInvitationAsync(AcceptOrgInvitationAppDto command, CancellationToken ct)
+    public async Task<GeneralResult<int>> AcceptInvitationAsync(AcceptOrgInvitationAppDto command, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
 
@@ -120,13 +119,7 @@ public class InvitationService : IInvitationService
         invitation!.AcceptInvite();
         await _uow.SaveAsync(ct);
 
-        // Create Relation between User And Org (Event)
-        await _eventService.PublishAddUserToOrgEventAsync(
-            new AddUserOrgAppDto(command.UserId, invitation.OrgId),
-            ct
-        );
-
-        return GeneralResult.Success();
+        return GeneralResult<int>.Success(invitation.OrgId);
     }
     public async Task<GeneralResult> RevokeInvitationAsync(RevokeOrgInvitationAppDto command, CancellationToken ct)
     {
