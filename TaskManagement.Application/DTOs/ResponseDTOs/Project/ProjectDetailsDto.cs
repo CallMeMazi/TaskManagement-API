@@ -1,6 +1,6 @@
 ﻿using TaskManagement.Domain.Enums.Statuses;
 
-namespace TaskManagement.Application.DTOs.ResponseDTOs.Project;
+namespace TaskManagement.Application.DTOs.SharedDTOs.Project;
 public record ProjectDetailsDto(
     string ProjName,
     string projDescription,

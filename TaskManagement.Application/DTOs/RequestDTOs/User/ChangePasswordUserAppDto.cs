@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.RequestDTOs.User;
+﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.User;
 public record ChangePasswordUserAppDto(
     int UserId,
     string OldPassword,

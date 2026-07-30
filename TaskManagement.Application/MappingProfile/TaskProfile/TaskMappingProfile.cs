@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using TaskManagement.Application.DTOs.RequestDTOs.Task;
-using TaskManagement.Application.DTOs.ResponseDTOs.Task;
+using TaskManagement.Application.DTOs.ApplicationDTOs.Task;
+using TaskManagement.Application.DTOs.SharedDTOs.Task;
 
 namespace TaskManagement.Application.MappingProfile.TaskProfile;
 public class TaskMappingProfile : Profile

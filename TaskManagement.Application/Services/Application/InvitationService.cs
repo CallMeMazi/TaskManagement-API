@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
-using TaskManagement.Application.DTOs.ResponseDTOs.Invitation;
+using TaskManagement.Application.DTOs.ApplicationDTOs.Invitatoin;
+using TaskManagement.Application.DTOs.SharedDTOs.Invitation;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWork;

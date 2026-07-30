@@ -1,6 +1,6 @@
 ﻿using TaskManagement.Domain.Enums.Statuses;
 
-namespace TaskManagement.Application.DTOs.ResponseDTOs.Invitation;
+namespace TaskManagement.Application.DTOs.SharedDTOs.Invitation;
 public record OrgInvitationDetailsDto(
     int OrgId,
     int UserId,

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using TaskManagement.Application.DTOs.RequestDTOs.Organization;
-using TaskManagement.Application.DTOs.ResponseDTOs.Organization;
+using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
+using TaskManagement.Application.DTOs.SharedDTOs.Organization;
 using TaskManagement.Application.Features.Organization.Command.AddUserToOrg;
 using TaskManagement.Application.Features.Organization.Command.ChangeOrgActivity;
 using TaskManagement.Application.Features.Organization.Command.ChangeUserRoleToAdmin;

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
+using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
 using TaskManagement.Application.Features.UserToken.Command.LoginUser;
 using TaskManagement.Application.Features.UserToken.Command.LogoutUser;
-using TaskManagement.Application.Features.UserToken.Command.RefreshUserToken;
+using TaskManagement.Application.Features.UserToken.Command.RefreshToken;
 using TaskManagement.Application.Features.UserToken.Command.RevokeAllTokensExceptCurrentByUserId;
 using TaskManagement.Application.Features.UserToken.Command.RevokeTokenByDeviceId;
 using TaskManagement.Application.Features.UserToken.Query.ValidateAccessToken;

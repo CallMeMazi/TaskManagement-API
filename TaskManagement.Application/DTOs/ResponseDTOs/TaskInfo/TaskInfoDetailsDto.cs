@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.ResponseDTOs.TaskInfo;
+﻿namespace TaskManagement.Application.DTOs.SharedDTOs.TaskInfo;
 public record TaskInfoDetailsDto(
     string TaskInfoDescription,
     DateTime StartedTaskAt,

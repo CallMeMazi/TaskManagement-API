@@ -1,5 +1,5 @@
-﻿using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
-using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
+﻿using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
+using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Interfaces.Services.Application;

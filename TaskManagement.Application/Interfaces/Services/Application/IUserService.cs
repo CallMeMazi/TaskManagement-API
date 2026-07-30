@@ -1,5 +1,5 @@
-﻿using TaskManagement.Application.DTOs.RequestDTOs.User;
-using TaskManagement.Application.DTOs.ResponseDTOs.User;
+﻿using TaskManagement.Application.DTOs.ApplicationDTOs.User;
+using TaskManagement.Application.DTOs.SharedDTOs.User;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Interfaces.Services.Application;

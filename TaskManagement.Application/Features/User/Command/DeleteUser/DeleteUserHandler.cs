@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
-using TaskManagement.Application.DTOs.RequestDTOs.User;
+using TaskManagement.Application.DTOs.ApplicationDTOs.User;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 

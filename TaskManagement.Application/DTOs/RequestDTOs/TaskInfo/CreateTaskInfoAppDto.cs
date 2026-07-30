@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.RequestDTOs.TaskInfo;
+﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.TaskInfo;
 public record CreateTaskInfoAppDto(
     int TaskId,
     int UserId,

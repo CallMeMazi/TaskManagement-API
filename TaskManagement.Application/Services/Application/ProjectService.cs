@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using TaskManagement.Application.DTOs.RequestDTOs.Project;
-using TaskManagement.Application.DTOs.ResponseDTOs.Project;
+using TaskManagement.Application.DTOs.ApplicationDTOs.Project;
+using TaskManagement.Application.DTOs.SharedDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWork;

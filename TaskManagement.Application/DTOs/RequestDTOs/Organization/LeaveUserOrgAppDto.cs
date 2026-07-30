@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Organization;
+﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
 public record LeaveUserOrgAppDto(
     int UserId,
     int OrgId

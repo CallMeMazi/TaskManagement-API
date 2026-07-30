@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Project;
+﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Project;
 public record UserProjectAppDto(
     int OwnerId,
     string UserPassword,

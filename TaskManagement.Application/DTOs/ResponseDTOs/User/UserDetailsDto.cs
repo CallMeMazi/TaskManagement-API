@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.ResponseDTOs.User;
+﻿namespace TaskManagement.Application.DTOs.SharedDTOs.User;
 public record UserDetailsDto(
     string MobileNumber,
     string Email,

@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using TaskManagement.Application.DTOs.ResponseDTOs.Organization;
+using TaskManagement.Application.DTOs.SharedDTOs.Organization;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Organization.Query.GetOrgByCode;

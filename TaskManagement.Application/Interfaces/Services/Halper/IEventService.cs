@@ -1,7 +1,7 @@
-﻿using TaskManagement.Application.DTOs.RequestDTOs.Organization;
-using TaskManagement.Application.DTOs.RequestDTOs.TaskInfo;
-using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
-using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
+﻿using TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
+using TaskManagement.Application.DTOs.ApplicationDTOs.TaskInfo;
+using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
+using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
 
 namespace TaskManagement.Application.Interfaces.Services.Halper;
 public interface IEventService
