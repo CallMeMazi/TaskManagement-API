@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
+using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Features.User.Command.CreateUserCommand;
+namespace TaskManagement.Application.Features.User.Command.CreateUser;
 
 public record CreateUserCommand(
     string MobileNumber,

@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using TaskManagement.Application.DTOs.SharedDTOs.User;
+using TaskManagement.Application.DTOs.ResponseDTOs.User;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.User.Query.GetUserByMobileNumber;

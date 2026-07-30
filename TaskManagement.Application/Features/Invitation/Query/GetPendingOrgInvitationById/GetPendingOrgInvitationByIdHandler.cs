@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using TaskManagement.Application.DTOs.SharedDTOs.Invitation;
+using TaskManagement.Application.DTOs.ResponseDTOs.Invitation;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 

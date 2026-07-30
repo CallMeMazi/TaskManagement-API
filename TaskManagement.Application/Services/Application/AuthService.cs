@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
 using TaskManagement.Application.DTOs.InternalDTOs.UserToken;
-using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
+using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
+using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWork;

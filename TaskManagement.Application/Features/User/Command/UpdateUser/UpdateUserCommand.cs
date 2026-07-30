@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Features.User.Command.UpdateUserCommand;
+namespace TaskManagement.Application.Features.User.Command.UpdateUser;
 
 public record UpdateUserCommand(
         int UserId,

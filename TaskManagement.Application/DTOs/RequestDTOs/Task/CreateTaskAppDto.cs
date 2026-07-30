@@ -1,6 +1,6 @@
 ﻿using TaskManagement.Domain.Enums;
 
-namespace TaskManagement.Application.DTOs.ApplicationDTOs.Task;
+namespace TaskManagement.Application.DTOs.RequestDTOs.Task;
 public record CreateTaskAppDto(
     int ProjId,
     int UserId,

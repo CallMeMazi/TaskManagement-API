@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using TaskManagement.Application.DTOs.ApplicationDTOs.User;
-using TaskManagement.Application.DTOs.SharedDTOs.User;
+using TaskManagement.Application.DTOs.RequestDTOs.User;
+using TaskManagement.Application.DTOs.ResponseDTOs.User;
 using TaskManagement.Application.Features.User.Command.ChangePasswordUser;
-using TaskManagement.Application.Features.User.Command.CreateUserCommand;
+using TaskManagement.Application.Features.User.Command.CreateUser;
 using TaskManagement.Application.Features.User.Command.DeleteUser;
-using TaskManagement.Application.Features.User.Command.UpdateUserCommand;
+using TaskManagement.Application.Features.User.Command.UpdateUser;
 using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Application.MappingProfile.UserProfile;

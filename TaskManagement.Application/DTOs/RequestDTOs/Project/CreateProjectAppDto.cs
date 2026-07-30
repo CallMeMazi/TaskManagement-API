@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Project;
+﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Project;
 public record CreateProjectAppDto(
     string ProjName,
     string ProjDescription,

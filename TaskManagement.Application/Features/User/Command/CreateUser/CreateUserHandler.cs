@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
-using TaskManagement.Application.DTOs.ApplicationDTOs.User;
-using TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
-using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
+using TaskManagement.Application.DTOs.RequestDTOs.User;
+using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
+using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 
-namespace TaskManagement.Application.Features.User.Command.CreateUserCommand;
+namespace TaskManagement.Application.Features.User.Command.CreateUser;
 
 public class CreateUserHandler
     : IRequestHandler<CreateUserCommand, GeneralResult<UserTokenDto>>

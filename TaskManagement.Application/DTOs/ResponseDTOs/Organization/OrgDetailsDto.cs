@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.SharedDTOs.Organization;
+﻿namespace TaskManagement.Application.DTOs.ResponseDTOs.Organization;
 public record OrgDetailsDto(
     string OrgName,
     string SecondOrgName,

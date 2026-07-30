@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Project;
+﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Project;
 public record ChangeProjectProgressAppDto(
     int OwnerId,
     int ProjId,
