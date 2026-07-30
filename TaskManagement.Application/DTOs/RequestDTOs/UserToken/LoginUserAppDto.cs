@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.UserToken;
+﻿namespace TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 public record LoginUserAppDto(
     string MobileNumber,
     string Password,

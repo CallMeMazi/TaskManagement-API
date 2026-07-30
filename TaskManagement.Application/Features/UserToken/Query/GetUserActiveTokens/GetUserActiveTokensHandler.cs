@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
+using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 

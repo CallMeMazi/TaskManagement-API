@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Organization;
+﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Organization;
 public record ChangeUserRoleOrgAppDto(
     int OrgOwnerId,
     int OrgId,

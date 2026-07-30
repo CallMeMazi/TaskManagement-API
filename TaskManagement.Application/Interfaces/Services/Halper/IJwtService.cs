@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using TaskManagement.Application.DTOs.InternalDTOs.UserToken;
-using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
+using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Interfaces.Services.Halper;

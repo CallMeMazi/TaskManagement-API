@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Invitatoin;
+﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
 public record RevokeOrgInvitationAppDto(
     int OrgOwnerId,
     int InvitationId

@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.ApplicationDTOs.Task;
+﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Task;
 public record AddRemoveUserTaskAppDto(
     int OwnerId,
     int UserId,

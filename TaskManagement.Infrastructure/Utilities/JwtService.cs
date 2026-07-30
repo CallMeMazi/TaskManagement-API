@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using TaskManagement.Application.DTOs.InternalDTOs.UserToken;
-using TaskManagement.Application.DTOs.SharedDTOs.UserToken;
+using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Enums;

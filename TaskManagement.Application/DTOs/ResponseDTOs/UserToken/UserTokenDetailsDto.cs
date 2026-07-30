@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Application.DTOs.SharedDTOs.UserToken;
+﻿namespace TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 public record UserTokenDetailsDto(
     int Id,
     int UserId,
