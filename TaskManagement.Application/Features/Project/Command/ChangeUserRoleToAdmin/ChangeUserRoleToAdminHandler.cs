@@ -5,7 +5,7 @@ using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.ChangeUserRoleToAdmin;
-internal class ChangeUserRoleToAdminHandler
+public class ChangeUserRoleToAdminHandler
     : IRequestHandler<ChangeUserRoleToAdminCommand, GeneralResult>
 {
     private readonly IProjectService _projectService;

@@ -5,7 +5,7 @@ using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.ChangeUserRoleToMember;
-internal class ChangeUserRoleToMemberHandler
+public class ChangeUserRoleToMemberHandler
     : IRequestHandler<ChangeUserRoleToMemberCommand, GeneralResult>
 {
     private readonly IProjectService _projectService;

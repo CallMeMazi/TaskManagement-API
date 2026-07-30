@@ -5,7 +5,7 @@ using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.ChangeProjectActivity;
-internal class ChangeProjectActivityHandler
+public class ChangeProjectActivityHandler
     : IRequestHandler<ChangeProjectActivityCommand, GeneralResult>
 {
     private readonly IProjectService _projectService;

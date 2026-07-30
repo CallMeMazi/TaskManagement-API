@@ -5,7 +5,7 @@ using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.RemoveUserFromProject;
-internal class RemoveUserFromProjectHandler
+public class RemoveUserFromProjectHandler
     : IRequestHandler<RemoveUserFromProjectCommand, GeneralResult>
 {
     private readonly IProjectService _projectService;

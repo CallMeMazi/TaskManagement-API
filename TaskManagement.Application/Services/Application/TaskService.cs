@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.RequestDTOs.Task;
-using TaskManagement.Application.DTOs.RequestDTOs.TaskInfo;
 using TaskManagement.Application.DTOs.ResponseDTOs.Task;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Exceptions;
@@ -17,16 +15,13 @@ public class TaskService : ITaskService
 {
     private readonly IUnitOfWork _uow;
     private readonly ITaskDomainService _taskDomainService;
-    private readonly IEventService _eventService;
     private readonly IMapper _mapper;
 
 
-    public TaskService(IUnitOfWork unitOfWork, ITaskDomainService taskDomainService, IEventService eventService
-        , IMapper mapper)
+    public TaskService(IUnitOfWork unitOfWork, ITaskDomainService taskDomainService, IMapper mapper)
     {
         _uow = unitOfWork;
         _taskDomainService = taskDomainService;
-        _eventService = eventService;
         _mapper = mapper;
     }
 
@@ -99,6 +94,8 @@ public class TaskService : ITaskService
     }
     public async Task<GeneralResult> SoftDeleteTaskAsync(UserTaskAppDto command, CancellationToken ct)
     {
+        // This method use SP (Stored Procedure)
+
         var task = await _uow.Task.GetByIdAsync(command.TaskId, false, ct);
         if (task.IsNullParameter())
             throw new NotFoundException("شناسه تسک نامعتبر است!");
@@ -261,10 +258,6 @@ public class TaskService : ITaskService
             throw new NotFoundException("اطلاعات نامعتبر است!");
 
         taskAssignment!.ChangeTaskInProgress(false);
-
-        // Create taskinfo after ended task (Event)
-        await _eventService.PublishCreateTaskInfoAsync
-            (new CreateTaskInfoAppDto(command.TaskId, command.UserId, taskAssignment.Id, (DateTime)taskAssignment.LastStartedAt!, DateTime.Now), ct);
 
         return GeneralResult.Success();
     }

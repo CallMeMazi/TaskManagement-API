@@ -2,7 +2,7 @@
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.ChangeProjectProgress;
-internal record ChangeProjectProgressCommand(
+public record ChangeProjectProgressCommand(
     int OwnerId,
     int ProjId,
     byte ProjectProgress

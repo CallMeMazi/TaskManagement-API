@@ -5,7 +5,7 @@ using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.UpdateProject;
-internal class UpdateProjectHandler
+public class UpdateProjectHandler
     : IRequestHandler<UpdateProjectCommand, GeneralResult>
 {
     private readonly IProjectService _projectService;

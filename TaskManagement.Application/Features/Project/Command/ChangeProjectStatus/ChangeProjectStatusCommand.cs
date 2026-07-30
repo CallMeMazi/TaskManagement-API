@@ -2,8 +2,8 @@
 using TaskManagement.Common.Classes;
 using TaskManagement.Domain.Enums.Statuses;
 
-namespace TaskManagement.Application.Features.Project.Command.ChagneProjectStatus;
-internal record ChagneProjectStatusCommand(
+namespace TaskManagement.Application.Features.Project.Command.ChangeProjectStatus;
+public record ChangeProjectStatusCommand(
     int OwnerId,
     string UserPassword,
     int ProjId,

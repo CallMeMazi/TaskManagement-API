@@ -5,7 +5,7 @@ using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.ChangeProjectProgress;
-internal class ChangeProjectProgressHandler
+public class ChangeProjectProgressHandler
     : IRequestHandler<ChangeProjectProgressCommand, GeneralResult>
 {
     private readonly IProjectService _projectService;

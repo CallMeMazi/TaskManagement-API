@@ -134,14 +134,14 @@ public class UserService : IUserService
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> DecreaseUserPointsAsync(int id, CancellationToken cancellationToken)
+    public async Task<GeneralResult> DecreaseUserPointsAsync(int id, CancellationToken ct)
     {
-        var user = await _uow.User.GetByIdAsync(id, true, cancellationToken);
+        var user = await _uow.User.GetByIdAsync(id, true, ct);
         if (user.IsNullParameter())
             throw new Exception($"user by {id} ID was not found. in {nameof(DecreaseUserPointsAsync)} method!");
 
         user!.IncreaseOrDecreasePoints(_appSettings.UserSetting.NegativeUserPoints);
-        await _uow.SaveAsync(cancellationToken);
+        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }

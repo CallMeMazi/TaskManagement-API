@@ -31,15 +31,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         _cleanString();
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
-    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken ct = default)
     {
         _cleanString();
-        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, ct);
     }
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override Task<int> SaveChangesAsync(CancellationToken ct = default)
     {
         _cleanString();
-        return base.SaveChangesAsync(acceptAllChangesOnSuccess: true, cancellationToken);
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess: true, ct);
     }
 
     private void _cleanString()

@@ -34,13 +34,22 @@ public class TaskInfoService : ITaskInfoService
 
         return GeneralResult<TaskInfoDetailsDto>.Success(taskInfoDto);
     }
-    
+
     // Command methods
     public async Task<GeneralResult> CreateTaskInfoAsync(CreateTaskInfoAppDto command, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
 
-        var taskInfo = _mapper.Map<TaskInfo>(command);
+        var taskAssignment = await _uow.TaskAssignment.GetByFilterAsync(ta =>
+            ta.TaskId == command.TaskId
+            && ta.UserId == command.UserId,
+            false,
+            ct
+        );
+        if (taskAssignment.IsNullParameter())
+            throw new NotFoundException("اطلاعات نامعتبر است!");
+
+        var taskInfo = _mapper.Map<TaskInfo>(taskAssignment);
 
         await _uow.TaskInfo.AddAsync(taskInfo, ct);
         await _uow.SaveAsync(ct);

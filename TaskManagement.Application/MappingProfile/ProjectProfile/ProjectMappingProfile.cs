@@ -2,9 +2,9 @@
 using TaskManagement.Application.DTOs.RequestDTOs.Project;
 using TaskManagement.Application.DTOs.ResponseDTOs.Project;
 using TaskManagement.Application.Features.Project.Command.AddUserToProject;
-using TaskManagement.Application.Features.Project.Command.ChagneProjectStatus;
 using TaskManagement.Application.Features.Project.Command.ChangeProjectActivity;
 using TaskManagement.Application.Features.Project.Command.ChangeProjectProgress;
+using TaskManagement.Application.Features.Project.Command.ChangeProjectStatus;
 using TaskManagement.Application.Features.Project.Command.ChangeUserRoleToAdmin;
 using TaskManagement.Application.Features.Project.Command.ChangeUserRoleToMember;
 using TaskManagement.Application.Features.Project.Command.CreateProject;
@@ -37,7 +37,7 @@ public class ProjectMappingProfile : Profile
         CreateMap<UpdateProjectCommand, UpdateProjectAppDto>();
         CreateMap<DeleteProjectCommand, UserProjectAppDto>();
         CreateMap<ChangeProjectActivityCommand, ChangeProjectActivityAppDto>();
-        CreateMap<ChagneProjectStatusCommand, UserProjectAppDto>();
+        CreateMap<ChangeProjectStatusCommand, UserProjectAppDto>();
         CreateMap<ChangeProjectProgressCommand, ChangeProjectProgressAppDto>();
         CreateMap<AddUserToProjectCommand, AddRemoveUserProjectAppDto>();
         CreateMap<RemoveUserFromProjectCommand, AddRemoveUserProjectAppDto>();

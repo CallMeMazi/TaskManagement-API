@@ -2,7 +2,7 @@
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.DeleteProject;
-internal record DeleteProjectCommand(
+public record DeleteProjectCommand(
     int OwnerId,
     string UserPassword,
     int ProjId

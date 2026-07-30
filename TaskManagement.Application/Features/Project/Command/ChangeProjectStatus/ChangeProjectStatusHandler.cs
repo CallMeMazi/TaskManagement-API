@@ -5,20 +5,20 @@ using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 using TaskManagement.Domain.Enums.Statuses;
 
-namespace TaskManagement.Application.Features.Project.Command.ChagneProjectStatus;
-internal class ChagneProjectStatusHandler
-    : IRequestHandler<ChagneProjectStatusCommand, GeneralResult>
+namespace TaskManagement.Application.Features.Project.Command.ChangeProjectStatus;
+public class ChangeProjectStatusHandler
+    : IRequestHandler<ChangeProjectStatusCommand, GeneralResult>
 {
     private readonly IProjectService _projectService;
     private readonly IMapper _mapper;
 
-    public ChagneProjectStatusHandler(IProjectService projectService, IMapper mapper)
+    public ChangeProjectStatusHandler(IProjectService projectService, IMapper mapper)
     {
         _projectService = projectService;
         _mapper = mapper;
     }
 
-    public Task<GeneralResult> Handle(ChagneProjectStatusCommand request, CancellationToken ct)
+    public Task<GeneralResult> Handle(ChangeProjectStatusCommand request, CancellationToken ct)
     {
         var dto = _mapper.Map<UserProjectAppDto>(request);
 
@@ -33,7 +33,7 @@ internal class ChagneProjectStatusHandler
             case ProjectStatusType.Finished:
                 return _projectService.FinishProjectAsync(dto, ct);
             default:
-                throw new ArgumentException($"Error in {nameof(ChagneProjectStatusHandler)} Handler!");
+                throw new ArgumentException($"Error in {nameof(ChangeProjectStatusHandler)} Handler!");
         }
     }
 }

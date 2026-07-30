@@ -2,7 +2,7 @@
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.UpdateProject;
-internal record UpdateProjectCommand(
+public record UpdateProjectCommand(
     int ProjId,
     int OwnerId,
     string ProjName,

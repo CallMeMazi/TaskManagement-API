@@ -2,7 +2,7 @@
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.ChangeUserRoleToMember;
-internal record ChangeUserRoleToMemberCommand(
+public record ChangeUserRoleToMemberCommand(
     int OwnerId,
     int ProjId,
     int UserId

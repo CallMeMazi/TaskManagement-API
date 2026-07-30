@@ -5,7 +5,7 @@ using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.AddUserToProject;
-internal class AddUserToProjectHandler
+public class AddUserToProjectHandler
     : IRequestHandler<AddUserToProjectCommand, GeneralResult>
 {
     private readonly IProjectService _projectSerivce;

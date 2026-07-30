@@ -18,10 +18,10 @@ public class LoginUserHandler
         _mapper = mapper;
     }
 
-    public Task<GeneralResult<UserTokenDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+    public Task<GeneralResult<UserTokenDto>> Handle(LoginUserCommand request, CancellationToken ct)
     {
         var dto = _mapper.Map<LoginUserAppDto>(request);
 
-        return _authService.LoginUserAsync(dto, cancellationToken);
+        return _authService.LoginUserAsync(dto, ct);
     }
 }

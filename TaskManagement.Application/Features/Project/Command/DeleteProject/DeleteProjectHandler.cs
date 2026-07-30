@@ -5,7 +5,7 @@ using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.DeleteProject;
-internal class DeleteProjectHandler
+public class DeleteProjectHandler
     : IRequestHandler<DeleteProjectCommand, GeneralResult>
 {
     private readonly IProjectService _projectService;
