@@ -2,5 +2,5 @@
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.UserToken.Command.RevokeTokenByDeviceId;
-public record RevokeTokenByDeviceIdCommand(int UserId, int DeviceId)
+public record RevokeTokenByDeviceIdCommand(int UserId, string DeviceId)
     : IRequest<GeneralResult>;

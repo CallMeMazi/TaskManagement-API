@@ -16,6 +16,7 @@ public class Project : BaseEntity
     public DateTime? ProjEndAt { get; private set; }
     public byte ProjMaxUsers { get; private set; }
     public byte ProjMaxTasks { get; private set; }
+    public byte[] RowVersion { get; private set; }
 
     #region Navigation Prop
 

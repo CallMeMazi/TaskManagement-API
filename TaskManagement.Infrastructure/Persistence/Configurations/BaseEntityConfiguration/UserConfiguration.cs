@@ -18,8 +18,8 @@ public class UserConfiguration : IBaseConfiguration<User>
 
         builder.Property(u => u.Email)
             .IsRequired()
-            .HasColumnType("nvarchar(100)")
-            .HasMaxLength(100);
+            .HasColumnType("nvarchar(254)")
+            .HasMaxLength(254);
 
         builder.Property(u => u.PasswordHash)
             .IsRequired()

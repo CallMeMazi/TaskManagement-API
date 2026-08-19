@@ -7,5 +7,6 @@ public record ChangePasswordUserCommand(
     int UserId,
     string OldPassword,
     string NewPassword,
+    string ConfirmPassword,
     string DeviceId
 ) : IRequest<GeneralResult>;

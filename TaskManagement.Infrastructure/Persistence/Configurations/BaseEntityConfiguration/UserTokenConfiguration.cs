@@ -18,8 +18,8 @@ public class UserTokenConfiguration : IBaseConfiguration<UserToken>
 
         builder.Property(ut => ut.RefreshTokenHash)
             .IsRequired()
-            .HasColumnType("nvarchar(50)")
-            .HasMaxLength(50);
+            .HasColumnType("nvarchar(100)")
+            .HasMaxLength(100);
 
         builder.Property(ut => ut.SecurityStamp)
             .IsRequired()
@@ -54,8 +54,8 @@ public class UserTokenConfiguration : IBaseConfiguration<UserToken>
 
         builder.Property(ut => ut.UserAgent)
             .IsRequired()
-            .HasColumnType("nvarchar(50)")
-            .HasMaxLength(50);
+            .HasColumnType("nvarchar(100)")
+            .HasMaxLength(100);
 
         //base property
         builder.Property(u => u.IsDelete)

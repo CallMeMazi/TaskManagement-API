@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Infrastructure.Persistence.Configurations.BaseEntityConfiguration;
 public class TaskConfiguration : IBaseConfiguration<Domain.Entities.BaseEntities.Task>
@@ -70,6 +69,9 @@ public class TaskConfiguration : IBaseConfiguration<Domain.Entities.BaseEntities
             .HasForeignKey(ti => ti.TaskId);
 
         #endregion
+
+        builder.Property(t => t.RowVersion)
+            .IsRowVersion();
 
         builder.HasQueryFilter(t => !t.IsDelete);
 

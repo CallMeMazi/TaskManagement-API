@@ -8,6 +8,7 @@ public record CreateUserCommand(
     string MobileNumber,
     string Email,
     string Password,
+    string ConfirmPassword,
     string FirstName,
     string LastName,
     string DeviceId,

@@ -85,6 +85,9 @@ public class ProjectConfiguration : IBaseConfiguration<Project>
 
         #endregion
 
+        builder.Property(p => p.RowVersion)
+            .IsRowVersion();
+
         builder.HasQueryFilter(p => !p.IsDelete);
 
         builder.HasIndex(p => p.OrgId);

@@ -15,6 +15,7 @@ public class Task : BaseEntity
     public TaskStatusType TaskStatus { get; private set; } = TaskStatusType.InProgress;
     public DateTime TaskDeadline { get; private set; }
     public byte TaskProgress { get; private set; }
+    public byte[] RowVersion { get; private set; }
 
     #region Navigation Prop
 

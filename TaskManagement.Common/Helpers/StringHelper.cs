@@ -1,23 +1,54 @@
 ﻿using System.Globalization;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace TaskManagement.Common.Helpers;
 public static class StringHelper
 {
-    public static readonly Regex MobileRegex = new Regex(@"^09\d{9}$", RegexOptions.Compiled);
+    public static readonly Regex MobileRegex = new(@"^09\d{9}$", RegexOptions.Compiled);
+    public static readonly Regex EmailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+    public static readonly Regex DeviceIdRegex = new(@"", RegexOptions.Compiled);
 
-    public static bool PhoneValid(this string? value)
+    public static bool PhoneValid(this string? phoneNumber)
     {
-        if (value.IsNullParameter())
+        if (phoneNumber.IsNullParameter())
             return false;
 
-        if (value!.Count() < 11 || value!.Count() > 11)
+        if (phoneNumber!.Count() < 11 || phoneNumber!.Count() > 11)
             return false;
 
-        if (!NumberValid(value!))
+        if (!NumberValid(phoneNumber!))
             return false;
 
         return true;
+    }
+
+    public static bool IsValidEmail(this string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+
+        email = email.Trim();
+
+        if (email.Length > 254)
+            return false;
+
+        try
+        {
+            return EmailRegex.IsMatch(email);
+        }
+        catch (RegexMatchTimeoutException)
+        {
+            return false;
+        }
+    }
+
+    public static bool IsValidIpAddress(this string? ip)
+    {
+        if (string.IsNullOrWhiteSpace(ip))
+            return false;
+
+        return IPAddress.TryParse(ip.Trim(), out _);
     }
 
     public static string? PersianDate(DateTime? dateTime)
