@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.User.Command.UpdateUser;
-internal class UpdateUserValidator
+public class UpdateUserValidator
     : AbstractValidator<UpdateUserCommand>
 {
     public UpdateUserValidator()

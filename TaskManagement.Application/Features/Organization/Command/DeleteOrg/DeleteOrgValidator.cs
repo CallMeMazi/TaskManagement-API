@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.Organization.Command.DeleteOrg;
-internal class DeleteOrgValidator
+public class DeleteOrgValidator
     : AbstractValidator<DeleteOrgCommand>
 {
     public DeleteOrgValidator()

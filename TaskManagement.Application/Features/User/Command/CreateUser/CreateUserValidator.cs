@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.User.Command.CreateUser;
-internal class CreateUserValidator
+public class CreateUserValidator
     : AbstractValidator<CreateUserCommand>
 {
     public CreateUserValidator()

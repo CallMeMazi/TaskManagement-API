@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.Organization.Command.ChangeOrgActivity;
-internal class ChangeOrgActivityValidator
+public class ChangeOrgActivityValidator
     : AbstractValidator<ChangeOrgActivityCommand>
 {
     public ChangeOrgActivityValidator()

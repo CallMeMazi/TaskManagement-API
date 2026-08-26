@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.Organization.Command.UpdateOrg;
-internal class UpdateOrgValidator
+public class UpdateOrgValidator
     : AbstractValidator<UpdateOrgCommand>
 {
     public UpdateOrgValidator()

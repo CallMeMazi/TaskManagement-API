@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.UserToken.Command.LoginUser;
-internal class LoginUserValidator
+public class LoginUserValidator
     : AbstractValidator<LoginUserCommand>
 {
     public LoginUserValidator()

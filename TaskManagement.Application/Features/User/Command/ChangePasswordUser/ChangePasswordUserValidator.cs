@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.User.Command.ChangePasswordUser;
-internal class ChangePasswordUserValidator
+public class ChangePasswordUserValidator
     : AbstractValidator<ChangePasswordUserCommand>
 {
     public ChangePasswordUserValidator()

@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.UserToken.Query.ValidateAccessToken;
-internal class ValidateAccessTokenValidator
+public class ValidateAccessTokenValidator
     : AbstractValidator<ValidateAcceessTokenQuery>
 {
     public ValidateAccessTokenValidator()

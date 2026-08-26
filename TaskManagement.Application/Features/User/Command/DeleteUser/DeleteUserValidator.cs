@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.User.Command.DeleteUser;
-internal class DeleteUserValidator
+public class DeleteUserValidator
     : AbstractValidator<DeleteUserCommand>
 {
     public DeleteUserValidator()

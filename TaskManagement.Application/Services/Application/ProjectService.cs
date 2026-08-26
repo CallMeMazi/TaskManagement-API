@@ -72,7 +72,7 @@ public class ProjectService : IProjectService
         {
             await CheckUserIdsAndCreateProjMemberShipsAsync(
                 org.Members.Select(om => om.UserId).ToList(),
-                command.UserIds!.Where(id => id != org.OwnerId && id != command.CreatorId).Take(project.ProjMaxUsers).ToList(),
+                command.UserIds!.Where(id => id != org.OwnerId && id != command.CreatorId).Take(project.ProjMaxUsers).Distinct().ToList(),
                 project.Id,
                 ct
             );

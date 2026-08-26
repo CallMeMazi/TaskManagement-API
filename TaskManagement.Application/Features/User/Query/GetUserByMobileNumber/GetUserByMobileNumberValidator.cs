@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.User.Query.GetUserByMobileNumber;
-internal class GetUserByMobileNumberValidator
+public class GetUserByMobileNumberValidator
     : AbstractValidator<GetUserByMobileNumberQuery>
 {
     public GetUserByMobileNumberValidator()

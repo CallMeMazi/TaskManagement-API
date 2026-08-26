@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.UserToken.Command.RefreshUserToken;
-internal class RefreshUserTokenValidator
+public class RefreshUserTokenValidator
     : AbstractValidator<RefreshUserTokenCommand>
 {
     public RefreshUserTokenValidator()

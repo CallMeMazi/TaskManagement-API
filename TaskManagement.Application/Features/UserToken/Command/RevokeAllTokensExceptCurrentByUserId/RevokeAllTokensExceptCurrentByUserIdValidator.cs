@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.UserToken.Command.RevokeAllTokensExceptCurrentByUserId;
-internal class RevokeAllTokensExceptCurrentByUserIdValidator
+public class RevokeAllTokensExceptCurrentByUserIdValidator
     : AbstractValidator<RevokeAllTokensExceptCurrentByUserIdCommand>
 {
     public RevokeAllTokensExceptCurrentByUserIdValidator()

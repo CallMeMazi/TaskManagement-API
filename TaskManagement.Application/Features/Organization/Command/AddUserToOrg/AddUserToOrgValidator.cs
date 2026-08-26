@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.Organization.Command.AddUserToOrg;
-internal class AddUserToOrgValidator
+public class AddUserToOrgValidator
     : AbstractValidator<AddUserToOrgCommand>
 {
     public AddUserToOrgValidator()

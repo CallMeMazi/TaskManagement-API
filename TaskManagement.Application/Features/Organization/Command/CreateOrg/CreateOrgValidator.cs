@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.Organization.Command.CreateOrg;
-internal class CreateOrgValidator
+public class CreateOrgValidator
     : AbstractValidator<CreateOrgCommand>
 {
     public CreateOrgValidator()
@@ -19,6 +19,6 @@ internal class CreateOrgValidator
         RuleFor(x => x.OwnerId).ValidateId();
 
         RuleFor(x => (int)x.MaxUser).NotEmpty().WithMessage("تعداد کارکنان نمیتواند خالی باشد!")
-            .GreaterThanOrEqualTo(50).WithMessage("تعداد کارکنان نمیتواند بیشتر از 50 نفر باشد!");
+            .LessThanOrEqualTo(50).WithMessage("تعداد کارکنان نمیتواند بیشتر از 50 نفر باشد!");
     }
 }

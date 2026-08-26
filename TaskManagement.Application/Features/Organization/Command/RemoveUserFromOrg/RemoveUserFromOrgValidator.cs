@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.Organization.Command.RemoveUserFromOrg;
-internal class RemoveUserFromOrgValidator
+public class RemoveUserFromOrgValidator
     : AbstractValidator<RemoveUserFromOrgCommand>
 {
     public RemoveUserFromOrgValidator()

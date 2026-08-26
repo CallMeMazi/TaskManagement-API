@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.UserToken.Command.RevokeTokenByDeviceId;
-internal class RevokeTokenByDeviceIdValidator
+public class RevokeTokenByDeviceIdValidator
     : AbstractValidator<RevokeTokenByDeviceIdCommand>
 {
     public RevokeTokenByDeviceIdValidator()

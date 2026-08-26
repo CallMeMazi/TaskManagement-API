@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.UserToken.Command.LogoutUser;
-internal class LogoutUserValidator
+public class LogoutUserValidator
     : AbstractValidator<LogoutUserCommand>
 {
     public LogoutUserValidator()

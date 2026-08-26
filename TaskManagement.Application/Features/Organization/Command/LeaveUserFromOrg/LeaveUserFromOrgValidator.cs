@@ -2,7 +2,7 @@
 using TaskManagement.Application.Extentions;
 
 namespace TaskManagement.Application.Features.Organization.Command.LeaveUserFromOrg;
-internal class LeaveUserFromOrgValidator
+public class LeaveUserFromOrgValidator
     : AbstractValidator<LeaveUserFromOrgCommand>
 {
     public LeaveUserFromOrgValidator()

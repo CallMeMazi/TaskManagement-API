@@ -2,7 +2,7 @@
 using TaskManagement.Common.Helpers;
 
 namespace TaskManagement.Application.Extentions;
-internal static class ValidatorExtention
+public static class ValidatorExtention
 {
     public static IRuleBuilderOptions<T, int> ValidateId<T>(this IRuleBuilder<T, int> ruleBuilder)
     {
