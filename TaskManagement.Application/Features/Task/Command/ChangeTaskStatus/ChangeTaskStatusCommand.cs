@@ -4,7 +4,7 @@ using TaskManagement.Domain.Enums.Statuses;
 
 namespace TaskManagement.Application.Features.Task.Command.ChangeTaskStatus;
 public record ChangeTaskStatusCommand(
-    int UserId,
-    int TaskId,
+    long UserId,
+    long TaskId,
     TaskStatusType TaskStatus
 ) : IRequest<GeneralResult>;

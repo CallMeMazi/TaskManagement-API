@@ -1,6 +1,6 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Project;
 public record ChangeUserRoleProjectAppDto(
-    int OwnerId,
-    int ProjId,
-    int UserId
+    long OwnerId,
+    long ProjId,
+    long UserId
 );

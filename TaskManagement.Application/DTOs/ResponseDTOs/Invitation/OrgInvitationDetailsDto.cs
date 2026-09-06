@@ -2,8 +2,8 @@
 
 namespace TaskManagement.Application.DTOs.ResponseDTOs.Invitation;
 public record OrgInvitationDetailsDto(
-    int OrgId,
-    int UserId,
+    long OrgId,
+    long UserId,
     string Token,
     OrgInvitationStatus Status,
     DateTime ExpiredAt,

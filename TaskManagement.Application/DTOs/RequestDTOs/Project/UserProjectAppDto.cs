@@ -1,6 +1,6 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Project;
 public record UserProjectAppDto(
-    int OwnerId,
+    long OwnerId,
     string UserPassword,
-    int ProjId
+    long ProjId
 );

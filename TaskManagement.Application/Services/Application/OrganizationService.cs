@@ -31,7 +31,7 @@ public class OrganizationService : IOrganizationService
 
 
     // Query methods
-    public async Task<GeneralResult<OrgDetailsDto>> GetOrgByIdAsync(int id, CancellationToken ct)
+    public async Task<GeneralResult<OrgDetailsDto>> GetOrgByIdAsync(long id, CancellationToken ct)
     {
         var org = await _uow.Organization.GetByIdAsync(id, false, ct);
 
@@ -245,7 +245,7 @@ public class OrganizationService : IOrganizationService
         return GeneralResult.Success();
     }
 
-    private async System.Threading.Tasks.Task CreateOrgMemberShipAsync(int orgId, int userId, OrganizationRoles role, CancellationToken ct)
+    private async System.Threading.Tasks.Task CreateOrgMemberShipAsync(long orgId, long userId, OrganizationRoles role, CancellationToken ct)
     {
         var orgMemberShip = new OrganizationMemberShip(orgId, userId, role);
 

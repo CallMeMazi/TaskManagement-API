@@ -3,4 +3,5 @@ public class AppSettings
 {
     public required JwtSetting JwtSetting { get; set; }
     public required UserSetting UserSetting { get; set; }
+    public IdGeneratorSetting IdGeneratorSetting { get; set; } = new();
 }

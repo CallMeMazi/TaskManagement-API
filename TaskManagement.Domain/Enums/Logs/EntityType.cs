@@ -20,5 +20,7 @@ public enum EntityType
     [Display(Name = "توضیحات تسک")]
     TaskInfo,
     [Display(Name = "توکن")]
-    UserToken
+    UserToken,
+    [Display(Name = "دعوت‌نامه سازمان")]
+    OrganizationInvitation
 }

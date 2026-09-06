@@ -4,11 +4,11 @@ using TaskManagement.Domain.Enums;
 
 namespace TaskManagement.Application.Features.Task.Command.CreateTask;
 public record CreateTaskCommand(
-    int ProjId,
-    int UserId,
+    long ProjId,
+    long UserId,
     string TaskName,
     string TaskDescription,
     TaskType TaskType,
     DateTime TaskDeadLine,
-    List<int> UserIds
+    List<long> UserIds
 ) : IRequest<GeneralResult>;

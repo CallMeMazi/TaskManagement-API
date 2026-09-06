@@ -5,7 +5,7 @@ using TaskManagement.Domain.Enums.Statuses;
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class UserToken : BaseEntity
 {
-    public int UserId { get; private set; }
+    public long UserId { get; private set; }
     public string AccessTokenHash { get; private set; }
     public string RefreshTokenHash { get; private set; }
     public string SecurityStamp { get; set; }
@@ -25,7 +25,7 @@ public class UserToken : BaseEntity
 
 
     private UserToken() { }
-    public UserToken(int userId, string accessToken, string refreshToken
+    public UserToken(long userId, string accessToken, string refreshToken
         , string securityStamp, DateTime expiredAt, string deviceId
         , string userIp, string userAgent)
     {
@@ -76,7 +76,7 @@ public class UserToken : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateUserToken(int userId, string accessToken, string refreshToken
+    public void ValidateUserToken(long userId, string accessToken, string refreshToken
         , string securityStamp, DateTime expiredAt, string deviceId
         , string userIp, string userAgent)
     {

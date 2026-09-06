@@ -1,5 +1,5 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
 public record AcceptOrgInvitationAppDto(
-    int UserId,
+    long UserId,
     string Token
 );

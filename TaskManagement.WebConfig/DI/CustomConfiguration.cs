@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Settings;
 using TaskManagement.Domain.Interface.Repository;
+using TaskManagement.Infrastructure.IdGeneration;
 using TaskManagement.Infrastructure.Repositories;
 using TaskManagement.Infrastructure.UnitOfWork;
 
@@ -14,8 +16,8 @@ public static class CustomConfiguration
     {
         services.AddUnitOfWorkConfig();
         services.AddRepositoriesConfig();
-        services.AddServicesConfig();
         services.AddAppSettingConfig(configuration);
+        services.AddServicesConfig();
 
         return services;
     }
@@ -41,6 +43,7 @@ public static class CustomConfiguration
     }
     private static IServiceCollection AddServicesConfig(this IServiceCollection services)
     {
+        services.AddSingleton<IIdGenerator, IdGeneratorService>();
 
         return services;
     }

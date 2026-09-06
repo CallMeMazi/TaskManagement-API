@@ -35,7 +35,7 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity>
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.Where(filter).ToListAsync(ct);
     }
-    public async Task<TEntity?> GetByIdAsync(int entityId, bool isTracking = false, CancellationToken ct = default)
+    public async Task<TEntity?> GetByIdAsync(long entityId, bool isTracking = false, CancellationToken ct = default)
     {
         //var query = isTracking ? Entities : Entities.AsNoTracking();
         //return query.FirstOrDefaultAsync(o => o.Id == entityId, ct);
@@ -53,7 +53,7 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity>
     {
         return Entities.FindAsync(ids, ct);
     }
-    public Task<T?> GetFieldByIdAsync<T>(int entityId, Expression<Func<TEntity, T>> filedExpression, CancellationToken ct = default)
+    public Task<T?> GetFieldByIdAsync<T>(long entityId, Expression<Func<TEntity, T>> filedExpression, CancellationToken ct = default)
     {
         return Entities.AsNoTracking().Where(e => e.Id == entityId).Select(filedExpression).FirstOrDefaultAsync(ct);
     }

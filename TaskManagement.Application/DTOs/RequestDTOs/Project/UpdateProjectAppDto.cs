@@ -1,7 +1,7 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Project;
 public record UpdateProjectAppDto(
-    int ProjId,
-    int OwnerId,
+    long ProjId,
+    long OwnerId,
     string ProjName,
     string ProjDescription
 );

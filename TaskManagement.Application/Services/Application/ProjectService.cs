@@ -32,7 +32,7 @@ public class ProjectService : IProjectService
 
 
     // Query methods
-    public async Task<GeneralResult<ProjectDetailsDto>> GetProjectByIdAsync(int projId, CancellationToken ct)
+    public async Task<GeneralResult<ProjectDetailsDto>> GetProjectByIdAsync(long projId, CancellationToken ct)
     {
         var project = await _uow.Project.GetByIdAsync(projId, false, ct);
 
@@ -315,13 +315,13 @@ public class ProjectService : IProjectService
         return GeneralResult.Success();
     }
 
-    private async System.Threading.Tasks.Task CreateProjectMemberShipAsync(int projId, int userId, ProjectRoles role, CancellationToken ct)
+    private async System.Threading.Tasks.Task CreateProjectMemberShipAsync(long projId, long userId, ProjectRoles role, CancellationToken ct)
     {
         var ProjectMemberShip = new ProjectMemberShip(projId, userId, role);
 
         await _uow.ProjectMemberShip.AddAsync(ProjectMemberShip, ct);
     }
-    private async System.Threading.Tasks.Task CheckUserIdsAndCreateProjMemberShipsAsync(List<int> memberIds, List<int> userIds, int projId
+    private async System.Threading.Tasks.Task CheckUserIdsAndCreateProjMemberShipsAsync(List<long> memberIds, List<long> userIds, long projId
        , CancellationToken ct)
     {
         try
@@ -345,7 +345,7 @@ public class ProjectService : IProjectService
             );
         }
     }
-    private async System.Threading.Tasks.Task CheckUserPasswordAsync(Project project, int userId, string password, CancellationToken ct)
+    private async System.Threading.Tasks.Task CheckUserPasswordAsync(Project project, long userId, string password, CancellationToken ct)
     {
         if (project.CreatorId == userId)
         {

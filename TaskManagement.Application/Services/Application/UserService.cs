@@ -32,7 +32,7 @@ public class UserService : IUserService
     }
 
     // Query methods
-    public async Task<GeneralResult<UserDetailsDto>> GetUserByIdAsync(int id, CancellationToken ct)
+    public async Task<GeneralResult<UserDetailsDto>> GetUserByIdAsync(long id, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(id, false, ct);
 
@@ -56,7 +56,7 @@ public class UserService : IUserService
     }
 
     // Command methods
-    public async Task<GeneralResult<int>> CreateUserAsync(CreateUserAppDto command, CancellationToken ct)
+    public async Task<GeneralResult<long>> CreateUserAsync(CreateUserAppDto command, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
 
@@ -69,7 +69,7 @@ public class UserService : IUserService
         await _uow.User.AddAsync(user, ct);
         await _uow.SaveAsync(ct);
 
-        return GeneralResult<int>.Success(user.Id);
+        return GeneralResult<long>.Success(user.Id);
     }
     public async Task<GeneralResult> UpdateUserAsync(UpdateUserAppDto command, CancellationToken ct)
     {
@@ -123,7 +123,7 @@ public class UserService : IUserService
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> IncreaseUserPointsAsync(int id, CancellationToken ct)
+    public async Task<GeneralResult> IncreaseUserPointsAsync(long id, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(id, true, ct);
         if (user.IsNullParameter())
@@ -134,7 +134,7 @@ public class UserService : IUserService
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> DecreaseUserPointsAsync(int id, CancellationToken ct)
+    public async Task<GeneralResult> DecreaseUserPointsAsync(long id, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(id, true, ct);
         if (user.IsNullParameter())

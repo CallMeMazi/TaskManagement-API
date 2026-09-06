@@ -3,9 +3,9 @@
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class TaskInfo : BaseEntity
 {
-    public int TaskId { get; private set; }
-    public int UserId { get; private set; }
-    public int TaskAssignmentId { get; private set; }
+    public long TaskId { get; private set; }
+    public long UserId { get; private set; }
+    public long TaskAssignmentId { get; private set; }
     public string? TaskInfoDescription { get; private set; }
     public DateTime StartedTaskAt { get; private set; }
     public DateTime? EndedTaskAt { get; private set; }
@@ -21,7 +21,7 @@ public class TaskInfo : BaseEntity
 
 
     private TaskInfo() { }
-    public TaskInfo(int taskId, int userId, int taskAssignmentId
+    public TaskInfo(long taskId, long userId, long taskAssignmentId
         , DateTime startedTaskAt, DateTime endedTaskAt)
     {
         ValidateTaskInfo(taskId, userId, taskAssignmentId, startedTaskAt, endedTaskAt);
@@ -38,7 +38,7 @@ public class TaskInfo : BaseEntity
     public byte GetTotalHours() =>
         Convert.ToByte((EndedTaskAt! - StartedTaskAt).Value.TotalHours);
 
-    public void ValidateTaskInfo(int taskId, int userId, int taskAssignmentId
+    public void ValidateTaskInfo(long taskId, long userId, long taskAssignmentId
         , DateTime startedTaskAt, DateTime endedTaskAt)
     {
         var errorMessages = new List<string>();

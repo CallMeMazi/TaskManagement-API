@@ -12,19 +12,19 @@ public class OrganizationRepository
 
 
     // Query methods
-    public Task<Organization?> GetOrgByIdWithOwnerAsync(int orgId, bool isTracking = false, CancellationToken ct = default)
+    public Task<Organization?> GetOrgByIdWithOwnerAsync(long orgId, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.Include(o => o.Owner).FirstOrDefaultAsync(o => o.Id == orgId, ct);
     }
-    public Task<Organization?> GetOrgByIdWithMembersAsync(int orgId, bool isTracking = false, CancellationToken ct = default)
+    public Task<Organization?> GetOrgByIdWithMembersAsync(long orgId, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.Include(o => o.Members).FirstOrDefaultAsync(o => o.Id == orgId, ct);
     }
 
     // Command methods
-    public Task<int> SoftDeleteOrgSpAsync(int orgId, CancellationToken ct = default)
+    public Task<int> SoftDeleteOrgSpAsync(long orgId, CancellationToken ct = default)
     {
         var query = string.Format("EXEC dbo.sp_SoftDeleteOrg @OrgId = {0}", orgId);
         return _db.Database.ExecuteSqlRawAsync(query, ct);

@@ -1,5 +1,5 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.User;
 public record DeleteUserAppDto(
-    int UserId,
+    long UserId,
     string Password
 );

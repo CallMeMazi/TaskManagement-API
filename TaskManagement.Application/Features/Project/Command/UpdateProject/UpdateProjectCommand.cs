@@ -3,8 +3,8 @@ using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.UpdateProject;
 public record UpdateProjectCommand(
-    int ProjId,
-    int OwnerId,
+    long ProjId,
+    long OwnerId,
     string ProjName,
     string ProjDescription
 ) : IRequest<GeneralResult>;

@@ -3,7 +3,7 @@ using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Task.Command.ChangeTaskActivity;
 public record ChangeTaskActivityCommand(
-    int UserId,
-    int TaskId,
+    long UserId,
+    long TaskId,
     bool Activity
 ) : IRequest<GeneralResult>;

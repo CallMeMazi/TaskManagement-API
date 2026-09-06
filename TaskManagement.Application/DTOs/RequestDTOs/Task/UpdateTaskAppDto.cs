@@ -1,7 +1,7 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Task;
 public record UpdateTaskAppDto(
-    int UserId,
-    int TaskId,
+    long UserId,
+    long TaskId,
     string TaskName,
     string TaskDescription,
     DateTime TaskDeadLine

@@ -31,7 +31,7 @@ public class InvitationService : IInvitationService
 
 
     // Query methods
-    public async Task<GeneralResult<OrgInvitationDetailsDto>> GetOrgInvitationByIdAsync(int id, CancellationToken ct)
+    public async Task<GeneralResult<OrgInvitationDetailsDto>> GetOrgInvitationByIdAsync(long id, CancellationToken ct)
     {
         var invitation = await _uow.Invitation.GetByIdAsync(id, false, ct);
         if (invitation.IsNullParameter())
@@ -41,7 +41,7 @@ public class InvitationService : IInvitationService
 
         return GeneralResult<OrgInvitationDetailsDto>.Success(invitationDto);
     }
-    public async Task<GeneralResult<OrgInvitationDetailsDto>> GetPendingOrgInvitationByIdAsync(int id, CancellationToken ct)
+    public async Task<GeneralResult<OrgInvitationDetailsDto>> GetPendingOrgInvitationByIdAsync(long id, CancellationToken ct)
     {
         var invitation = await _uow.Invitation.GetByFilterAsync(oi =>
             oi.Id == id
@@ -56,7 +56,7 @@ public class InvitationService : IInvitationService
 
         return GeneralResult<OrgInvitationDetailsDto>.Success(invitationDto);
     }
-    public async Task<GeneralResult<List<OrgInvitationDetailsDto>>> GetAllOrgInvitationByOrgIdAsync(int orgId, CancellationToken ct)
+    public async Task<GeneralResult<List<OrgInvitationDetailsDto>>> GetAllOrgInvitationByOrgIdAsync(long orgId, CancellationToken ct)
     {
         var invitations = await _uow.Invitation.GetAllByFilterAsync(oi => oi.OrgId == orgId, false, ct);
         if (invitations.IsNullParameter() || !invitations.Any())
@@ -66,7 +66,7 @@ public class InvitationService : IInvitationService
 
         return GeneralResult<List<OrgInvitationDetailsDto>>.Success(invitationsDto);
     }
-    public async Task<GeneralResult<List<OrgInvitationDetailsDto>>> GetAllPendingOrgInvitationByOrgIdAsync(int orgId, CancellationToken ct)
+    public async Task<GeneralResult<List<OrgInvitationDetailsDto>>> GetAllPendingOrgInvitationByOrgIdAsync(long orgId, CancellationToken ct)
     {
         var invitations = await _uow.Invitation.GetAllByFilterAsync(oi =>
             oi.OrgId == orgId
@@ -98,7 +98,7 @@ public class InvitationService : IInvitationService
 
         return GeneralResult<string>.Success(invatation.Token);
     }
-    public async Task<GeneralResult<int>> AcceptInvitationAsync(AcceptOrgInvitationAppDto command, CancellationToken ct)
+    public async Task<GeneralResult<long>> AcceptInvitationAsync(AcceptOrgInvitationAppDto command, CancellationToken ct)
     {
         // This method is used in transaction (TransAction)
 
@@ -119,7 +119,7 @@ public class InvitationService : IInvitationService
         invitation!.AcceptInvite();
         await _uow.SaveAsync(ct);
 
-        return GeneralResult<int>.Success(invitation.OrgId);
+        return GeneralResult<long>.Success(invitation.OrgId);
     }
     public async Task<GeneralResult> RevokeInvitationAsync(RevokeOrgInvitationAppDto command, CancellationToken ct)
     {

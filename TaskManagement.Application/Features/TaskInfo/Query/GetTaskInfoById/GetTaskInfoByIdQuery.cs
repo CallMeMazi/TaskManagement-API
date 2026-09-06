@@ -3,5 +3,5 @@ using TaskManagement.Application.DTOs.ResponseDTOs.TaskInfo;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.TaskInfo.Query.GetTaskInfoById;
-public record GetTaskInfoByIdQuery(int TaskInfoId)
+public record GetTaskInfoByIdQuery(long TaskInfoId)
     : IRequest<GeneralResult<TaskInfoDetailsDto>>;

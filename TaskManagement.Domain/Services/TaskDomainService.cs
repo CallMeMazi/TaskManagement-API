@@ -25,11 +25,11 @@ public class TaskDomainService : ITaskDomainService
     }
 
 
-    public async System.Threading.Tasks.Task EnsureUserHasAdminRoleAsync(Entities.BaseEntities.Task task, int userId, CancellationToken ct)
+    public async System.Threading.Tasks.Task EnsureUserHasAdminRoleAsync(Entities.BaseEntities.Task task, long userId, CancellationToken ct)
     {
         await CheckUserAdminRoleAsync(task, userId, ct);
     }
-    public async System.Threading.Tasks.Task EnsureCanCreateTaskAsync(Project project, int userId, CancellationToken ct)
+    public async System.Threading.Tasks.Task EnsureCanCreateTaskAsync(Project project, long userId, CancellationToken ct)
     {
         var isUserHasAccess = project.ProjMember.Any(pm =>
             pm.UserId == userId
@@ -55,7 +55,7 @@ public class TaskDomainService : ITaskDomainService
         if (project.ProjMaxTasks > projTaskCount)
             throw new BadRequestException("پروژه شما به سقف تسک ها رسیده و نمیتوانید تسک جدید اضافه کنید!");
     }
-    public async System.Threading.Tasks.Task EnsureCanChangeTaskStateAsync(Entities.BaseEntities.Task task, int userId, CancellationToken ct)
+    public async System.Threading.Tasks.Task EnsureCanChangeTaskStateAsync(Entities.BaseEntities.Task task, long userId, CancellationToken ct)
     {
         await CheckUserAdminRoleAsync(task, userId, ct);
 
@@ -70,7 +70,7 @@ public class TaskDomainService : ITaskDomainService
         if (isTaskInProgress)
             throw new BadRequestException("تسک شما درحال انجام است و نمیتوانید وضعیت آن را تغییر دهید!");
     }
-    public async System.Threading.Tasks.Task EnsureCanChangeTaskTypeAsync(Entities.BaseEntities.Task task, int userId, CancellationToken ct)
+    public async System.Threading.Tasks.Task EnsureCanChangeTaskTypeAsync(Entities.BaseEntities.Task task, long userId, CancellationToken ct)
     {
         await CheckUserAdminRoleAsync(task, userId, ct);
 
@@ -82,7 +82,7 @@ public class TaskDomainService : ITaskDomainService
             throw new BadRequestException("اگر میخواهید تایپ تسک را به گروهی تغییر دهید باید فقط یک نفر را اختصاص دهید و بقیه افراد را حذف کنید!");
     }
     // Task Assignment methods
-    public async System.Threading.Tasks.Task EnsureCanAssignUserToTaskAsync(Entities.BaseEntities.Task task, int userId, CancellationToken ct)
+    public async System.Threading.Tasks.Task EnsureCanAssignUserToTaskAsync(Entities.BaseEntities.Task task, long userId, CancellationToken ct)
     {
         await CheckUserAdminRoleAsync(task, userId, ct);
 
@@ -99,14 +99,14 @@ public class TaskDomainService : ITaskDomainService
         if (TaskAssigningCount == 5)
             throw new BadRequestException("نمیتوانید تسک را به بیشتر از 5 نفر اختصاص دهید!");
     }
-    public async System.Threading.Tasks.Task EnsureCanRemoveUserFromTaskAsync(Entities.BaseEntities.Task task, int userId, CancellationToken ct)
+    public async System.Threading.Tasks.Task EnsureCanRemoveUserFromTaskAsync(Entities.BaseEntities.Task task, long userId, CancellationToken ct)
     {
         await CheckUserAdminRoleAsync(task, userId, ct);
 
         if (!task.IsActive)
             throw new BadRequestException("تسک غیرفعال است و نمیتوانید کسی را به آن اضافه کنید!");
     }
-    public async System.Threading.Tasks.Task EnsureCanUserStartTaskAsync(int taskId, CancellationToken ct)
+    public async System.Threading.Tasks.Task EnsureCanUserStartTaskAsync(long taskId, CancellationToken ct)
     {
         var isTaskActive = await _taskRepository.IsEntityExistByFilterAsync(t =>
             t.Id == taskId
@@ -117,7 +117,7 @@ public class TaskDomainService : ITaskDomainService
             throw new BadRequestException("تسک غیرفعال است!");
     }
 
-    private async System.Threading.Tasks.Task CheckUserAdminRoleAsync(Entities.BaseEntities.Task task, int userId, CancellationToken ct)
+    private async System.Threading.Tasks.Task CheckUserAdminRoleAsync(Entities.BaseEntities.Task task, long userId, CancellationToken ct)
     {
         if (task.CreatorId != userId)
         {

@@ -1,6 +1,6 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Organization;
 public record DeleteOrgAppDto(
-    int OrgId,
-    int OwnerId,
+    long OrgId,
+    long OwnerId,
     string OwnerPassword
 );

@@ -11,6 +11,6 @@ public interface IJwtService
     GeneralResult<string> GenerateRefreshToken();
     GeneralResult<string> GetClaimValueByAccessToken(string token, string claimType, string deviceId);
     GeneralResult<string> GetSecurityStampFromAccessToken(string token, string deviceId);
-    GeneralResult<int> GetUserIdFromAccessToken(string token, string deviceId);
+    GeneralResult<long> GetUserIdFromAccessToken(string token, string deviceId);
     GeneralResult<ClaimsPrincipal> ValidateAccessTokenAndGetPrincipal(string token, string deviceId);
 }

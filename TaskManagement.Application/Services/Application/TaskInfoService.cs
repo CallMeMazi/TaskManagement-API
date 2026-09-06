@@ -23,7 +23,7 @@ public class TaskInfoService : ITaskInfoService
 
 
     // Query methods
-    public async Task<GeneralResult<TaskInfoDetailsDto>> GetTaskInfoByIdAsync(int taskInfoId, CancellationToken ct)
+    public async Task<GeneralResult<TaskInfoDetailsDto>> GetTaskInfoByIdAsync(long taskInfoId, CancellationToken ct)
     {
         var taskInfo = await _uow.TaskInfo.GetByIdAsync(taskInfoId, false, ct);
 

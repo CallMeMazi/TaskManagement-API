@@ -1,6 +1,6 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
 public record CreateOrgInvitatoinAppDto(
-    int OrgId,
-    int OrgOwnerId,
+    long OrgId,
+    long OrgOwnerId,
     string UserMobileNumber
 );

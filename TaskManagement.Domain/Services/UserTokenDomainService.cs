@@ -18,7 +18,7 @@ public class UserTokenDomainService : IUserTokenDomainService
     }
 
 
-    public async Task EnsureCanLoginAsync(int userId, CancellationToken ct)
+    public async Task EnsureCanLoginAsync(long userId, CancellationToken ct)
     {
         var activeDevice = await _tokenRepository.GetCountByFilterAsync(ut =>
             ut.UserId == userId

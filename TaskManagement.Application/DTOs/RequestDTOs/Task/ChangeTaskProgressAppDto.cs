@@ -1,6 +1,6 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Task;
 public record ChangeTaskProgressAppDto(
-    int UserId,
-    int TaskId,
+    long UserId,
+    long TaskId,
     byte TaskProgress
 );

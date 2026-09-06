@@ -5,8 +5,8 @@ using TaskManagement.Domain.Enums.Roles;
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class OrganizationMemberShip : BaseEntity
 {
-    public int OrgId { get; private set; }
-    public int UserId { get; private set; }
+    public long OrgId { get; private set; }
+    public long UserId { get; private set; }
     public OrganizationRoles Role { get; private set; }
 
     #region Navigation Prop
@@ -18,7 +18,7 @@ public class OrganizationMemberShip : BaseEntity
 
 
     private OrganizationMemberShip() { }
-    public OrganizationMemberShip(int orgId, int userId, OrganizationRoles role)
+    public OrganizationMemberShip(long orgId, long userId, OrganizationRoles role)
     {
         ValidateOrgMemberShip(orgId, userId);
 
@@ -41,7 +41,7 @@ public class OrganizationMemberShip : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateOrgMemberShip(int orgId, int userId)
+    public void ValidateOrgMemberShip(long orgId, long userId)
     {
         var errorMessages = new List<string>();
 

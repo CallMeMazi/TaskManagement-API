@@ -1,6 +1,6 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.User;
 public record UpdateUserAppDto(
-    int UserId,
+    long UserId,
     string Email,
     string FirstName,
     string LastName

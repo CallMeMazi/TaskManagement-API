@@ -3,9 +3,9 @@
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class TaskAssignment : BaseEntity
 {
-    public int TaskId { get; private set; }
-    public int UserId { get; private set; }
-    public int ProjId { get; private set; }
+    public long TaskId { get; private set; }
+    public long UserId { get; private set; }
+    public long ProjId { get; private set; }
     public byte TotalTimeSpent { get; private set; }
     public byte StartTaskCount { get; private set; }
     public bool IsInProgress { get; private set; } = false;
@@ -21,7 +21,7 @@ public class TaskAssignment : BaseEntity
     #endregion
 
     private TaskAssignment() { }
-    public TaskAssignment(int taskId, int userId, int projId)
+    public TaskAssignment(long taskId, long userId, long projId)
     {
         ValidateTaskAssignmentCreating(taskId, userId, projId);
 
@@ -68,7 +68,7 @@ public class TaskAssignment : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateTaskAssignmentCreating(int taskId, int userId, int projectId)
+    public void ValidateTaskAssignmentCreating(long taskId, long userId, long projectId)
     {
         var errorMessages = new List<string>();
 

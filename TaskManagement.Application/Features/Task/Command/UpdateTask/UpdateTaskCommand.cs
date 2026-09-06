@@ -3,8 +3,8 @@ using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Task.Command.UpdateTask;
 public record UpdateTaskCommand(
-    int UserId,
-    int TaskId,
+    long UserId,
+    long TaskId,
     string TaskName,
     string TaskDescription,
     DateTime TaskDeadLine

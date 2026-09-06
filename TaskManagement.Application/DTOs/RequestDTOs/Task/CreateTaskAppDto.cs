@@ -2,11 +2,11 @@
 
 namespace TaskManagement.Application.DTOs.RequestDTOs.Task;
 public record CreateTaskAppDto(
-    int ProjId,
-    int UserId,
+    long ProjId,
+    long UserId,
     string TaskName,
     string TaskDescription,
     TaskType TaskType,
     DateTime TaskDeadLine,
-    List<int> UserIds
+    List<long> UserIds
 );

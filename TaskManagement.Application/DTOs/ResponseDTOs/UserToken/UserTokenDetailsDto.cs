@@ -1,7 +1,7 @@
 ﻿namespace TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 public record UserTokenDetailsDto(
-    int Id,
-    int UserId,
+    long Id,
+    long UserId,
     string AccessTokenHash,
     string RefreshTokenHash,
     DateTime CreatedAt,

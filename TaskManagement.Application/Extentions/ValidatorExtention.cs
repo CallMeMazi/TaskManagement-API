@@ -4,10 +4,10 @@ using TaskManagement.Common.Helpers;
 namespace TaskManagement.Application.Extentions;
 public static class ValidatorExtention
 {
-    public static IRuleBuilderOptions<T, int> ValidateId<T>(this IRuleBuilder<T, int> ruleBuilder)
+    public static IRuleBuilderOptions<T, long> ValidateId<T>(this IRuleBuilder<T, long> ruleBuilder)
     {
         return ruleBuilder.NotNull().WithMessage($"شناسه نمیتواند خالی باشد")
-            .LessThanOrEqualTo(0).WithMessage("شناسه نمیتوانید از صفر کمتر باشد!");
+            .GreaterThan(0).WithMessage("شناسه نمیتوانید از صفر کمتر باشد!");
     }
 
     public static IRuleBuilderOptions<T, string> ValidateMobileNumber<T>(this IRuleBuilder<T, string> ruleBuilder)

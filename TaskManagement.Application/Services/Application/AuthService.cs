@@ -35,7 +35,7 @@ public class AuthService : IAuthServiec
 
 
     // Query methods
-    public async Task<GeneralResult<List<UserTokenDetailsDto>>> GetUserActiveTokensAsync(int userId, CancellationToken ct)
+    public async Task<GeneralResult<List<UserTokenDetailsDto>>> GetUserActiveTokensAsync(long userId, CancellationToken ct)
     {
         var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == userId
@@ -220,7 +220,7 @@ public class AuthService : IAuthServiec
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(int userId, bool isSaved, CancellationToken ct)
+    public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(long userId, bool isSaved, CancellationToken ct)
     {
         var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == userId

@@ -7,8 +7,8 @@ public class Project : BaseEntity
 {
     public string ProjName { get; private set; }
     public string ProjDescription { get; private set; }
-    public int OrgId { get; private set; }
-    public int CreatorId { get; private set; }
+    public long OrgId { get; private set; }
+    public long CreatorId { get; private set; }
     public byte ProjProgress { get; private set; }
     public ProjectStatusType ProjStatus { get; private set; } = ProjectStatusType.InProgress;
     public bool IsActive { get; private set; } = true;
@@ -30,8 +30,8 @@ public class Project : BaseEntity
 
 
     private Project() { }
-    public Project(string projName, string projDescription, int orgId
-        , int creatorId, byte maxUsers, byte maxTasks)
+    public Project(string projName, string projDescription, long orgId
+        , long creatorId, byte maxUsers, byte maxTasks)
     {
         ValidateProjectCreating(projName, projDescription, orgId, creatorId, maxUsers, maxTasks);
 
@@ -155,8 +155,8 @@ public class Project : BaseEntity
         ProjEndAt = DateTime.Now;
     }
 
-    public void ValidateProjectCreating(string projName, string projDescription, int orgId
-        , int creatorId, byte maxUsers, byte maxTasks)
+    public void ValidateProjectCreating(string projName, string projDescription, long orgId
+        , long creatorId, byte maxUsers, byte maxTasks)
     {
         var errorMessages = new List<string>();
 

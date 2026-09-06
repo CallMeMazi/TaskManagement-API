@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TaskManagement.Infrastructure.IdGeneration;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManagement.WebConfig.DI;
@@ -8,6 +9,7 @@ public static class DbConfiguration
 {
     public static IServiceCollection AddDbContexts(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton<EntityIdSaveChangesInterceptor>();
         services.AddApplicationDbContext(configuration);
         services.AddLogDbContext(configuration);
 
@@ -16,8 +18,9 @@ public static class DbConfiguration
 
     private static IServiceCollection AddApplicationDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("ApplicationConnectionString")),
+        services.AddDbContext<ApplicationDbContext>((sp, options) =>
+            options.UseSqlServer(configuration.GetConnectionString("ApplicationConnectionString"))
+                .AddInterceptors(sp.GetRequiredService<EntityIdSaveChangesInterceptor>()),
             ServiceLifetime.Scoped
         );
 

@@ -116,20 +116,20 @@ public class Jwtservice : IJwtService
             return deviceId.Equals(currentDeviceId);
         }
     }
-    public GeneralResult<int> GetUserIdFromAccessToken(string token, string deviceId)
+    public GeneralResult<long> GetUserIdFromAccessToken(string token, string deviceId)
     {
         var principalResult = ValidateAccessTokenAndGetPrincipal(token, deviceId);
         if (!principalResult.IsSuccess)
-            return GeneralResult<int>.Failure(default, principalResult.Message);
+            return GeneralResult<long>.Failure(default, principalResult.Message);
 
         var userId = principalResult.Result!.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (userId.IsNullParameter())
             throw new Exception($"The UserID not found in token, error in {nameof(GetUserIdFromAccessToken)} method!");
 
-        if (int.TryParse(userId, out var id))
-            return GeneralResult<int>.Success(id);
+        if (long.TryParse(userId, out var id))
+            return GeneralResult<long>.Success(id);
 
-        return GeneralResult<int>.Failure(default, "مقدار شناسه درون توکن نامعتبر است!");
+        return GeneralResult<long>.Failure(default, "مقدار شناسه درون توکن نامعتبر است!");
     }
     public GeneralResult<string> GetSecurityStampFromAccessToken(string token, string deviceId)
     {

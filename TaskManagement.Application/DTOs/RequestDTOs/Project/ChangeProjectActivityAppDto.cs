@@ -1,7 +1,7 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.Project;
 public record ChangeProjectActivityAppDto(
-    int OwnerId,
-    int ProjId,
+    long OwnerId,
+    long ProjId,
     string UserPassword,
     bool Activity
 );

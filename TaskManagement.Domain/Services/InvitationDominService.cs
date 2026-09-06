@@ -22,7 +22,7 @@ public class InvitationDomainService : IInvitationDomainService
     }
 
 
-    public async Task EnsureCanGenerateInviteLinkAsync(int orgId, int orgOwnerId, int userId, CancellationToken ct)
+    public async Task EnsureCanGenerateInviteLinkAsync(long orgId, long orgOwnerId, long userId, CancellationToken ct)
     {
         var isUserOrgOwner = await _orgRepository.IsEntityExistByFilterAsync(o =>
             o.Id == orgId

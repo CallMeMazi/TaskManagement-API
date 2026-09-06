@@ -3,6 +3,6 @@ using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Task.Command.DeleteTask;
 public record DeleteTaskCommand(
-    int UserId,
-    int TaskId
+    long UserId,
+    long TaskId
 ) : IRequest<GeneralResult>;

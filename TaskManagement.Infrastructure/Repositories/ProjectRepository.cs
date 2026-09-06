@@ -12,19 +12,19 @@ public class ProjectRepository
 
 
     // Query methods
-    public Task<Project?> GetProjectByIdWithOrgAsync(int projId, bool isTracking = false, CancellationToken ct = default)
+    public Task<Project?> GetProjectByIdWithOrgAsync(long projId, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.Include(p => p.Org).FirstOrDefaultAsync(p => p.Id == projId, ct);
     }
-    public Task<Project?> GetProjectByIdWithMembersAsync(int projId, bool isTracking = false, CancellationToken ct = default)
+    public Task<Project?> GetProjectByIdWithMembersAsync(long projId, bool isTracking = false, CancellationToken ct = default)
     {
         var query = isTracking ? Entities : Entities.AsNoTracking();
         return query.Include(p => p.ProjMember).FirstOrDefaultAsync(p => p.Id == projId, ct);
     }
 
     // Command methods
-    public Task<int> SoftDeleteProjectSpAsync(int projId, CancellationToken ct)
+    public Task<int> SoftDeleteProjectSpAsync(long projId, CancellationToken ct)
     {
         var query = string.Format("EXEC dbo.sp_SoftDeleteProject @ProjectId = {0}", projId);
         return _db.Database.ExecuteSqlRawAsync(query, ct);

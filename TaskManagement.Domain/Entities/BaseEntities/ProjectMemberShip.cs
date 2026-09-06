@@ -5,8 +5,8 @@ using TaskManagement.Domain.Enums.Roles;
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class ProjectMemberShip : BaseEntity
 {
-    public int UserId { get; private set; }
-    public int ProjId { get; private set; }
+    public long UserId { get; private set; }
+    public long ProjId { get; private set; }
     public ProjectRoles Role { get; private set; }
 
     #region Navigation Prop
@@ -18,7 +18,7 @@ public class ProjectMemberShip : BaseEntity
 
 
     private ProjectMemberShip() { }
-    public ProjectMemberShip(int userId, int projId, ProjectRoles role)
+    public ProjectMemberShip(long userId, long projId, ProjectRoles role)
     {
         ValidateProjMemberShip(userId, projId);
 
@@ -41,7 +41,7 @@ public class ProjectMemberShip : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateProjMemberShip(int userId, int projId)
+    public void ValidateProjMemberShip(long userId, long projId)
     {
         var errorMessages = new List<string>();
 

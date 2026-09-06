@@ -5,9 +5,9 @@ namespace TaskManagement.Application.Features.Project.Command.CreateProject;
 public record CreateProjectCommand(
     string ProjName,
     string ProjDescription,
-    int OrgId,
-    int CreatorId,
+    long OrgId,
+    long CreatorId,
     byte MaxUser,
     byte MaxTask,
-    List<int>? UserIds
+    List<long>? UserIds
 ) : IRequest<GeneralResult>;

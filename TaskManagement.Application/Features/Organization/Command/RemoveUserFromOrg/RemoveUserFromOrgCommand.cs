@@ -3,7 +3,7 @@ using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Organization.Command.RemoveUserFromOrg;
 public record RemoveUserFromOrgCommand(
-    int OrgOwnerId,
-    int UserId,
-    int OrgId
+    long OrgOwnerId,
+    long UserId,
+    long OrgId
 ) : IRequest<GeneralResult>;

@@ -4,8 +4,8 @@ using TaskManagement.Domain.Enums.Statuses;
 
 namespace TaskManagement.Application.Features.Project.Command.ChangeProjectStatus;
 public record ChangeProjectStatusCommand(
-    int OwnerId,
+    long OwnerId,
     string UserPassword,
-    int ProjId,
+    long ProjId,
     ProjectStatusType ProjectStatus
 ) : IRequest<GeneralResult>;

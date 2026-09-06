@@ -1,6 +1,6 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.User;
 public record ChangePasswordUserAppDto(
-    int UserId,
+    long UserId,
     string OldPassword,
     string NewPassword,
     string DeviceId

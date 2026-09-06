@@ -3,7 +3,7 @@ using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Organization.Command.ChangeUserRoleToMember;
 public record ChangeUserRoleToMemberCommand(
-    int OrgOwnerId,
-    int OrgId,
-    int UserId
+    long OrgOwnerId,
+    long OrgId,
+    long UserId
 ) : IRequest<GeneralResult>;

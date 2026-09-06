@@ -3,7 +3,7 @@ using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.DeleteProject;
 public record DeleteProjectCommand(
-    int OwnerId,
+    long OwnerId,
     string UserPassword,
-    int ProjId
+    long ProjId
 ) : IRequest<GeneralResult>;

@@ -4,7 +4,7 @@ using TaskManagement.Common.Classes;
 namespace TaskManagement.Application.Features.User.Command.UpdateUser;
 
 public record UpdateUserCommand(
-        int UserId,
+        long UserId,
         string Email,
         string FirstName,
         string LastName

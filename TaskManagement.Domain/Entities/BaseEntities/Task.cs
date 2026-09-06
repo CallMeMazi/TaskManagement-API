@@ -6,8 +6,8 @@ using TaskManagement.Domain.Enums.Statuses;
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class Task : BaseEntity
 {
-    public int ProjId { get; private set; }
-    public int CreatorId { get; private set; }
+    public long ProjId { get; private set; }
+    public long CreatorId { get; private set; }
     public string TaskName { get; private set; }
     public string TaskDescription { get; private set; }
     public bool IsActive { get; private set; } = true;
@@ -28,7 +28,7 @@ public class Task : BaseEntity
 
 
     private Task() { }
-    public Task(int projId, int creatorId, string taskName
+    public Task(long projId, long creatorId, string taskName
         , string taskDescription, TaskType taskType, DateTime taskDeadline)
     {
         ValidateTaskCreating(projId, creatorId, taskName, taskDescription, taskDeadline);
@@ -140,7 +140,7 @@ public class Task : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateTaskCreating(int projId, int creatorId, string taskName
+    public void ValidateTaskCreating(long projId, long creatorId, string taskName
         , string taskDescription, DateTime taskDeadline)
     {
         var errorMessages = new List<string>();

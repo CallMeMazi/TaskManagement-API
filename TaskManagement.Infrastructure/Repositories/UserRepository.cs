@@ -12,7 +12,7 @@ public class UserRepository
 
 
     // Command methods
-    public Task<int> SoftDeleteUserSpAsync(int userId, CancellationToken ct)
+    public Task<int> SoftDeleteUserSpAsync(long userId, CancellationToken ct)
     {
         var query = string.Format("EXEC dbo.sp_SoftDeleteUser @UserId = {0}", userId);
         return _db.Database.ExecuteSqlRawAsync(query, ct);

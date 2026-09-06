@@ -3,5 +3,5 @@ using TaskManagement.Application.DTOs.ResponseDTOs.Invitation;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Invitation.Query.GetPendingOrgInvitationById;
-public record GetPendingOrgInvitationByIdQuery(int InvitationId)
+public record GetPendingOrgInvitationByIdQuery(long InvitationId)
     : IRequest<GeneralResult<OrgInvitationDetailsDto>>;

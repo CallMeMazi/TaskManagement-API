@@ -11,7 +11,7 @@ public class TaskRepository
 
 
     // command methods
-    public Task<int> SoftDeleteTaskSpAsync(int taskId, CancellationToken ct)
+    public Task<int> SoftDeleteTaskSpAsync(long taskId, CancellationToken ct)
     {
         var query = string.Format("EXEC dbo.sp_SoftDeleteTask @TaskId = {0}", taskId);
         return _db.Database.ExecuteSqlRawAsync(query, ct);

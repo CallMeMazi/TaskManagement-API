@@ -6,7 +6,7 @@ public class Organization : BaseEntity
 {
     public string OrgName { get; private set; }
     public string SecondOrgName { get; set; }
-    public int OwnerId { get; private set; }
+    public long OwnerId { get; private set; }
     public string OrgCode { get; private set; }
     public string OrgDescription { get; private set; }
     public bool IsActive { get; private set; } = true;
@@ -23,7 +23,7 @@ public class Organization : BaseEntity
 
 
     private Organization() { }
-    public Organization(string orgName, string secondOrgName, int ownerId
+    public Organization(string orgName, string secondOrgName, long ownerId
         , string orgDescription, byte maxUsers)
     {
         ValidateOrgCreating(orgName, secondOrgName, ownerId, orgDescription, maxUsers);
@@ -58,7 +58,7 @@ public class Organization : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateOrgCreating(string orgName, string secondOrgName, int ownerId
+    public void ValidateOrgCreating(string orgName, string secondOrgName, long ownerId
         , string orgDescription, int maxUser)
     {
         var errorMessages = new List<string>();

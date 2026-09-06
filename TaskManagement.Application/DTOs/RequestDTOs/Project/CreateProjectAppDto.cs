@@ -2,9 +2,9 @@
 public record CreateProjectAppDto(
     string ProjName,
     string ProjDescription,
-    int OrgId,
-    int CreatorId,
+    long OrgId,
+    long CreatorId,
     byte MaxUser,
     byte MaxTask,
-    List<int>? UserIds
+    List<long>? UserIds
 );

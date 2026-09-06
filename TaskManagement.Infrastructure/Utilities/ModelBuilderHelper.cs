@@ -24,12 +24,31 @@ public static class ModelBuilderHelper
     }
 
     /// <summary>
-    /// Set NEWSEQUENTIALID() sql function for all columns named "Id"
+    /// Use application-generated snowflake ids. SQL Server identity is not used.
     /// </summary>
-    /// <param name="modelBuilder"></param>
-    public static void AddSequentialGuidForIdConvention(this ModelBuilder modelBuilder)
+    public static void AddSnowflakeIdConvention(this ModelBuilder modelBuilder)
     {
-        modelBuilder.AddDefaultValueSqlConvention("Id", typeof(int), "NEWSEQUENTIALID()");
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var idProperty = entityType.FindProperty("Id");
+            if (idProperty is null || idProperty.ClrType != typeof(long))
+                continue;
+
+            idProperty.ValueGenerated = ValueGenerated.Never;
+            idProperty.SetColumnType("bigint");
+        }
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var property in entityType.GetProperties())
+            {
+                if (property.ClrType != typeof(long))
+                    continue;
+
+                if (property.Name.EndsWith("Id", StringComparison.Ordinal))
+                    property.SetColumnType("bigint");
+            }
+        }
     }
 
     /// <summary>

@@ -15,7 +15,7 @@ public interface IProjectService
     Task<GeneralResult> ChangeUserRoleToMemberAsync(ChangeUserRoleProjectAppDto command, CancellationToken ct);
     Task<GeneralResult> CreateProjectAsync(CreateProjectAppDto command, CancellationToken ct);
     Task<GeneralResult> FinishProjectAsync(UserProjectAppDto command, CancellationToken ct);
-    Task<GeneralResult<ProjectDetailsDto>> GetProjectByIdAsync(int projId, CancellationToken ct);
+    Task<GeneralResult<ProjectDetailsDto>> GetProjectByIdAsync(long projId, CancellationToken ct);
     Task<GeneralResult> RemoveUserFromProjectAsync(AddRemoveUserProjectAppDto command, CancellationToken ct);
     Task<GeneralResult> SoftDeleteProjectAsync(UserProjectAppDto command, CancellationToken ct);
     Task<GeneralResult> UpdateProjectAsync(UpdateProjectAppDto command, CancellationToken ct);

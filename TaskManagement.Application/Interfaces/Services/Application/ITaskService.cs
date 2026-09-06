@@ -14,7 +14,7 @@ public interface ITaskService
     Task<GeneralResult> DeadTaskAsync(UserTaskAppDto command, CancellationToken ct);
     Task<GeneralResult> EndTaskAsync(UserTaskAppDto command, CancellationToken ct);
     Task<GeneralResult> FinishTaskAsync(UserTaskAppDto command, CancellationToken ct);
-    Task<GeneralResult<TaskDetailsDto>> GetTaskByIdAsync(int taskId, CancellationToken ct);
+    Task<GeneralResult<TaskDetailsDto>> GetTaskByIdAsync(long taskId, CancellationToken ct);
     Task<GeneralResult> RemoveUserFromTaskAsync(AddRemoveUserTaskAppDto command, CancellationToken ct);
     Task<GeneralResult> SoftDeleteTaskAsync(UserTaskAppDto command, CancellationToken ct);
     Task<GeneralResult> StartTaskAsync(UserTaskAppDto command, CancellationToken ct);

@@ -1,7 +1,7 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 
 public record RegisterUserTokenAppDto(
-    int UserId,
+    long UserId,
     string DeviceId,
     string UserIp,
     string UserAgent

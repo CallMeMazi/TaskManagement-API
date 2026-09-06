@@ -5,6 +5,6 @@ using TaskManagement.Common.Classes;
 namespace TaskManagement.Application.Interfaces.Services.Application;
 public interface ITaskInfoService
 {
-    Task<GeneralResult<TaskInfoDetailsDto>> GetTaskInfoByIdAsync(int taskInfoId, CancellationToken ct);
+    Task<GeneralResult<TaskInfoDetailsDto>> GetTaskInfoByIdAsync(long taskInfoId, CancellationToken ct);
     Task<GeneralResult> CreateTaskInfoAsync(CreateTaskInfoAppDto command, CancellationToken ct);
 }

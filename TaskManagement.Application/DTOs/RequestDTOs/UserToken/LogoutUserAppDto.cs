@@ -1,6 +1,6 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 public record LogoutUserAppDto(
-    int UserId,
+    long UserId,
     string AccessToken,
     string DeviceId
 );

@@ -20,7 +20,7 @@ public class ProjectDomainService : IProjectDomainService
     }
 
 
-    public async System.Threading.Tasks.Task EnsureUserHasProjectAccessAsync(int ownerId, int orgId, CancellationToken ct)
+    public async System.Threading.Tasks.Task EnsureUserHasProjectAccessAsync(long ownerId, long orgId, CancellationToken ct)
     {
         var isOwnerInOrg = await _orgMemberShipRepository.IsEntityExistByFilterAsync(om =>
             om.UserId == ownerId
@@ -31,7 +31,7 @@ public class ProjectDomainService : IProjectDomainService
         if (!isOwnerInOrg)
             throw new ForbiddenException("شما به این پروژه دسترسی ندارید!");
     }
-    public async System.Threading.Tasks.Task CheakProjectActiveTaskAsync(int projectId, CancellationToken ct)
+    public async System.Threading.Tasks.Task CheakProjectActiveTaskAsync(long projectId, CancellationToken ct)
     {
         var isProjHasActiveTask = await _taskRepository.IsEntityExistByFilterAsync(t =>
             t.ProjId == projectId
@@ -42,7 +42,7 @@ public class ProjectDomainService : IProjectDomainService
             throw new BadRequestException("شما در پروژه تسک های فعال دارید، ابتدا آن ها را عیرفعال کنید!");
     }
     // Project Member Ship methods
-    public async System.Threading.Tasks.Task EnsureCanAddUserToProjectAsync(Project project, int userId, int orgId, CancellationToken ct)
+    public async System.Threading.Tasks.Task EnsureCanAddUserToProjectAsync(Project project, long userId, long orgId, CancellationToken ct)
     {
         if (project.ProjMaxUsers == project.ProjMember.Count)
             throw new BadRequestException("پروژه شما در حال حاضر پر است و نمیتوانید شخص دیگری را اضافه کنید!");
@@ -55,7 +55,7 @@ public class ProjectDomainService : IProjectDomainService
         if (!isUserInOrg)
             throw new BadRequestException("گاربر مورد نظر در سازمان وجود ندارد!");
     }
-    public async System.Threading.Tasks.Task EnsureCanRemoveUserFromProjectAsync(Project project, int userId, CancellationToken ct)
+    public async System.Threading.Tasks.Task EnsureCanRemoveUserFromProjectAsync(Project project, long userId, CancellationToken ct)
     {
         if (project!.CreatorId == userId)
             throw new BadRequestException("شما مالک پروژه هستید و نمیتوانید آن را ترک کنید!");

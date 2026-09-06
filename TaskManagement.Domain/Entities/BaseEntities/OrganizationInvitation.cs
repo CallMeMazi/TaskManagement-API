@@ -4,8 +4,8 @@ using TaskManagement.Domain.Enums.Statuses;
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class OrganizationInvitation : BaseEntity
 {
-    public int OrgId { get; private set; }
-    public int UserId { get; private set; }
+    public long OrgId { get; private set; }
+    public long UserId { get; private set; }
     public string Token { get; private set; }
     public OrgInvitationStatus Status { get; private set; }
     public DateTime ExpiredAt { get; private set; }
@@ -21,7 +21,7 @@ public class OrganizationInvitation : BaseEntity
 
     private OrganizationInvitation() { }
 
-    public OrganizationInvitation(int orgId, int userId)
+    public OrganizationInvitation(long orgId, long userId)
     {
         ValidateOrgInvitation(orgId, userId);
 
@@ -62,7 +62,7 @@ public class OrganizationInvitation : BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public void ValidateOrgInvitation(int orgId, int userId)
+    public void ValidateOrgInvitation(long orgId, long userId)
     {
         var errorMessages = new List<string>();
 

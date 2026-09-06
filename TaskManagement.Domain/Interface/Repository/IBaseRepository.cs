@@ -10,10 +10,10 @@ public interface IBaseRepository<TEntity>
     // Query methods
     Task<List<TEntity>> GetAllAsync(bool isTracking = false, CancellationToken ct = default);
     Task<List<TEntity>> GetAllByFilterAsync(Expression<Func<TEntity, bool>> filter, bool isTracking = false, CancellationToken ct = default);
-    Task<TEntity?> GetByIdAsync(int entityId, bool isTracking = false, CancellationToken ct = default);
+    Task<TEntity?> GetByIdAsync(long entityId, bool isTracking = false, CancellationToken ct = default);
     Task<TEntity?> GetByFilterAsync(Expression<Func<TEntity, bool>> filter, bool isTracking = false, CancellationToken ct = default);
     ValueTask<TEntity?> FindByIdsAsync(CancellationToken ct, params object[] ids);
-    Task<T?> GetFieldByIdAsync<T>(int entityId, Expression<Func<TEntity, T>> filedExpression, CancellationToken ct = default);
+    Task<T?> GetFieldByIdAsync<T>(long entityId, Expression<Func<TEntity, T>> filedExpression, CancellationToken ct = default);
     Task<T?> GetFieldByFilterAsync<T>(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, T>> filedExpression, CancellationToken ct = default);
 
     // Command methods

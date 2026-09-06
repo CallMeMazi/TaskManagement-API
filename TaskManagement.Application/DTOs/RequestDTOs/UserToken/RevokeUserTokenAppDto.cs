@@ -1,5 +1,5 @@
 ﻿namespace TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 public record RevokeUserTokenAppDto(
-    int UserId,
+    long UserId,
     string DeviceId
 );

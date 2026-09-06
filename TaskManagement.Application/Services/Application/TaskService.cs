@@ -27,7 +27,7 @@ public class TaskService : ITaskService
 
 
     // Query methods
-    public async Task<GeneralResult<TaskDetailsDto>> GetTaskByIdAsync(int taskId, CancellationToken ct)
+    public async Task<GeneralResult<TaskDetailsDto>> GetTaskByIdAsync(long taskId, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(taskId, false, ct);
         if (task.IsNullParameter())
@@ -262,8 +262,8 @@ public class TaskService : ITaskService
         return GeneralResult.Success();
     }
 
-    private async System.Threading.Tasks.Task CheckUserIdsAndCreateTaskAssignmentsAsync(List<int> userIds, List<int> memberIds, int taskId
-        , int projectid, CancellationToken ct)
+    private async System.Threading.Tasks.Task CheckUserIdsAndCreateTaskAssignmentsAsync(List<long> userIds, List<long> memberIds, long taskId
+        , long projectid, CancellationToken ct)
     {
         var projMemberIds = memberIds.ToHashSet();
         var invalid = userIds.FirstOrDefault(u => !projMemberIds.Contains(u));
@@ -277,7 +277,7 @@ public class TaskService : ITaskService
         await _uow.TaskAssignment.AddRangeAsync(taskAssignments, ct);
         await _uow.SaveAsync(ct);
     }
-    private async System.Threading.Tasks.Task CreateTaskAssignmentAsync(int taskId, int userId, int projId
+    private async System.Threading.Tasks.Task CreateTaskAssignmentAsync(long taskId, long userId, long projId
         , bool isSaved, CancellationToken ct)
     {
         var taskAsiignment = new TaskAssignment(taskId, userId, projId);

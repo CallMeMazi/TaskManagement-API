@@ -6,6 +6,6 @@ public record CreateOrgCommand(
     string OrgName,
     string SecondOrgName,
     string OrgDescription,
-    int OwnerId,
+    long OwnerId,
     byte MaxUser
 ) : IRequest<GeneralResult>;
