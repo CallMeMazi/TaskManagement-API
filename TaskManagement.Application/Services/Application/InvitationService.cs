@@ -94,14 +94,11 @@ public class InvitationService : IInvitationService
         var invatation = new OrganizationInvitation(command.OrgId, user!.Id);
 
         await _uow.Invitation.AddAsync(invatation, ct);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult<string>.Success(invatation.Token);
     }
     public async Task<GeneralResult<long>> AcceptInvitationAsync(AcceptOrgInvitationAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         if (!await _uow.User.IsEntityExistByFilterAsync(u => u.Id == command.UserId, ct))
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(AcceptInvitationAsync)} method!");
 
@@ -117,7 +114,6 @@ public class InvitationService : IInvitationService
             throw new BadRequestException("لینک نامعتبر است!");
 
         invitation!.AcceptInvite();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult<long>.Success(invitation.OrgId);
     }
@@ -136,7 +132,6 @@ public class InvitationService : IInvitationService
             throw new ForbiddenException("شما مالک این سازمان نیستید!");
 
         invitation.RevokedInvite();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }

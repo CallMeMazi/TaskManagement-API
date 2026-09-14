@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Linq.Expressions;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Interface.Repository;
+using TaskManagement.Infrastructure.IdGeneration;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 using TaskManagement.Infrastructure.QueryCache;
 
@@ -13,12 +14,14 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity>
 {
     protected readonly ApplicationDbContext _db;
     protected readonly DbSet<TEntity> Entities;
+    private readonly IIdGenerator _idGenerator;
 
 
-    public BaseRepository(ApplicationDbContext dbContext)
+    public BaseRepository(ApplicationDbContext dbContext, IIdGenerator idGenerator)
     {
         _db = dbContext;
         Entities = _db.Set<TEntity>();
+        _idGenerator = idGenerator;
     }
 
 
@@ -68,6 +71,7 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity>
         if (entity.IsNullParameter())
             throw new NullReferenceException($"null parameter in {nameof(AddAsync)} method, Type = {typeof(TEntity)}!");
 
+        AssignId(entity);
         await Entities.AddAsync(entity, ct).ConfigureAwait(false);
     }
     public async System.Threading.Tasks.Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken ct = default)
@@ -75,7 +79,11 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity>
         if (entities.IsNullParameter())
             throw new NullReferenceException($"null parameter in {nameof(AddRangeAsync)} method, Type = {typeof(TEntity)}!");
 
-        await Entities.AddRangeAsync(entities, ct).ConfigureAwait(false);
+        var list = entities as IList<TEntity> ?? entities.ToList();
+        foreach (var entity in list)
+            AssignId(entity);
+
+        await Entities.AddRangeAsync(list, ct).ConfigureAwait(false);
     }
     public void Update(TEntity entity)
     {
@@ -114,6 +122,11 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity>
     public Task<int> GetCountByFilterAsync(Expression<Func<TEntity, bool>> filter, CancellationToken ct)
     {
         return Entities.CountAsync(filter, ct);
+    }
+
+    private void AssignId(TEntity entity)
+    {
+        EntityIdAssigner.EnsureId(entity, _idGenerator);
     }
 
     #endregion

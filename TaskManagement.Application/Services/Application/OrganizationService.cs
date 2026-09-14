@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using TaskManagement.Application.DTOs.RequestDTOs.Organization;
 using TaskManagement.Application.DTOs.ResponseDTOs.Organization;
 using TaskManagement.Application.Interfaces.Services.Application;
@@ -57,14 +57,11 @@ public class OrganizationService : IOrganizationService
     // command services
     public async Task<GeneralResult> CreateOrgAsync(CreateOrgAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         await _orgDomainService.EnsureCanCreateOrgAsync(command.SecondOrgName, command.OwnerId, ct);
 
         var org = _mapper.Map<Organization>(command);
 
         await _uow.Organization.AddAsync(org, ct);
-        await _uow.SaveAsync(ct);
 
         // Create relation between owner(User) and Org
         await CreateOrgMemberShipAsync(org.Id, command.OwnerId, OrganizationRoles.Owner, ct);
@@ -83,7 +80,6 @@ public class OrganizationService : IOrganizationService
         await _orgDomainService.EnsureCanUpdateOrgAsync(command.SecondOrgName, org.Id, ct);
 
         org.UpdateOrg(command.OrgName, command.SecondOrgName, command.OrgDescription);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -127,20 +123,15 @@ public class OrganizationService : IOrganizationService
             throw new BadRequestException("رمز عبور اشتباه است!");
 
         if (org.IsActive && !command.Activity)
-        {
             await _orgDomainService.EnsureCanDeactiveOrgAsync(org.Id, ct);
-        }
 
         org.ChangeOrgActivity(command.Activity);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
     // Org MemberShip methods
     public async Task<GeneralResult> AddUserToOrgAsync(AddUserOrgAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         await _orgDomainService.EnsureCanUserAddToOrgAsync(command.OrgId, command.UserId, ct);
 
         await CreateOrgMemberShipAsync(command.OrgId, command.UserId, OrganizationRoles.Member, ct);
@@ -169,7 +160,6 @@ public class OrganizationService : IOrganizationService
         await _orgDomainService.EnsureCanRemoveUserFromOrgAsync(command.OrgId, command.UserId, ct);
 
         orgMemberShip!.SoftDelete();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -192,7 +182,6 @@ public class OrganizationService : IOrganizationService
         await _orgDomainService.EnsureCanRemoveUserFromOrgAsync(command.OrgId, command.UserId, ct);
 
         orgMemberShip!.SoftDelete();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -215,7 +204,6 @@ public class OrganizationService : IOrganizationService
             throw new NotFoundException("کاربری با این شناسه در سازمان وجود ندارد!");
 
         orgMemberShip!.ChangeUserOrgRole(OrganizationRoles.Admin);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -240,7 +228,6 @@ public class OrganizationService : IOrganizationService
         await _orgDomainService.EnsureCanChangeRoleToMemberAsync(command.UserId, org.Id, ct);
 
         orgMemberShip!.ChangeUserOrgRole(OrganizationRoles.Member);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }

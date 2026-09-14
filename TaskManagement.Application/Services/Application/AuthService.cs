@@ -80,8 +80,6 @@ public class AuthService : IAuthServiec
     // Command methods
     public async Task<GeneralResult<UserTokenDto>> RegisterUserAsync(RegisterUserTokenAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         var user = await _uow.User.GetByIdAsync(command.UserId, false, ct);
 
         var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken
@@ -140,7 +138,6 @@ public class AuthService : IAuthServiec
         );
 
         await _uow.UserToken.AddAsync(userToken, ct);
-        await _uow.SaveAsync(ct);
 
         var result = new UserTokenDto(tokenResult.Result.AccessTokenHash, tokenResult.Result.RefreshTokenHash);
 
@@ -167,7 +164,6 @@ public class AuthService : IAuthServiec
             throw new BadRequestException("توکن ارسالی شما نامعتبر است");
 
         token.RevokeToken();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -186,7 +182,12 @@ public class AuthService : IAuthServiec
         if (token!.RefreshTokenHash != commandRefreshTokenHash)
             throw new BadRequestException("رفرش توکن نامعتبر است!");
 
-        await CheckSecurityStampAsync(token.User.SecurityStamp, token, ct);
+        if (token.User.SecurityStamp != token.SecurityStamp)
+        {
+            token.RevokeToken();
+            await _uow.SaveAsync(ct);
+            throw new BadRequestException("اطلاعات کاربری بروزرسانی شده، لطفا دوباره وارد شوید!");
+        }
 
         var newTokensResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken
             (new GenerateTokensInternalDto(token.User.Id, token.User.MobileNumber, token.User.SecurityStamp, command.DeviceId));
@@ -197,7 +198,6 @@ public class AuthService : IAuthServiec
         (string accessToken, string refreshToken) = HashAcceesTokenAndRefreshToken(newTokensResult.Result!.AccessTokenHash, newTokensResult.Result.RefreshTokenHash);
 
         token.RefreshToken(accessToken, refreshToken, _appSettings.JwtSetting.ExpirationDaysRefreshToken);
-        await _uow.SaveAsync(ct);
 
         var result = new UserTokenDto(newTokensResult.Result.AccessTokenHash, newTokensResult.Result.RefreshTokenHash);
 
@@ -216,11 +216,10 @@ public class AuthService : IAuthServiec
             throw new NotFoundException("توکنی با این اطلاعات یافت نشد!");
 
         token!.RevokeToken();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(long userId, bool isSaved, CancellationToken ct)
+    public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(long userId, CancellationToken ct)
     {
         var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == userId
@@ -235,15 +234,10 @@ public class AuthService : IAuthServiec
             ut.RevokeToken()
         );
 
-        if (isSaved)
-            await _uow.SaveAsync(ct);
-
         return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken ct)
+    public async Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == command.UserId
             && ut.DeviceId != command.DeviceId
@@ -258,9 +252,6 @@ public class AuthService : IAuthServiec
             ut.RevokeToken()
         );
 
-        if (isSaved)
-            await _uow.SaveAsync(ct);
-
         return GeneralResult.Success();
     }
 
@@ -270,14 +261,5 @@ public class AuthService : IAuthServiec
         var refreshTokenHashed = _commonService.Password.Hash(refreshToken);
 
         return (accessTokenHashed, refreshTokenHashed);
-    }
-    private async System.Threading.Tasks.Task CheckSecurityStampAsync(string securityStamp, UserToken token, CancellationToken ct)
-    {
-        if (securityStamp != token.SecurityStamp)
-        {
-            token.RevokeToken();
-            await _uow.SaveAsync(ct);
-            throw new BadRequestException("توکن شما معتبر نیست، لطفا دوباره لاگین کنید!");
-        }
     }
 }

@@ -20,8 +20,6 @@ public class DeleteUserHandler
 
     public Task<GeneralResult> Handle(DeleteUserCommand request, CancellationToken ct)
     {
-        // TransActional
-
         var dto = _mapper.Map<DeleteUserAppDto>(request);
 
         return _userService.SoftDeleteUserAsync(dto, ct);

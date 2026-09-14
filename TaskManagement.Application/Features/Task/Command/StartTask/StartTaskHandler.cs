@@ -2,25 +2,32 @@
 using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Task;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Task.Command.StartTask;
 public class StartTaskHandler
     : IRequestHandler<StartTaskCommand, GeneralResult>
 {
+    private readonly IUnitOfWork _uow;
     private readonly ITaskService _taskService;
     private readonly IMapper _mapper;
 
-    public StartTaskHandler(ITaskService taskService, IMapper mapper)
+    public StartTaskHandler(ITaskService taskService, IMapper mapper, IUnitOfWork uow)
     {
         _taskService = taskService;
         _mapper = mapper;
+        _uow = uow;
     }
 
-    public Task<GeneralResult> Handle(StartTaskCommand request, CancellationToken ct)
+    public async Task<GeneralResult> Handle(StartTaskCommand request, CancellationToken ct)
     {
         var dto = _mapper.Map<UserTaskAppDto>(request);
 
-        return _taskService.StartTaskAsync(dto, ct);
+        var startTaskRes = await _taskService.StartTaskAsync(dto, ct);
+
+        await _uow.SaveAsync(ct);
+
+        return startTaskRes;
     }
 }

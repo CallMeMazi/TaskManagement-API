@@ -58,8 +58,6 @@ public class UserService : IUserService
     // Command methods
     public async Task<GeneralResult<long>> CreateUserAsync(CreateUserAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         // Check mobile number exist
         await _userDomainService.EnsureCanCreateUserAsync(command.MobileNumber, ct);
 
@@ -67,7 +65,6 @@ public class UserService : IUserService
         var user = _mapper.Map<User>(command, opt => opt.Items["PasswordHash"] = userPassHash);
 
         await _uow.User.AddAsync(user, ct);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult<long>.Success(user.Id);
     }
@@ -78,7 +75,6 @@ public class UserService : IUserService
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(UpdateUserAsync)} method!");
 
         user!.UpdateUser(command.Email, command.FirstName, command.LastName);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -90,7 +86,7 @@ public class UserService : IUserService
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(SoftDeleteUserAsync)} method!");
 
-        _commonService.Password.VerifyAndCheck(user!.PasswordHash, command.Password, "رمز عبور اشتلاه است!");
+        _commonService.Password.VerifyAndCheck(user!.PasswordHash, command.Password, "رمز عبور اشتباه است!");
 
         // Check user has org
         // Check user in org
@@ -111,8 +107,6 @@ public class UserService : IUserService
     }
     public async Task<GeneralResult> ChangePasswordUserAsync(ChangePasswordUserAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         var user = await _uow.User.GetByIdAsync(command.UserId, true, ct);
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(ChangePasswordUserAsync)} method!");
@@ -130,7 +124,6 @@ public class UserService : IUserService
             throw new Exception($"user by {id} ID was not found. in {nameof(IncreaseUserPointsAsync)} method!");
 
         user!.IncreaseOrDecreasePoints(_appSettings.UserSetting.PositiveUserPoints);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -141,7 +134,6 @@ public class UserService : IUserService
             throw new Exception($"user by {id} ID was not found. in {nameof(DecreaseUserPointsAsync)} method!");
 
         user!.IncreaseOrDecreasePoints(_appSettings.UserSetting.NegativeUserPoints);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using TaskManagement.Application.DTOs.RequestDTOs.Project;
 using TaskManagement.Application.DTOs.ResponseDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
@@ -47,8 +47,6 @@ public class ProjectService : IProjectService
     // Command methods
     public async Task<GeneralResult> CreateProjectAsync(CreateProjectAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         var org = await _uow.Organization.GetOrgByIdWithMembersAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
             throw new BadRequestException("اطلاعات ورودی نامعتبر است!");
@@ -63,20 +61,17 @@ public class ProjectService : IProjectService
         var project = _mapper.Map<Project>(command);
 
         await _uow.Project.AddAsync(project, ct);
-        await _uow.SaveAsync(ct);
 
         await CreateProjectMemberShipAsync(project.Id, command.CreatorId, ProjectRoles.Creator, ct);
 
         // Check UserIds And Creat ProjectMemberShip
         if (!command.UserIds.IsNullParameter())
-        {
             await CheckUserIdsAndCreateProjMemberShipsAsync(
                 org.Members.Select(om => om.UserId).ToList(),
                 command.UserIds!.Where(id => id != org.OwnerId && id != command.CreatorId).Take(project.ProjMaxUsers).Distinct().ToList(),
                 project.Id,
                 ct
             );
-        }
 
         return GeneralResult.Success();
     }
@@ -89,7 +84,6 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         project!.UpdateProject(command.ProjName, command.ProjDescription);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -156,7 +150,6 @@ public class ProjectService : IProjectService
         await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.ChangeProjStatusToInProgress();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -176,7 +169,6 @@ public class ProjectService : IProjectService
         await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.ChangeProjStatusToAdjournment();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -193,7 +185,6 @@ public class ProjectService : IProjectService
         await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.CancelProj();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -210,7 +201,6 @@ public class ProjectService : IProjectService
         await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.FinishProj();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -223,7 +213,6 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         project!.ChangeProjProgress(command.ProjectProgress);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -243,7 +232,6 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureCanAddUserToProjectAsync(project, command.UserId, project.OrgId, ct);
 
         await CreateProjectMemberShipAsync(project.Id, command.UserId, ProjectRoles.Member, ct);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -255,7 +243,6 @@ public class ProjectService : IProjectService
 
         await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
-
         var projectMemberShip = project.ProjMember.FirstOrDefault(pm =>
             pm.UserId == command.UserId
             && (pm.Role == ProjectRoles.Admin || pm.Role == ProjectRoles.Member)
@@ -266,7 +253,6 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureCanRemoveUserFromProjectAsync(project, command.UserId, ct);
 
         projectMemberShip!.SoftDelete();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -288,7 +274,6 @@ public class ProjectService : IProjectService
             throw new NotFoundException("کاربری با این شناسه در پروژه وجود ندارد!");
 
         ProjectMemberShip!.ChangeUserOrgRole(ProjectRoles.Admin);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -310,7 +295,6 @@ public class ProjectService : IProjectService
             throw new NotFoundException("کاربری با این شناسه در پروژه وجود ندارد!");
 
         ProjectMemberShip!.ChangeUserOrgRole(ProjectRoles.Member);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using TaskManagement.Application.Interfaces.Services.Halper;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Interface.Repository;
@@ -8,8 +9,8 @@ namespace TaskManagement.Infrastructure.Repositories;
 public class UserTokenRepository 
     : BaseRepository<UserToken>, IUserTokenRepository
 {
-    public UserTokenRepository(ApplicationDbContext dbContext)
-        : base(dbContext) { }
+    public UserTokenRepository(ApplicationDbContext dbContext, IIdGenerator idGenerator)
+        : base(dbContext, idGenerator) { }
 
 
     // Query methods

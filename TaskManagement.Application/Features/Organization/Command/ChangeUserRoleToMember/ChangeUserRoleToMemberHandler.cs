@@ -2,25 +2,32 @@
 using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Organization;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Organization.Command.ChangeUserRoleToMember;
 public class ChangeUserRoleToMemberHandler
     : IRequestHandler<ChangeUserRoleToMemberCommand, GeneralResult>
 {
+    private readonly IUnitOfWork _uow;
     private readonly IOrganizationService _organizationService;
     private readonly IMapper _mapper;
 
-    public ChangeUserRoleToMemberHandler(IOrganizationService organizationService, IMapper mapper)
+    public ChangeUserRoleToMemberHandler(IOrganizationService organizationService, IMapper mapper, IUnitOfWork uow)
     {
         _organizationService = organizationService;
         _mapper = mapper;
+        _uow = uow;
     }
 
-    public Task<GeneralResult> Handle(ChangeUserRoleToMemberCommand request, CancellationToken ct)
+    public async Task<GeneralResult> Handle(ChangeUserRoleToMemberCommand request, CancellationToken ct)
     {
         var dto = _mapper.Map<ChangeUserRoleOrgAppDto>(request);
 
-        return _organizationService.ChangeUserRoleToMemberAsync(dto, ct);
+        var changeUserRole = await _organizationService.ChangeUserRoleToMemberAsync(dto, ct);
+
+        await _uow.SaveAsync(ct);
+
+        return changeUserRole;
     }
 }

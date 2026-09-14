@@ -10,8 +10,8 @@ public interface IAuthServiec
     Task<GeneralResult> LogoutUserAsync(LogoutUserAppDto command, CancellationToken ct);
     Task<GeneralResult<UserTokenDto>> RefreshTokenAsync(RefreshUserTokenAppDto command, CancellationToken ct);
     Task<GeneralResult<UserTokenDto>> RegisterUserAsync(RegisterUserTokenAppDto command, CancellationToken ct);
-    Task<GeneralResult> RevokeAllTokensByUserIdAsync(long userId, bool isSaved, CancellationToken ct);
-    Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, bool isSaved, CancellationToken ct);
+    Task<GeneralResult> RevokeAllTokensByUserIdAsync(long userId, CancellationToken ct);
+    Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, CancellationToken ct);
     Task<GeneralResult> RevokeTokenByDeviceIdAsync(RevokeUserTokenAppDto command, CancellationToken ct);
     Task<GeneralResult> ValidateAccessTokenAsync(ValidateUserTokenAppDto query, CancellationToken ct);
 }

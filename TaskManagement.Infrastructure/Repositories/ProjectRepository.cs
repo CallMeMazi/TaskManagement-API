@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using TaskManagement.Application.Interfaces.Services.Halper;
+using Microsoft.EntityFrameworkCore;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
@@ -7,8 +8,8 @@ namespace TaskManagement.Infrastructure.Repositories;
 public class ProjectRepository 
     : BaseRepository<Project>, IProjectRepository
 {
-    public ProjectRepository(ApplicationDbContext dbContext)
-        : base(dbContext) { }
+    public ProjectRepository(ApplicationDbContext dbContext, IIdGenerator idGenerator)
+        : base(dbContext, idGenerator) { }
 
 
     // Query methods

@@ -19,8 +19,6 @@ public class DeleteProjectHandler
 
     public Task<GeneralResult> Handle(DeleteProjectCommand request, CancellationToken ct)
     {
-        // TransActional
-
         var dto = _mapper.Map<UserProjectAppDto>(request);
 
         return _projectService.SoftDeleteProjectAsync(dto, ct);

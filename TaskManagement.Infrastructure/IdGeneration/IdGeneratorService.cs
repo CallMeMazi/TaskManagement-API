@@ -2,12 +2,13 @@ using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Common.Settings;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Enums.Logs;
+using DomainTask = TaskManagement.Domain.Entities.BaseEntities.Task;
 
 namespace TaskManagement.Infrastructure.IdGeneration;
 
-/// <summary>
-/// Custom snowflake generator.
-/// </summary>
+// <summary>
+// Custom snowflake generator.
+// </summary>
 public class IdGeneratorService : IIdGenerator
 {
     // [1 sign][42 timestamp][5 entityType][3 worker][10 sequence][3 version]
@@ -29,10 +30,10 @@ public class IdGeneratorService : IIdGenerator
     private const long TimestampMask = (1L << TimestampBits) - 1;
     private const long VersionMask = (1L << VersionBits) - 1;
 
-    /// Current id format. Bump this when the bit layout changes and decode by version.
+    // Current id format. Bump this when the bit layout changes and decode by version.
     private const byte CurrentVersion = 1;
 
-    /// Custom epoch (UTC). Timestamp field is milliseconds since this instant.
+    // Custom epoch (UTC). Timestamp field is milliseconds since this instant.
     private static readonly DateTime EpochUtc = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     private static readonly Dictionary<Type, EntityType> EntityTypeMap = new()

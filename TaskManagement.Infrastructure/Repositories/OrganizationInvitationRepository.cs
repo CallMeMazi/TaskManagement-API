@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using TaskManagement.Application.Interfaces.Services.Halper;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Interface.Repository;
@@ -8,8 +9,8 @@ namespace TaskManagement.Infrastructure.Repositories;
 public class OrganizationInvitationRepository
     : BaseRepository<OrganizationInvitation>, IOrganizationInvitationRepository
 {
-    public OrganizationInvitationRepository(ApplicationDbContext dbContext)
-        : base(dbContext) { }
+    public OrganizationInvitationRepository(ApplicationDbContext dbContext, IIdGenerator idGenerator)
+        : base(dbContext, idGenerator) { }
 
 
     public Task<OrganizationInvitation?> GetByFilterWithOrgAsync(Expression<Func<OrganizationInvitation, bool>> filter, bool isTracking = false, CancellationToken ct = default)

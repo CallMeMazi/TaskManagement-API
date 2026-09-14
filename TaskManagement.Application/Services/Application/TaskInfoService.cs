@@ -38,8 +38,6 @@ public class TaskInfoService : ITaskInfoService
     // Command methods
     public async Task<GeneralResult> CreateTaskInfoAsync(CreateTaskInfoAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         var taskAssignment = await _uow.TaskAssignment.GetByFilterAsync(ta =>
             ta.TaskId == command.TaskId
             && ta.UserId == command.UserId,
@@ -52,7 +50,6 @@ public class TaskInfoService : ITaskInfoService
         var taskInfo = _mapper.Map<TaskInfo>(taskAssignment);
 
         await _uow.TaskInfo.AddAsync(taskInfo, ct);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }

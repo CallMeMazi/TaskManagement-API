@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.UnitOfWork;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.User.Command.DecreaseUserPoints;
@@ -7,12 +8,21 @@ namespace TaskManagement.Application.Features.User.Command.DecreaseUserPoints;
 public class DecreaseUserPointsHandler
     : IRequestHandler<DecreaseUserPointsCommand, GeneralResult>
 {
+    private readonly IUnitOfWork _uow;
     private readonly IUserService _userService;
 
-    public DecreaseUserPointsHandler(IUserService userService) => _userService = userService;
-
-    public Task<GeneralResult> Handle(DecreaseUserPointsCommand request, CancellationToken ct)
+    public DecreaseUserPointsHandler(IUserService userService, IUnitOfWork uow)
     {
-        return _userService.DecreaseUserPointsAsync(request.UserId, ct);
+        _userService = userService;
+        _uow = uow;
+    }
+
+    public async Task<GeneralResult> Handle(DecreaseUserPointsCommand request, CancellationToken ct)
+    {
+        var decreaseUserPointRes = await _userService.DecreaseUserPointsAsync(request.UserId, ct);
+
+        await _uow.SaveAsync(ct);
+
+        return decreaseUserPointRes;
     }
 }

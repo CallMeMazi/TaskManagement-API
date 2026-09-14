@@ -2,13 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Infrastructure.IdGeneration;
 
-namespace TaskManagement.Infrastructure.IdGeneration;
+namespace TaskManagement.Infrastructure.Persistence.Interceptors;
 
-/// <summary>
-/// Assigns snowflake ids to newly added aggregates right before SQL is generated.
-/// Create flows do not need to call the generator themselves.
-/// </summary>
+// Safety: assigns a snowflake id to Added aggregates that still have Id == 0
+// Primary assignment happens in BaseRepository before SaveChanges
 public sealed class EntityIdSaveChangesInterceptor : SaveChangesInterceptor
 {
     private readonly IIdGenerator _idGenerator;
@@ -27,10 +26,10 @@ public sealed class EntityIdSaveChangesInterceptor : SaveChangesInterceptor
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         AssignMissingIds(eventData.Context);
-        return base.SavingChangesAsync(eventData, result, ct);
+        return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
     private void AssignMissingIds(DbContext? context)
@@ -38,13 +37,12 @@ public sealed class EntityIdSaveChangesInterceptor : SaveChangesInterceptor
         if (context is null)
             return;
 
-        foreach (var entry in context.ChangeTracker.Entries())
+        foreach (var entry in context.ChangeTracker.Entries<BaseEntity>())
         {
             if (entry.State != EntityState.Added)
                 continue;
 
-            if (entry.Entity is BaseEntity baseEntity && baseEntity.Id == 0)
-                baseEntity.AssignId(_idGenerator.NextId(entry.Entity.GetType()));
+            EntityIdAssigner.EnsureId(entry.Entity, _idGenerator, entry.Metadata.ClrType);
         }
     }
 }

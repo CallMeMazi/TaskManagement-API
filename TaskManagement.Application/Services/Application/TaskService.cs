@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using TaskManagement.Application.DTOs.RequestDTOs.Task;
 using TaskManagement.Application.DTOs.ResponseDTOs.Task;
 using TaskManagement.Application.Interfaces.Services.Application;
@@ -50,32 +50,18 @@ public class TaskService : ITaskService
         var task = _mapper.Map<Domain.Entities.BaseEntities.Task>(command);
 
         await _uow.Task.AddAsync(task, ct);
-        await _uow.SaveAsync(ct);
 
         // Check UserIds And Creat TaskAssignment
-        try
-        {
-            if (!command.UserIds.IsNullParameter())
-            {
-                if (command.TaskType == TaskType.Group)
-                    await CheckUserIdsAndCreateTaskAssignmentsAsync(
-                        command.UserIds!.Take(5).ToList(),
-                        project!.ProjMember.Select(p => p.Id).ToList(),
-                        task.Id,
-                        project.Id,
-                        ct
-                    );
-                else
-                    await CreateTaskAssignmentAsync(task.Id, command.UserIds!.First(), command.ProjId, true, ct);
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new BadRequestException(
-                "تسک ساخته شد ولی در افزودن اعضا مشکلی وجود داشت!",
-                innerException: ex
+        if (command.TaskType == TaskType.Group)
+            await CheckUserIdsAndCreateTaskAssignmentsAsync(
+                command.UserIds!.Take(5).ToList(),
+                project!.ProjMember.Select(p => p.Id).ToList(),
+                task.Id,
+                project.Id,
+                ct
             );
-        }
+        else
+            await CreateTaskAssignmentAsync(task.Id, command.UserIds!.First(), command.ProjId, ct);
 
         return GeneralResult.Success();
     }
@@ -88,7 +74,6 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
         task!.UpdateTask(command.TaskName, command.TaskDescription, command.TaskDeadLine);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -118,7 +103,6 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
         task!.ChangeTaskActivity(command.Activity);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -131,7 +115,6 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
         task!.CancelTask();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -144,7 +127,6 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
         task!.DeadTask();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -157,7 +139,6 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
         task!.FinishTask();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -170,7 +151,6 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureUserHasAdminRoleAsync(task!, command.UserId, ct);
 
         task!.ChangeTaskProgress(command.TaskProgress);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -183,7 +163,6 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskTypeAsync(task!, command.UserId, ct);
 
         task!.ChangeTaskType();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -196,8 +175,7 @@ public class TaskService : ITaskService
 
         await _taskDomainService.EnsureCanAssignUserToTaskAsync(task!, command.OwnerId, ct);
 
-        await CreateTaskAssignmentAsync(command.TaskId, command.UserId, command.ProjId, false, ct);
-        await _uow.SaveAsync(ct);
+        await CreateTaskAssignmentAsync(command.TaskId, command.UserId, command.ProjId, ct);
 
         return GeneralResult.Success();
     }
@@ -222,7 +200,6 @@ public class TaskService : ITaskService
             throw new BadRequestException("کاربر درحال انجام تسک هست و نمیتوانید آن را حذف کنید!");
 
         taskAssignment.SoftDelete();
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
@@ -240,14 +217,11 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanUserStartTaskAsync(command.TaskId, ct);
 
         taskAssignment!.ChangeTaskInProgress(true);
-        await _uow.SaveAsync(ct);
 
         return GeneralResult.Success();
     }
     public async Task<GeneralResult> EndTaskAsync(UserTaskAppDto command, CancellationToken ct)
     {
-        // This method is used in transaction (TransAction)
-
         var taskAssignment = await _uow.TaskAssignment.GetByFilterAsync(ta =>
             ta.UserId == command.UserId
             && ta.TaskId == command.TaskId,
@@ -275,16 +249,12 @@ public class TaskService : ITaskService
             .ToList();
 
         await _uow.TaskAssignment.AddRangeAsync(taskAssignments, ct);
-        await _uow.SaveAsync(ct);
     }
     private async System.Threading.Tasks.Task CreateTaskAssignmentAsync(long taskId, long userId, long projId
-        , bool isSaved, CancellationToken ct)
+        , CancellationToken ct)
     {
         var taskAsiignment = new TaskAssignment(taskId, userId, projId);
 
         await _uow.TaskAssignment.AddAsync(taskAsiignment, ct);
-
-        if (isSaved)
-            await _uow.SaveAsync(ct);
     }
 }
