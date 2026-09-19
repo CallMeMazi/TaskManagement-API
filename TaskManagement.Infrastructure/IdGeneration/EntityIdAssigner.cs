@@ -3,7 +3,7 @@ using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Infrastructure.IdGeneration;
 
-internal static class EntityIdAssigner
+public static class EntityIdAssigner
 {
     public static void EnsureId(BaseEntity entity, IIdGenerator idGenerator, Type? entityClrType = null)
     {

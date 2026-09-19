@@ -15,6 +15,6 @@ public class UpdateProjectValidator
             .MaximumLength(50).WithMessage("نام پروژه نمیتواند بیشتر از 50 کاراکتر باشد!");
 
         RuleFor(x => x.ProjDescription).NotEmpty().WithMessage("توضیحات پروژه نمیتواند خالی باشد!")
-            .MaximumLength(300).WithMessage("توضیحات پروژه نمیتواند بیشتز از 300 کاراکتر باشد!");
+            .MaximumLength(300).WithMessage("توضیحات پروژه نمیتواند بیشتر از 300 کاراکتر باشد!");
     }
 }

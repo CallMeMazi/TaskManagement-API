@@ -1,4 +1,5 @@
 ﻿using TaskManagement.Common.Exceptions;
+using TaskManagement.Common.Helpers;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class TaskInfo : BaseEntity
@@ -22,13 +23,14 @@ public class TaskInfo : BaseEntity
 
     private TaskInfo() { }
     public TaskInfo(long taskId, long userId, long taskAssignmentId
-        , DateTime startedTaskAt, DateTime endedTaskAt)
+        , string taskInfoDescreption, DateTime startedTaskAt, DateTime endedTaskAt)
     {
-        ValidateTaskInfo(taskId, userId, taskAssignmentId, startedTaskAt, endedTaskAt);
+        ValidateTaskInfo(taskId, userId, taskAssignmentId, taskInfoDescreption, startedTaskAt, endedTaskAt);
 
         TaskId = taskId;
         UserId = userId;
         TaskAssignmentId = taskAssignmentId;
+        TaskInfoDescription = taskInfoDescreption;
         StartedTaskAt = startedTaskAt;
         EndedTaskAt = endedTaskAt;
         TotalHours = GetTotalHours();
@@ -39,7 +41,7 @@ public class TaskInfo : BaseEntity
         Convert.ToByte((EndedTaskAt! - StartedTaskAt).Value.TotalHours);
 
     public void ValidateTaskInfo(long taskId, long userId, long taskAssignmentId
-        , DateTime startedTaskAt, DateTime endedTaskAt)
+        , string taskInfoDescription, DateTime startedTaskAt, DateTime endedTaskAt)
     {
         var errorMessages = new List<string>();
 
@@ -51,6 +53,9 @@ public class TaskInfo : BaseEntity
 
         if (taskAssignmentId <= 0)
             errorMessages.Add("آیدی تسک کاربر خالی است!");
+
+        if (taskInfoDescription.IsNullParameter())
+            errorMessages.Add("توضیحات تسک خالی است!");
 
         if (startedTaskAt >= DateTime.Now)
             errorMessages.Add("زمان شروع تسک مربوط به آینده است!");

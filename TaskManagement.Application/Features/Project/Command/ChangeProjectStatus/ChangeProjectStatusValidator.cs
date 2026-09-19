@@ -14,7 +14,7 @@ public class ChangeProjectStatusValidator
         RuleFor(x => x.UserPassword).NotEmpty().WithMessage("رمز عبور نمیتواند خالی باشد!")
             .Length(8, 256).WithMessage("رمز عبور باید بین 8 و 256 کاراکتر باشد!");
 
-        RuleFor(x => x.ProjectStatus).NotEmpty().WithMessage("")
+        RuleFor(x => x.ProjectStatus).NotEmpty().WithMessage("مقدار وضعیت پروژه نمیتواند خالی باشد!")
             .IsInEnum().WithMessage("مقدار وضعیت پروژه نامعتبر است!");
     }
 }

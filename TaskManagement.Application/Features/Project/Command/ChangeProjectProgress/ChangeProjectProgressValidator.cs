@@ -11,7 +11,7 @@ public class ChangeProjectProgressValidator
 
         RuleFor(x => x.ProjId).ValidateId();
 
-        RuleFor(x => (int)x.ProjectProgress).NotEmpty().WithMessage("")
+        RuleFor(x => (int)x.ProjectProgress).NotEmpty().WithMessage("مقدار پیشرفت نمیتواند خالی باشد!")
             .InclusiveBetween(0, 100).WithMessage("مقدار پیشرفت باید بین 0 تا 100 باشد!");
     }
 }
