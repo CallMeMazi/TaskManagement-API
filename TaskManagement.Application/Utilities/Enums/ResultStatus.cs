@@ -6,7 +6,7 @@ public enum ResultStatus
     [Display(Name = "موفق.")]
     OK = 200,
     [Display(Name = "درخواست نامعتبر!")]
-    BadRequest = 400,
+    ValidaitonFailure = 400,
     [Display(Name = "یافت نشد!")]
     NotFound = 404,
     [Display(Name = "وضعیت نامعتبر!")]

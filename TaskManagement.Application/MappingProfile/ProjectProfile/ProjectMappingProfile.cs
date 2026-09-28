@@ -27,7 +27,7 @@ public class ProjectMappingProfile : Profile
             src.CreatorId,
             src.MaxUser,
             src.MaxTask
-        ));
+        )).ForAllMembers(opt => opt.Ignore());
 
         // Query DTOs
         CreateMap<Project, ProjectDetailsDto>();

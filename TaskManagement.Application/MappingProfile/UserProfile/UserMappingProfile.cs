@@ -21,7 +21,7 @@ public class UserMappingProfile : Profile
             (string)context.Items[nameof(User.PasswordHash)],
             src.FirstName,
             src.LastName
-        ));
+        )).ForAllMembers(opt => opt.Ignore());
 
         // Query DTOs
         CreateMap<User, UserDetailsDto>();

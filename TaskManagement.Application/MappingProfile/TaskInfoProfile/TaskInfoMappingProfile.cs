@@ -16,7 +16,7 @@ public class TaskInfoMappingProfile : Profile
             (string)context.Items[nameof(TaskInfo.TaskInfoDescription)],
             (DateTime)src.LastStartedAt!,
             DateTime.Now
-        ));
+        )).ForAllMembers(opt => opt.Ignore());
 
         // Query DTOs
         CreateMap<TaskInfo, TaskInfoDetailsDto>();

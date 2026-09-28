@@ -1,30 +1,24 @@
-using TaskManagement.WebConfig.DI;
+using TaskManagement.Application.Registration;
+using TaskManagement.Infrastructure.Registration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// System Services
+// Register System Configs And Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-// Framework Services
-builder.Services.AddAutoMapperConfig();
-
-// DbContext Services
-builder.Services.AddDbContexts(builder.Configuration);
-
-// Custom Services
-builder.Services.AddAppServicesConfig(builder.Configuration);
+// Register All Configs And Services In Layers
+builder.Services.RegisterAllApplicationLayerConfiguration()
+    .RegisterAllInfrastructureLayerConfiguration(builder.Configuration);
 
 var app = builder.Build();
 
-app.Services.CompileMappings();
+// Compile AutoMapper Configs After Starting Application
+app.Services.CompileAutoMapperConfiguration();
 
-//Custom Midleware
+//Custom Midlewares
 
-// System Midleware
-app.UseSwagger();
-app.UseSwaggerUI();
+// System Midlewares
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

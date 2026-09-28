@@ -3,5 +3,5 @@ public record TaskInfoDetailsDto(
     string TaskInfoDescription,
     DateTime StartedTaskAt,
     DateTime EndedTaskAt,
-    byte TotalHourse
+    byte TotalHours
 );

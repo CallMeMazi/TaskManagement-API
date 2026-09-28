@@ -1,0 +1,22 @@
+﻿using TaskManagement.Domain.Interface.Repository;
+
+namespace TaskManagement.Application.Interfaces.UnitOfWorks;
+public interface IUnitOfWork
+{
+    IOrganizationMemberShipRepository OrganizationMemberShip { get; }
+    IOrganizationRepository Organization { get; }
+    IProjectRepository Project { get; }
+    ITaskInfoRepository TaskInfo { get; }
+    ITaskRepository Task { get; }
+    IUserRepository User { get; }
+    IUserTokenRepository UserToken { get; }
+    IOrganizationInvitationRepository Invitation { get; }
+    IProjectMemberShipRepository ProjectMemberShip { get; }
+    ITaskAssignmentRepository TaskAssignment { get; }
+
+
+    void Save();
+    void Save(bool acceptAllChangesOnSuccess);
+    Task SaveAsync(CancellationToken ct = default);
+    Task SaveAsync(bool acceptAllChangesOnSuccess, CancellationToken ct = default);
+}

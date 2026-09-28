@@ -7,8 +7,8 @@ public record TaskDetailsDto(
     string TaskDescription,
     bool IsActive,
     TaskType TaskType,
-    TaskStatusType TaskStatusType,
+    TaskStatusType TaskStatus,
     DateTime TaskDeadline,
     byte TaskProgress,
-    DateTime CreateAt
+    DateTime CreatedAt
 );

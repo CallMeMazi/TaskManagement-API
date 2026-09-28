@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Domain.Entities.BaseEntities;
-using TaskManagement.Infrastructure.IdGeneration;
+using TaskManagement.Infrastructure.Utilities;
 
 namespace TaskManagement.Infrastructure.Persistence.Interceptors;
 
@@ -10,11 +10,11 @@ namespace TaskManagement.Infrastructure.Persistence.Interceptors;
 // Primary assignment happens in BaseRepository before SaveChanges
 public sealed class EntityIdSaveChangesInterceptor : SaveChangesInterceptor
 {
-    private readonly IIdGenerator _idGenerator;
+    private readonly ICommonService _common;
 
-    public EntityIdSaveChangesInterceptor(IIdGenerator idGenerator)
+    public EntityIdSaveChangesInterceptor(ICommonService common)
     {
-        _idGenerator = idGenerator;
+        _common = common;
     }
 
 
@@ -42,7 +42,7 @@ public sealed class EntityIdSaveChangesInterceptor : SaveChangesInterceptor
             if (entry.State != EntityState.Added)
                 continue;
 
-            EntityIdAssigner.EnsureId(entry.Entity, _idGenerator, entry.Metadata.ClrType);
+            EntityIdAssigner.EnsureId(entry.Entity, _common.IdGenerator, entry.Metadata.ClrType);
         }
     }
 }

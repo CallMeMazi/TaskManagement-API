@@ -2,8 +2,7 @@
 using TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
 using TaskManagement.Application.DTOs.ResponseDTOs.Invitation;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Helpers;
@@ -16,16 +15,13 @@ public class InvitationService : IInvitationService
 {
     private readonly IUnitOfWork _uow;
     private readonly IInvitationDomainService _invitationDomainService;
-    private readonly IEventService _eventService;
     private readonly IMapper _mapper;
 
 
-    public InvitationService(IUnitOfWork uow, IEventService eventService, IMapper mapper
-        , IInvitationDomainService invitationDomainService)
+    public InvitationService(IUnitOfWork uow, IMapper mapper, IInvitationDomainService invitationDomainService)
     {
         _uow = uow;
         _invitationDomainService = invitationDomainService;
-        _eventService = eventService;
         _mapper = mapper;
     }
 

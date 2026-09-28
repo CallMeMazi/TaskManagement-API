@@ -3,7 +3,7 @@ using TaskManagement.Application.DTOs.RequestDTOs.User;
 using TaskManagement.Application.DTOs.ResponseDTOs.User;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Helpers;
@@ -94,6 +94,7 @@ public class UserService : IUserService
         // Delete all UserTokens By UserId (SP)
         // Delete All Orgs By UserId (SP)
         // Delete All OrgMemberships By OrgId (SP)
+        // Delete All OrgInvitation By OrgId (SP)
         // Delete All Projects By OrgId (SP)
         // Delete All ProjectMemberships By ProjectId (SP)
         // Delete All Tasks By ProjectId (SP)

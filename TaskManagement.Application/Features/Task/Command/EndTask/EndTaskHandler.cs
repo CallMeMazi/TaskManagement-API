@@ -3,7 +3,7 @@ using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Task;
 using TaskManagement.Application.DTOs.RequestDTOs.TaskInfo;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Task.Command.EndTask;

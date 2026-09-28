@@ -1,0 +1,33 @@
+﻿using TaskManagement.Application.Interfaces.Services.Halper;
+using Microsoft.EntityFrameworkCore;
+using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Domain.Interface.Repository;
+using TaskManagement.Infrastructure.Persistence.DbContexts;
+
+namespace TaskManagement.Infrastructure.Repositories.ApplicationRepositories;
+public class ProjectRepository 
+    : BaseRepository<Project>, IProjectRepository
+{
+    public ProjectRepository(ApplicationDbContext dbContext, ICommonService commonService)
+        : base(dbContext, commonService) { }
+
+
+    // Query methods
+    public Task<Project?> GetProjectByIdWithOrgAsync(long projId, bool isTracking = false, CancellationToken ct = default)
+    {
+        var query = isTracking ? Entities : Entities.AsNoTracking();
+        return query.Include(p => p.Org).FirstOrDefaultAsync(p => p.Id == projId, ct);
+    }
+    public Task<Project?> GetProjectByIdWithMembersAsync(long projId, bool isTracking = false, CancellationToken ct = default)
+    {
+        var query = isTracking ? Entities : Entities.AsNoTracking();
+        return query.Include(p => p.ProjMember).FirstOrDefaultAsync(p => p.Id == projId, ct);
+    }
+
+    // Command methods
+    public Task<int> SoftDeleteProjectSpAsync(long projId, CancellationToken ct)
+    {
+        var query = string.Format("EXEC dbo.sp_SoftDeleteProject @ProjectId = {0}", projId);
+        return _db.Database.ExecuteSqlRawAsync(query, ct);
+    }
+}

@@ -2,7 +2,7 @@
 using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.User;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.User.Command.UpdateUser;

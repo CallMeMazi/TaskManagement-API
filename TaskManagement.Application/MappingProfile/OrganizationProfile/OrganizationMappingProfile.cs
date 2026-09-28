@@ -25,7 +25,7 @@ public class OrganizationMappingProfile : Profile
             src.OwnerId,
             src.OrgDescription,
             src.MaxUser
-        ));
+        )).ForAllMembers(opt => opt.Ignore());
 
         // Query DTOs
         CreateMap<Organization, OrgDetailsDto>();

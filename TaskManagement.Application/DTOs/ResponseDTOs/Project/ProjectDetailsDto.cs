@@ -11,5 +11,5 @@ public record ProjectDetailsDto(
     DateTime ProjEndAt,
     byte ProjMaxUsers,
     byte ProjMaxTasks,
-    DateTime CreateAt
+    DateTime CreatedAt
 );

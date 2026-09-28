@@ -2,9 +2,7 @@
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 
-public interface IBaseEntity
-{
-}
+public interface IBaseEntity { }
 
 public abstract class BaseEntity : IBaseEntity
 {
@@ -13,9 +11,7 @@ public abstract class BaseEntity : IBaseEntity
     public DateTime CreatedAt { get; protected set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; protected set; }
 
-    /// <summary>
-    /// Assigns a generated id once. Rich model constructors stay free of infrastructure details.
-    /// </summary>
+    // Assigns a generated id once. Rich model constructors stay free of infrastructure details.
     public void AssignId(long id)
     {
         if (Id != 0)

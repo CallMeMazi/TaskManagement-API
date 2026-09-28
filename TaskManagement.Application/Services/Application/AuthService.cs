@@ -4,7 +4,7 @@ using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Helpers;
@@ -14,6 +14,7 @@ using TaskManagement.Domain.Enums.Statuses;
 using TaskManagement.Domain.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
+
 public class AuthService : IAuthServiec
 {
     private readonly ICommonService _commonService;

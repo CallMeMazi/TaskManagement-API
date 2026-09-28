@@ -27,10 +27,10 @@ public class TaskMappingProfile : Profile
             src.TaskDescription,
             src.TaskType,
             src.TaskDeadLine
-        ));
+        )).ForAllMembers(opt => opt.Ignore());
 
         // Query DTOs
-        CreateMap<Task, TaskDetailsDto>();
+        CreateMap<Domain.Entities.BaseEntities.Task, TaskDetailsDto>();
 
         // MediatR Mapping
         CreateMap<CreateTaskCommand, CreateTaskAppDto>();

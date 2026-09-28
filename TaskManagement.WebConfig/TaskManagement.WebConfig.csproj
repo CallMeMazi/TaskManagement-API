@@ -7,17 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\**" />
+    <Compile Remove="Filters\**" />
+    <Compile Remove="Middlewares\**" />
+    <EmbeddedResource Remove="DTOs\**" />
+    <EmbeddedResource Remove="Filters\**" />
+    <EmbeddedResource Remove="Middlewares\**" />
+    <None Remove="DTOs\**" />
+    <None Remove="Filters\**" />
+    <None Remove="Middlewares\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TaskManagement.Infrastructure\TaskManagement.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Filters\" />
-    <Folder Include="Middlewares\" />
-    <Folder Include="DTOs\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.13" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 

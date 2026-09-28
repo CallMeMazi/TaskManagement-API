@@ -1,4 +1,5 @@
-﻿using TaskManagement.Domain.Enums.Types.Logs;
+﻿using TaskManagement.Domain.Enums.Types.Application;
+using TaskManagement.Domain.Enums.Types.Logs;
 
 namespace TaskManagement.Domain.Entities.LogEntities;
 public class EntityLog : LogBaseEntity

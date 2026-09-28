@@ -3,4 +3,5 @@ public interface ICommonService
 {
     IPasswordService Password { get; }
     IJwtService Jwt { get; }
+    IIdGeneratorService IdGenerator { get; }
 }

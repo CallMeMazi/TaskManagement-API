@@ -1,0 +1,33 @@
+﻿using TaskManagement.Application.Interfaces.Services.Halper;
+using Microsoft.EntityFrameworkCore;
+using TaskManagement.Domain.Entities.BaseEntities;
+using TaskManagement.Domain.Interface.Repository;
+using TaskManagement.Infrastructure.Persistence.DbContexts;
+
+namespace TaskManagement.Infrastructure.Repositories.ApplicationRepositories;
+public class OrganizationRepository 
+    : BaseRepository<Organization>, IOrganizationRepository
+{
+    public OrganizationRepository(ApplicationDbContext dbContext, ICommonService commonService)
+        : base(dbContext, commonService) { }
+
+
+    // Query methods
+    public Task<Organization?> GetOrgByIdWithOwnerAsync(long orgId, bool isTracking = false, CancellationToken ct = default)
+    {
+        var query = isTracking ? Entities : Entities.AsNoTracking();
+        return query.Include(o => o.Owner).FirstOrDefaultAsync(o => o.Id == orgId, ct);
+    }
+    public Task<Organization?> GetOrgByIdWithMembersAsync(long orgId, bool isTracking = false, CancellationToken ct = default)
+    {
+        var query = isTracking ? Entities : Entities.AsNoTracking();
+        return query.Include(o => o.Members).FirstOrDefaultAsync(o => o.Id == orgId, ct);
+    }
+
+    // Command methods
+    public Task<int> SoftDeleteOrgSpAsync(long orgId, CancellationToken ct = default)
+    {
+        var query = string.Format("EXEC dbo.sp_SoftDeleteOrg @OrgId = {0}", orgId);
+        return _db.Database.ExecuteSqlRawAsync(query, ct);
+    }
+}

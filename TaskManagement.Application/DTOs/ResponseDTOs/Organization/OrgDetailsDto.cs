@@ -5,6 +5,6 @@ public record OrgDetailsDto(
     string OrgCode,
     string OrgDescription,
     bool IsActive,
-    byte MaxUser,
-    DateTime CreateAt
+    byte MaxUsers,
+    DateTime CreatedAt
 );

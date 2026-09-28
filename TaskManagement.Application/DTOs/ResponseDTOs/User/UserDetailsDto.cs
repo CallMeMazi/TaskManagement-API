@@ -4,6 +4,6 @@ public record UserDetailsDto(
     string Email,
     string FirstName,
     string LastName,
-    byte Point,
-    DateTime CreateAt
+    byte Points,
+    DateTime CreatedAt
 );

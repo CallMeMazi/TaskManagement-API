@@ -5,5 +5,6 @@ namespace TaskManagement.Application.Features.Organization.Command.ChangeOrgActi
 public record ChangeOrgActivityCommand(
     long OrgId,
     long OwnerId,
-    string OwnerPassword
+    string OwnerPassword,
+    bool Activity
 ) : IRequest<GeneralResult>;

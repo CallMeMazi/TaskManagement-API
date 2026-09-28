@@ -2,7 +2,7 @@
 using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Invitation.Command.RevokeInvitation;
