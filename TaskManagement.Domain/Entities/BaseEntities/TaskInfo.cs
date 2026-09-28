@@ -1,5 +1,5 @@
-﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Common.Helpers;
+﻿using TaskManagement.Common.Helpers;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class TaskInfo : BaseEntity
@@ -64,6 +64,6 @@ public class TaskInfo : BaseEntity
             errorMessages.Add("زمان پایان تسک مربوط به آینده است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعتبر است!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعتبر است!", errorMessages);
     }
 }

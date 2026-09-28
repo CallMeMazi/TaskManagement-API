@@ -1,4 +1,4 @@
-using TaskManagement.Domain.Enums.Logs;
+using TaskManagement.Domain.Enums.Types.Logs;
 
 namespace TaskManagement.Application.Interfaces.Services.Halper;
 

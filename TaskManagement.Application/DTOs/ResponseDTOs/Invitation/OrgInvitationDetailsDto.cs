@@ -5,7 +5,7 @@ public record OrgInvitationDetailsDto(
     long OrgId,
     long UserId,
     string Token,
-    OrgInvitationStatus Status,
+    OrgInvitationStatusType Status,
     DateTime ExpiredAt,
     DateTime CreatedAt
 );

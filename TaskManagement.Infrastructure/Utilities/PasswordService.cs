@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Common.Exceptions;
+using TaskManagement.Application.Utilities.Exceptions;
 
 namespace TaskManagement.Infrastructure.Utilities;
 
@@ -23,6 +23,6 @@ public class PasswordService : IPasswordService
     public void VerifyAndCheck(string hashedPassword, string providedPassword, string message)
     {
         if (!Verify(hashedPassword, providedPassword))
-            throw new BadRequestException(message);
+            throw new ValidationFailureException(message);
     }
 }

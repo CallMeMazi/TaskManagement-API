@@ -1,6 +1,6 @@
-﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Common.Helpers;
+﻿using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Enums.Statuses;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class Project : BaseEntity
@@ -56,13 +56,13 @@ public class Project : BaseEntity
     public void ChangeProjActivity(bool activity)
     {
         if (ProjStatus == ProjectStatusType.Cancel)
-            throw new BadRequestException("پروژه کنسل شده، نمیتوانید وضعیت آن را تغییر دهید!");
+            throw new DomainLogicalException("پروژه کنسل شده، نمیتوانید وضعیت آن را تغییر دهید!");
 
         if (ProjStatus == ProjectStatusType.Finished)
-            throw new BadRequestException("پروژه به پایان رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
+            throw new DomainLogicalException("پروژه به پایان رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
 
         if (IsActive == activity)
-            throw new BadRequestException(IsActive ? "پروژه در حال حاضر فعال است!" : "پروژه در حال حاضر غیر فعال است!");
+            throw new DomainLogicalException(IsActive ? "پروژه در حال حاضر فعال است!" : "پروژه در حال حاضر غیر فعال است!");
 
         if (!IsActive && ProjStatus == ProjectStatusType.InProgress)
             throw new Exception($"Project with {Id} ID is DeActive and the ProjStatus is InProgress, Error in {nameof(ChangeProjActivity)} method!");
@@ -78,16 +78,16 @@ public class Project : BaseEntity
     public void ChangeProjStatusToInProgress()
     {
         if (ProjStatus == ProjectStatusType.InProgress)
-            throw new BadRequestException("وضعیت پروژه شما در حال حاضر در حال انجام است!");
+            throw new DomainLogicalException("وضعیت پروژه شما در حال حاضر در حال انجام است!");
 
         if (IsActive)
             throw new Exception($"Project with {Id} ID is Active, Error in {nameof(ChangeProjStatusToInProgress)} method!");
 
         if (ProjStatus == ProjectStatusType.Cancel)
-            throw new BadRequestException("پروژه کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
+            throw new DomainLogicalException("پروژه کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
 
         if (ProjStatus == ProjectStatusType.Finished)
-            throw new BadRequestException("پروژه به اتمام رسیده، نمیتوانید وضعیتت آن را تغییر دهید!");
+            throw new DomainLogicalException("پروژه به اتمام رسیده، نمیتوانید وضعیتت آن را تغییر دهید!");
 
         ProjStatus = ProjectStatusType.InProgress;
         IsActive = true;
@@ -97,16 +97,16 @@ public class Project : BaseEntity
     public void ChangeProjStatusToAdjournment()
     {
         if (ProjStatus == ProjectStatusType.Adjournment)
-            throw new BadRequestException("وضعیت پروژه شما در حال حاضر در تعویق است!");
+            throw new DomainLogicalException("وضعیت پروژه شما در حال حاضر در تعویق است!");
 
         if (!IsActive)
             throw new Exception($"Project with {Id} ID is DeActive, Error in {nameof(ChangeProjStatusToAdjournment)} method!");
 
         if (ProjStatus == ProjectStatusType.Cancel)
-            throw new BadRequestException("پروژه کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
+            throw new DomainLogicalException("پروژه کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
 
         if (ProjStatus == ProjectStatusType.Finished)
-            throw new BadRequestException("پروژه به اتمام رسیده، نمیتوانید وضعیتت آن را تغییر دهید!");
+            throw new DomainLogicalException("پروژه به اتمام رسیده، نمیتوانید وضعیتت آن را تغییر دهید!");
 
         ProjStatus = ProjectStatusType.Adjournment;
         IsActive = false;
@@ -116,10 +116,10 @@ public class Project : BaseEntity
     public void CancelProj()
     {
         if (ProjStatus == ProjectStatusType.Cancel)
-            throw new BadRequestException("وضعیت پروژه شما از قبل کنسل شده است!");
+            throw new DomainLogicalException("وضعیت پروژه شما از قبل کنسل شده است!");
 
         if (ProjStatus == ProjectStatusType.Finished)
-            throw new BadRequestException("پروژه به اتمام رسیده، نمیتوانید وضعیتت آن را تغییر دهید!");
+            throw new DomainLogicalException("پروژه به اتمام رسیده، نمیتوانید وضعیتت آن را تغییر دهید!");
 
         ProjStatus = ProjectStatusType.Cancel;
         ProjEndAt = DateTime.Now;
@@ -130,10 +130,10 @@ public class Project : BaseEntity
     public void FinishProj()
     {
         if (ProjStatus == ProjectStatusType.Finished)
-            throw new BadRequestException("وضعیت پروژه شما از قبل به پایان رسیده است!");
+            throw new DomainLogicalException("وضعیت پروژه شما از قبل به پایان رسیده است!");
 
         if (ProjStatus == ProjectStatusType.Cancel)
-            throw new BadRequestException("پروژه کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
+            throw new DomainLogicalException("پروژه کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
 
         ProjStatus = ProjectStatusType.Finished;
         ProjProgress = 100;
@@ -148,7 +148,7 @@ public class Project : BaseEntity
             return;
 
         if (progress <= 0 || progress > 100)
-            throw new BadRequestException("نمیتوانید میزان پیشرفت را کمتر از 0 و بیشتر از 100 وارد کنید!");
+            throw new DomainValidationFailureException("نمیتوانید میزان پیشرفت را کمتر از 0 و بیشتر از 100 وارد کنید!");
 
         ProjProgress = progress;
 
@@ -179,7 +179,7 @@ public class Project : BaseEntity
             errorMessages.Add("حداقل تسک های پروژه باید بیشتر از 3 تسک باشد!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعتبر است!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعتبر است!", errorMessages);
     }
     public void ValidateProjectUpdating(string projName, string projDescription)
     {
@@ -192,6 +192,6 @@ public class Project : BaseEntity
             errorMessages.Add("توضیحات پروژه خالی است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعتبر است!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعتبر است!", errorMessages);
     }
 }

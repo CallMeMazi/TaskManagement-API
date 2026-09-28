@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -10,8 +9,6 @@ using TaskManagement.Application.DTOs.InternalDTOs.UserToken;
 using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Common.Classes;
-using TaskManagement.Common.Enums;
-using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Common.Settings;
 
@@ -98,16 +95,6 @@ public class Jwtservice : IJwtService
         catch (SecurityTokenException)
         {
             return GeneralResult<ClaimsPrincipal>.Failure(null, "توکن معتبر نیست!");
-        }
-        catch (Exception ex)
-        {
-            throw new AppException(
-                HttpStatusCode.InternalServerError,
-                ResultStatus.ServerError,
-                "خطایی هنگام اعتبارسنجی توکن اتفاق افتاد!",
-                null,
-                ex
-            );
         }
 
         bool ValidationDeviceId(ClaimsPrincipal principal, string currentDeviceId)

@@ -1,5 +1,5 @@
-﻿using TaskManagement.Domain.Enums;
-using TaskManagement.Domain.Enums.Statuses;
+﻿using TaskManagement.Domain.Enums.Statuses;
+using TaskManagement.Domain.Enums.Types.Application;
 
 namespace TaskManagement.Application.DTOs.ResponseDTOs.Task;
 public record TaskDetailsDto(

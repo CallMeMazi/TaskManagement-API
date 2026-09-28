@@ -4,8 +4,8 @@ using TaskManagement.Application.DTOs.ResponseDTOs.Organization;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
-using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Enums.Roles;
@@ -64,7 +64,7 @@ public class OrganizationService : IOrganizationService
         await _uow.Organization.AddAsync(org, ct);
 
         // Create relation between owner(User) and Org
-        await CreateOrgMemberShipAsync(org.Id, command.OwnerId, OrganizationRoles.Owner, ct);
+        await CreateOrgMemberShipAsync(org.Id, command.OwnerId, OrganizationRole.Owner, ct);
 
         return GeneralResult.Success()!;
     }
@@ -95,7 +95,7 @@ public class OrganizationService : IOrganizationService
             throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید آن را حذف کنید!");
 
         if (!_commonService.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
-            throw new BadRequestException("رمز عبور اشتباه است!");
+            throw new ValidationFailureException("رمز عبور اشتباه است!");
 
         await _orgDomainService.EnsureCanDeactiveOrgAsync(org.Id, ct);
 
@@ -120,7 +120,7 @@ public class OrganizationService : IOrganizationService
             throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید آن را ویرایش کنید!");
 
         if (!_commonService.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
-            throw new BadRequestException("رمز عبور اشتباه است!");
+            throw new ValidationFailureException("رمز عبور اشتباه است!");
 
         if (org.IsActive && !command.Activity)
             await _orgDomainService.EnsureCanDeactiveOrgAsync(org.Id, ct);
@@ -134,7 +134,7 @@ public class OrganizationService : IOrganizationService
     {
         await _orgDomainService.EnsureCanUserAddToOrgAsync(command.OrgId, command.UserId, ct);
 
-        await CreateOrgMemberShipAsync(command.OrgId, command.UserId, OrganizationRoles.Member, ct);
+        await CreateOrgMemberShipAsync(command.OrgId, command.UserId, OrganizationRole.Member, ct);
 
         return GeneralResult.Success();
     }
@@ -148,11 +148,11 @@ public class OrganizationService : IOrganizationService
             throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید کاربری را حذف کنید!");
 
         if (org.OwnerId == command.UserId)
-            throw new BadRequestException("شما مالک سازمانن هستید و نمیتوانید آن را ترک کنید!");
+            throw new ConflictException("شما مالک سازمانن هستید و نمیتوانید آن را ترک کنید!");
 
         var orgMemberShip = await _uow.OrganizationMemberShip.GetByFilterAsync(om =>
             om.UserId == command.UserId
-            && (om.Role == OrganizationRoles.Admin || om.Role == OrganizationRoles.Member)
+            && (om.Role == OrganizationRole.Admin || om.Role == OrganizationRole.Member)
         );
         if (orgMemberShip.IsNullParameter())
             throw new NotFoundException("کاربر مورد نظر در سازمان وجود ندارد!");
@@ -170,11 +170,11 @@ public class OrganizationService : IOrganizationService
             throw new NotFoundException("شناسه سازمان نامعتبر است!");
 
         if (org!.OwnerId == command.UserId)
-            throw new BadRequestException("شما مالک سازمان هستید و نمیتوانید آن را ترک کنید!");
+            throw new ConflictException("شما مالک سازمان هستید و نمیتوانید آن را ترک کنید!");
 
         var orgMemberShip = await _uow.OrganizationMemberShip.GetByFilterAsync(om =>
             om.UserId == command.UserId
-            && (om.Role == OrganizationRoles.Admin || om.Role == OrganizationRoles.Member)
+            && (om.Role == OrganizationRole.Admin || om.Role == OrganizationRole.Member)
         );
         if (orgMemberShip.IsNullParameter())
             throw new NotFoundException("شما در این سازمان حضور ندارید!");
@@ -203,7 +203,7 @@ public class OrganizationService : IOrganizationService
         if (orgMemberShip.IsNullParameter())
             throw new NotFoundException("کاربری با این شناسه در سازمان وجود ندارد!");
 
-        orgMemberShip!.ChangeUserOrgRole(OrganizationRoles.Admin);
+        orgMemberShip!.ChangeUserOrgRole(OrganizationRole.Admin);
 
         return GeneralResult.Success();
     }
@@ -227,12 +227,12 @@ public class OrganizationService : IOrganizationService
 
         await _orgDomainService.EnsureCanChangeRoleToMemberAsync(command.UserId, org.Id, ct);
 
-        orgMemberShip!.ChangeUserOrgRole(OrganizationRoles.Member);
+        orgMemberShip!.ChangeUserOrgRole(OrganizationRole.Member);
 
         return GeneralResult.Success();
     }
 
-    private async System.Threading.Tasks.Task CreateOrgMemberShipAsync(long orgId, long userId, OrganizationRoles role, CancellationToken ct)
+    private async System.Threading.Tasks.Task CreateOrgMemberShipAsync(long orgId, long userId, OrganizationRole role, CancellationToken ct)
     {
         var orgMemberShip = new OrganizationMemberShip(orgId, userId, role);
 

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using TaskManagement.Common.Classes;
-using TaskManagement.Domain.Enums;
+using TaskManagement.Domain.Enums.Types.Application;
 
 namespace TaskManagement.Application.Features.Task.Command.CreateTask;
 public record CreateTaskCommand(

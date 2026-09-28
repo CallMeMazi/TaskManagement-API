@@ -3,11 +3,11 @@ using TaskManagement.Application.DTOs.RequestDTOs.Task;
 using TaskManagement.Application.DTOs.ResponseDTOs.Task;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
-using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Entities.BaseEntities;
-using TaskManagement.Domain.Enums;
+using TaskManagement.Domain.Enums.Types.Application;
 using TaskManagement.Domain.Interface.Services;
 
 namespace TaskManagement.Application.Services.Application;
@@ -197,7 +197,7 @@ public class TaskService : ITaskService
             throw new Exception($"The TaskAssignment with {command.UserId} userId and {command.TaskId} taslId was not found!");
 
         if (taskAssignment!.IsInProgress)
-            throw new BadRequestException("کاربر درحال انجام تسک هست و نمیتوانید آن را حذف کنید!");
+            throw new ConflictException("کاربر درحال انجام تسک هست و نمیتوانید آن را حذف کنید!");
 
         taskAssignment.SoftDelete();
 
@@ -242,7 +242,7 @@ public class TaskService : ITaskService
         var projMemberIds = memberIds.ToHashSet();
         var invalid = userIds.FirstOrDefault(u => !projMemberIds.Contains(u));
         if (invalid != 0)
-            throw new BadRequestException($"کاربر با شناسه {invalid} در پروژه وجود ندارد!");
+            throw new ValidationFailureException($"کاربر با شناسه {invalid} در پروژه وجود ندارد!");
 
         var taskAssignments = userIds
             .Select(u => new TaskAssignment(taskId, u, projectid))

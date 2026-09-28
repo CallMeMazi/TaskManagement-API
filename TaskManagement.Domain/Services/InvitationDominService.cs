@@ -1,9 +1,7 @@
-﻿using System.Net;
-using TaskManagement.Common.Enums;
-using TaskManagement.Common.Exceptions;
-using TaskManagement.Domain.Enums.Statuses;
+﻿using TaskManagement.Domain.Enums.Statuses;
 using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Domain.Interface.Services;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Services;
 public class InvitationDomainService : IInvitationDomainService
@@ -30,16 +28,16 @@ public class InvitationDomainService : IInvitationDomainService
             ct
         );
         if (isUserOrgOwner)
-            throw new ForbiddenException("فقط مالک سازمان میتواند لینک دعوت بسازد!");
+            throw new DomainAuthorizationException("فقط مالک سازمان میتواند لینک دعوت بسازد!");
 
         var isInvitationExist = await _invitationRepository.IsEntityExistByFilterAsync(oi =>
             oi.UserId == userId
             && oi.OrgId == orgId
-            && oi.Status == OrgInvitationStatus.Pending,
+            && oi.Status == OrgInvitationStatusType.Pending,
             ct
         );
         if (isInvitationExist)
-            throw new BadRequestException("شما برای این کاربر لینک دعوت فعال دارید!");
+            throw new DomainLogicalException("شما برای این کاربر لینک دعوت فعال دارید!");
 
         var isUserInOrg = await _orgMembershipRepository.IsEntityExistByFilterAsync(om =>
             om.OrgId == orgId
@@ -47,6 +45,6 @@ public class InvitationDomainService : IInvitationDomainService
             ct
         );
         if (isUserInOrg)
-            throw new BadRequestException("این کاربر در حال حاضر در سازمان وجود دارد!");
+            throw new DomainLogicalException("این کاربر در حال حاضر در سازمان وجود دارد!");
     }
 }

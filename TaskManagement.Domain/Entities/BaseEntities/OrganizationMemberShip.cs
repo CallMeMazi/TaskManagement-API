@@ -1,13 +1,13 @@
-﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Common.Helpers;
+﻿using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Enums.Roles;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class OrganizationMemberShip : BaseEntity
 {
     public long OrgId { get; private set; }
     public long UserId { get; private set; }
-    public OrganizationRoles Role { get; private set; }
+    public OrganizationRole Role { get; private set; }
 
     #region Navigation Prop
 
@@ -18,7 +18,7 @@ public class OrganizationMemberShip : BaseEntity
 
 
     private OrganizationMemberShip() { }
-    public OrganizationMemberShip(long orgId, long userId, OrganizationRoles role)
+    public OrganizationMemberShip(long orgId, long userId, OrganizationRole role)
     {
         ValidateOrgMemberShip(orgId, userId);
 
@@ -28,13 +28,13 @@ public class OrganizationMemberShip : BaseEntity
     }
 
 
-    public void ChangeUserOrgRole(OrganizationRoles role)
+    public void ChangeUserOrgRole(OrganizationRole role)
     {
-        if (role == OrganizationRoles.Owner)
-            throw new BadRequestException("نمیتوانید نقش کاربری را به مالک تغییر دهید!");
+        if (role == OrganizationRole.Owner)
+            throw new DomainLogicalException("نمیتوانید نقش کاربری را به مالک تغییر دهید!");
 
         if (Role == role)
-            throw new BadRequestException($"نقش کاربر در حال حاضر {role.ToDisplay()} است!");
+            throw new DomainValidationFailureException($"نقش کاربر در حال حاضر {role.ToDisplay()} است!");
 
         Role = role;
 
@@ -52,6 +52,6 @@ public class OrganizationMemberShip : BaseEntity
             errorMessages.Add("آیدی کاربر خالی است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعبر هستند!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعبر هستند!", errorMessages);
     }
 }

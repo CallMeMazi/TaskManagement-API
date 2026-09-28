@@ -4,8 +4,8 @@ using TaskManagement.Application.DTOs.ResponseDTOs.User;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
-using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Common.Settings;
 using TaskManagement.Domain.Entities.BaseEntities;
@@ -35,7 +35,6 @@ public class UserService : IUserService
     public async Task<GeneralResult<UserDetailsDto>> GetUserByIdAsync(long id, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(id, false, ct);
-
         if (user.IsNullParameter())
             throw new NotFoundException("کاربری با این آیدی وجود ندارد!");
 
@@ -46,7 +45,6 @@ public class UserService : IUserService
     public async Task<GeneralResult<UserDetailsDto>> GetUserByMobileNumberAsync(string mobileNumber, CancellationToken ct)
     {
         var user = await _uow.User.GetByFilterAsync(u => u.MobileNumber == mobileNumber, false, ct);
-
         if (user == null)
             throw new NotFoundException("کاربری با این شماره موبایل وجود ندارد!");
 
@@ -62,7 +60,7 @@ public class UserService : IUserService
         await _userDomainService.EnsureCanCreateUserAsync(command.MobileNumber, ct);
 
         var userPassHash = _commonService.Password.Hash(command.Password);
-        var user = _mapper.Map<User>(command, opt => opt.Items["PasswordHash"] = userPassHash);
+        var user = _mapper.Map<User>(command, opt => opt.Items[nameof(User.PasswordHash)] = userPassHash);
 
         await _uow.User.AddAsync(user, ct);
 

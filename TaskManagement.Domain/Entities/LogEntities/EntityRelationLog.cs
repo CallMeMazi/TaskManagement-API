@@ -1,4 +1,4 @@
-﻿using TaskManagement.Domain.Enums.Logs;
+﻿using TaskManagement.Domain.Enums.Types.Logs;
 
 namespace TaskManagement.Domain.Entities.LogEntities;
 public class EntityRelationLog : LogBaseEntity

@@ -1,13 +1,13 @@
-﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Common.Helpers;
+﻿using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Enums.Roles;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class ProjectMemberShip : BaseEntity
 {
     public long UserId { get; private set; }
     public long ProjId { get; private set; }
-    public ProjectRoles Role { get; private set; }
+    public ProjectRole Role { get; private set; }
 
     #region Navigation Prop
 
@@ -18,7 +18,7 @@ public class ProjectMemberShip : BaseEntity
 
 
     private ProjectMemberShip() { }
-    public ProjectMemberShip(long userId, long projId, ProjectRoles role)
+    public ProjectMemberShip(long userId, long projId, ProjectRole role)
     {
         ValidateProjMemberShip(userId, projId);
 
@@ -28,13 +28,13 @@ public class ProjectMemberShip : BaseEntity
     }
 
 
-    public void ChangeUserOrgRole(ProjectRoles role)
+    public void ChangeUserOrgRole(ProjectRole role)
     {
-        if (role == ProjectRoles.Creator)
-            throw new BadRequestException("نمیتوانید نقش کاربری را به سازنده تغییر دهید!");
+        if (role == ProjectRole.Creator)
+            throw new DomainLogicalException("نمیتوانید نقش کاربری را به سازنده تغییر دهید!");
 
         if (Role == role)
-            throw new BadRequestException($"نقش کاربر در حال حاضر {role.ToDisplay()} است!");
+            throw new DomainLogicalException($"نقش کاربر در حال حاضر {role.ToDisplay()} است!");
 
         Role = role;
 
@@ -52,6 +52,6 @@ public class ProjectMemberShip : BaseEntity
             errorMessages.Add("آیدی پروژه خالی است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعبر هستند!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعبر هستند!", errorMessages);
     }
 }

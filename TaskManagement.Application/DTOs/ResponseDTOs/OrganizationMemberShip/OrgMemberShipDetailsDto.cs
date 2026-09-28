@@ -4,5 +4,5 @@ namespace TaskManagement.Application.DTOs.ResponseDTOs.OrganizationMemberShip;
 public record OrgMemberShipDetailsDto(
     long OrgId,
     long UserId,
-    OrganizationRoles Role
+    OrganizationRole Role
 );

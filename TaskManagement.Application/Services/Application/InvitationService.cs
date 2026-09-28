@@ -4,8 +4,8 @@ using TaskManagement.Application.DTOs.ResponseDTOs.Invitation;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
-using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Enums.Statuses;
@@ -45,7 +45,7 @@ public class InvitationService : IInvitationService
     {
         var invitation = await _uow.Invitation.GetByFilterAsync(oi =>
             oi.Id == id
-            && oi.Status == OrgInvitationStatus.Pending,
+            && oi.Status == OrgInvitationStatusType.Pending,
             false,
             ct
         );
@@ -70,7 +70,7 @@ public class InvitationService : IInvitationService
     {
         var invitations = await _uow.Invitation.GetAllByFilterAsync(oi =>
             oi.OrgId == orgId
-            && oi.Status == OrgInvitationStatus.Pending,
+            && oi.Status == OrgInvitationStatusType.Pending,
             false,
             ct
         );
@@ -105,13 +105,13 @@ public class InvitationService : IInvitationService
         var invitation = await _uow.Invitation.GetByFilterAsync(oi =>
             oi.Token == command.Token
             && oi.UserId == command.UserId
-            && oi.Status == OrgInvitationStatus.Pending
+            && oi.Status == OrgInvitationStatusType.Pending
             && oi.ExpiredAt > DateTime.Now,
             true,
             ct
         );
         if (invitation.IsNullParameter())
-            throw new BadRequestException("لینک نامعتبر است!");
+            throw new ValidationFailureException("لینک نامعتبر است!");
 
         invitation!.AcceptInvite();
 
@@ -121,7 +121,7 @@ public class InvitationService : IInvitationService
     {
         var invitation = await _uow.Invitation.GetByFilterWithOrgAsync(oi =>
             oi.Id == command.InvitationId
-            && oi.Status == OrgInvitationStatus.Pending,
+            && oi.Status == OrgInvitationStatusType.Pending,
             true,
             ct
         );

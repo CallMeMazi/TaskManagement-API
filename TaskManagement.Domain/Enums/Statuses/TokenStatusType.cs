@@ -1,5 +1,5 @@
 ﻿namespace TaskManagement.Domain.Enums.Statuses;
-public enum TokenStatus
+public enum TokenStatusType
 {
     Active,
     Revoked,

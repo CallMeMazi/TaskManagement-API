@@ -1,7 +1,7 @@
-﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Common.Helpers;
-using TaskManagement.Domain.Enums;
+﻿using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Enums.Statuses;
+using TaskManagement.Domain.Enums.Types.Application;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class Task : BaseEntity
@@ -55,16 +55,16 @@ public class Task : BaseEntity
     public void ChangeTaskActivity(bool activity)
     {
         if (TaskStatus == TaskStatusType.Cancel)
-            throw new BadRequestException("تسک کنسل شده، نمیتوانید وضعیت آن را تغییر دهید!");
+            throw new DomainLogicalException("تسک کنسل شده، نمیتوانید وضعیت آن را تغییر دهید!");
 
         if (TaskStatus == TaskStatusType.Dead)
-            throw new BadRequestException("زمان تسک به اتمام رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
+            throw new DomainLogicalException("زمان تسک به اتمام رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
 
         if (TaskStatus == TaskStatusType.Finished)
-            throw new BadRequestException("تسک به پایان رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
+            throw new DomainLogicalException("تسک به پایان رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
 
         if (IsActive == activity)
-            throw new BadRequestException(IsActive ? "تسک در حال حاضر فعال است!" : "تسک در حال حاضر غیر فعال است!");
+            throw new DomainLogicalException(IsActive ? "تسک در حال حاضر فعال است!" : "تسک در حال حاضر غیر فعال است!");
 
         IsActive = activity;
 
@@ -73,13 +73,13 @@ public class Task : BaseEntity
     public void CancelTask()
     {
         if (TaskStatus == TaskStatusType.Cancel)
-            throw new BadRequestException("تسک از قبل کنسل شده است!");
+            throw new DomainLogicalException("تسک از قبل کنسل شده است!");
 
         if (TaskStatus == TaskStatusType.Dead)
-            throw new BadRequestException("زمان تسک اتمام رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
+            throw new DomainLogicalException("زمان تسک اتمام رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
 
         if (TaskStatus == TaskStatusType.Finished)
-            throw new BadRequestException("تسک به اتمام رسیده، نمیتوانید وضعیتت آن را تغییر دهید!");
+            throw new DomainLogicalException("تسک به اتمام رسیده، نمیتوانید وضعیتت آن را تغییر دهید!");
 
         TaskStatus = TaskStatusType.Cancel;
         IsActive = false;
@@ -89,13 +89,13 @@ public class Task : BaseEntity
     public void FinishTask()
     {
         if (TaskStatus == TaskStatusType.Finished)
-            throw new BadRequestException("تسک از قبل تمام شده است!");
+            throw new DomainLogicalException("تسک از قبل تمام شده است!");
 
         if (TaskStatus == TaskStatusType.Dead)
-            throw new BadRequestException("زمان تسک اتمام رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
+            throw new DomainLogicalException("زمان تسک اتمام رسیده، نمیتوانید وضعیت آن را تغییر دهید!");
 
         if (TaskStatus == TaskStatusType.Cancel)
-            throw new BadRequestException("تسک کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
+            throw new DomainLogicalException("تسک کنسل شده است، نمیتوانید وضعیتت آن را تغییر دهید!");
 
         TaskStatus = TaskStatusType.Finished;
         TaskProgress = 100;
@@ -106,7 +106,7 @@ public class Task : BaseEntity
     public void DeadTask()
     {
         if (TaskStatus == TaskStatusType.Finished)
-            throw new BadRequestException("زمان تسک از قبل تمام شده است!");
+            throw new DomainLogicalException("زمان تسک از قبل تمام شده است!");
 
         if (TaskDeadline <= DateTime.Now)
         {
@@ -118,16 +118,16 @@ public class Task : BaseEntity
     public void ChangeTaskProgress(byte progress)
     {
         if (!IsActive)
-            throw new BadRequestException("تسک فعال نیست، نمیتوانید میزان پیشرفت را تغییر دهید!");
+            throw new DomainLogicalException("تسک فعال نیست، نمیتوانید میزان پیشرفت را تغییر دهید!");
 
         if (TaskProgress == progress)
             return;
 
         if (progress <= 0 || progress > 100)
-            throw new BadRequestException("نمیتوانید میزان پیشرفت را کمتر از 0 و بیشتر از 100 وارد کنید!");
+            throw new DomainValidationFailureException("نمیتوانید میزان پیشرفت را کمتر از 0 و بیشتر از 100 وارد کنید!");
 
         if (TaskProgress > progress)
-            throw new BadRequestException("نمیتوانید میزان پیشرفت را کمتر از میزان فعلی اعمال کنید!");
+            throw new DomainValidationFailureException("نمیتوانید میزان پیشرفت را کمتر از میزان فعلی اعمال کنید!");
 
         TaskProgress = progress;
 
@@ -164,7 +164,7 @@ public class Task : BaseEntity
             errorMessages.Add("مهلت پایان تسک مربوط به گذشته است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعتبر است!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعتبر است!", errorMessages);
     }
     public void ValidateTaskUpdating(string taskName, string taskDescription, DateTime taskDeadline)
     {
@@ -183,6 +183,6 @@ public class Task : BaseEntity
             errorMessages.Add("مهلت پایان تسک مربوط به گذشته است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعتبر است!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعتبر است!", errorMessages);
     }
 }

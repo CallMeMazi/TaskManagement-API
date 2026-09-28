@@ -1,4 +1,4 @@
-﻿using TaskManagement.Domain.Enums;
+﻿using TaskManagement.Domain.Enums.Types.Application;
 
 namespace TaskManagement.Application.DTOs.RequestDTOs.Task;
 public record CreateTaskAppDto(

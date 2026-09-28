@@ -1,13 +1,14 @@
 ﻿using Newtonsoft.Json;
-using TaskManagement.Common.Enums;
+using System.Net;
+using TaskManagement.Application.Utilities.Enums;
 using TaskManagement.Common.Helpers;
 
 namespace TaskManagement.WebConfig.API;
 public class ApiResult
 {
     public bool IsSuccess { get; set; }
-    public ResultStatus ResultStatus { get; set; }
-    public int StatusCode => (int)ResultStatus;
+    public ResultStatus Status { get; set; }
+    public int StatusCode => (int)Status;
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public string Message { get; set; }
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
@@ -18,51 +19,51 @@ public class ApiResult
     {
         IsSuccess = false;
         Message = "خطایی در سرور رخ داد!";
-        ResultStatus = ResultStatus.ServerError;
-        ErrorMessages = new() { "خطایی در سرور رخ داد!" };
+        Status = ResultStatus.ServerError;
+        ErrorMessages = [Message];
     }
     public ApiResult(bool isSuccess)
     {
         IsSuccess = isSuccess;
-        ResultStatus = IsSuccess ? ResultStatus.Success : ResultStatus.ServerError;
+        Status = IsSuccess ? ResultStatus.OK : ResultStatus.ServerError;
         Message = isSuccess ? "عملیات با موفیت انجام شد." : "خطایی در سرور رخ داد!";
-        ErrorMessages = isSuccess ? null : new() { "خطایی در سرور رخ داد!" };
+        ErrorMessages = isSuccess ? null : [Message];
     }
     public ApiResult(bool isSuccess, string message)
     {
         IsSuccess = isSuccess;
-        ResultStatus = isSuccess ? ResultStatus.Success : ResultStatus.ServerError;
-        Message = ValidationMessage(message, isSuccess);
-        ErrorMessages = isSuccess ? null : new() { "خطایی در سرور رخ داد!" };
+        Status = isSuccess ? ResultStatus.OK : ResultStatus.ServerError;
+        Message = ValidationMessage(message, IsSuccess);
+        ErrorMessages = isSuccess ? null : [Message];
     }
-    public ApiResult(bool isSuccess, string message, List<string>? errorMessages)
+    public ApiResult(string message, List<string>? errorMessages)
     {
-        IsSuccess = isSuccess;
-        ResultStatus = isSuccess ? ResultStatus.Success : ResultStatus.ServerError; ;
-        Message = ValidationMessage(message, isSuccess);
-        ErrorMessages = errorMessages ?? new() { message };
+        IsSuccess = false;
+        Status = ResultStatus.ServerError;
+        Message = ValidationMessage(message, IsSuccess);
+        ErrorMessages = errorMessages ?? [Message];
     }
-    public ApiResult(bool isSuccess, string message, ResultStatus resultStatus)
+    public ApiResult(string message, ResultStatus resultStatus)
     {
-        IsSuccess = isSuccess;
-        ResultStatus = resultStatus;
-        Message = ValidationMessage(message, isSuccess);
-        ErrorMessages = isSuccess ? null : new() { "خطایی در سرور رخ داد!" };
+        IsSuccess = false;
+        Status = resultStatus;
+        Message = ValidationMessage(message, IsSuccess);
+        ErrorMessages = [Message];
     }
-    public ApiResult(bool isSuccess, string message, List<string>? errorMessages, ResultStatus resultStatus)
+    public ApiResult(string message, List<string>? errorMessages, ResultStatus resultStatus)
     {
-        IsSuccess = isSuccess;
-        ResultStatus = resultStatus;
-        Message = ValidationMessage(message, isSuccess);
-        ErrorMessages = errorMessages ?? new() { message };
+        IsSuccess = false;
+        Status = resultStatus;
+        Message = ValidationMessage(message, IsSuccess);
+        ErrorMessages = errorMessages ?? [message];
     }
 
 
     public static ApiResult Success(string message = "عملیات با موفیت انجام شد.")
-        => new ApiResult(true, message, ResultStatus.Success);
-    public static ApiResult Error(string message = "خطایی در سرور رخ داد!"
-        , ResultStatus status = ResultStatus.ServerError, List<string>? errorMessages = null)
-            => new ApiResult(false, message, errorMessages, status);
+        => new ApiResult(true, message, ResultStatus.OK);
+    public static ApiResult Error(string message = "خطایی در سرور رخ داد!", ResultStatus status = ResultStatus.ServerError
+        , List<string>? errorMessages = null)
+            => new ApiResult(message, errorMessages, status);
 
     private static string ValidationMessage(string? message, bool isSuccess)
     {
@@ -92,7 +93,7 @@ public class ApiResult<T> : ApiResult
     {
         Result = result;
     }
-    public ApiResult(string message, ResultStatus resultStatus, T result)
+    public ApiResult(string message, HttpStatusCode resultStatus, T result)
         : base(true, message, resultStatus)
     {
         Result = result;
@@ -100,5 +101,5 @@ public class ApiResult<T> : ApiResult
 
 
     public static ApiResult<TResult> Success<TResult>(TResult result, string message = "عملیات با موفیت انجام شد.")
-        => new ApiResult<TResult>(message, ResultStatus.Success, result);
+        => new ApiResult<TResult>(message, HttpStatusCode.OK, result);
 }

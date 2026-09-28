@@ -18,7 +18,7 @@ public class UserMappingProfile : Profile
         new User(
             src.MobileNumber,
             src.Email,
-            (string)context.Items["PasswordHash"],
+            (string)context.Items[nameof(User.PasswordHash)],
             src.FirstName,
             src.LastName
         ));

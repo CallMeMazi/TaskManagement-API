@@ -3,8 +3,8 @@ using TaskManagement.Application.DTOs.RequestDTOs.TaskInfo;
 using TaskManagement.Application.DTOs.ResponseDTOs.TaskInfo;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
-using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Entities.BaseEntities;
 
@@ -47,7 +47,7 @@ public class TaskInfoService : ITaskInfoService
         if (taskAssignment.IsNullParameter())
             throw new NotFoundException("اطلاعات نامعتبر است!");
 
-        var taskInfo = _mapper.Map<TaskInfo>(taskAssignment);
+        var taskInfo = _mapper.Map<TaskInfo>(taskAssignment, opt => opt.Items[nameof(TaskInfo.TaskInfoDescription)] = command.TaskInfoDescription);
 
         await _uow.TaskInfo.AddAsync(taskInfo, ct);
 

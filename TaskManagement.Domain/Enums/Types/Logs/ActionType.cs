@@ -1,4 +1,4 @@
-﻿namespace TaskManagement.Domain.Enums.Logs;
+﻿namespace TaskManagement.Domain.Enums.Types.Logs;
 public enum ActionType
 {
     create,

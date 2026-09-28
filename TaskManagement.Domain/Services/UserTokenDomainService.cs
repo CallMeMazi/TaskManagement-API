@@ -1,9 +1,7 @@
-﻿using System.Net;
-using TaskManagement.Common.Enums;
-using TaskManagement.Common.Exceptions;
-using TaskManagement.Domain.Enums.Statuses;
+﻿using TaskManagement.Domain.Enums.Statuses;
 using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Domain.Interface.Services;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Services;
 
@@ -22,10 +20,10 @@ public class UserTokenDomainService : IUserTokenDomainService
     {
         var activeDevice = await _tokenRepository.GetCountByFilterAsync(ut =>
             ut.UserId == userId
-            && ut.TokenStatus == TokenStatus.Active,
+            && ut.TokenStatus == TokenStatusType.Active,
             ct
         );
         if (activeDevice >= 3)
-            throw new BadRequestException("نمیتوانید با بیشتر از سه دستگاه یا مرورگر متفاوت وارد شوید!");
+            throw new DomainLogicalException("نمیتوانید با بیشتر از سه دستگاه یا مرورگر متفاوت وارد شوید!");
     }
 }

@@ -1,5 +1,5 @@
 ﻿namespace TaskManagement.Domain.Enums.Statuses;
-public enum OrgInvitationStatus
+public enum OrgInvitationStatusType
 {
     Pending,
     Accepted,

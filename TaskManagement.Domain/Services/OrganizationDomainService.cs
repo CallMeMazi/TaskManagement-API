@@ -1,9 +1,7 @@
-﻿using System.Net;
-using TaskManagement.Common.Enums;
-using TaskManagement.Common.Exceptions;
-using TaskManagement.Domain.Enums.Statuses;
+﻿using TaskManagement.Domain.Enums.Statuses;
 using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Domain.Interface.Services;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Services;
 
@@ -25,19 +23,19 @@ public class OrganizationDomainService : IOrganizationDomainService
     public async Task EnsureCanCreateOrgAsync(string secondOrgName, long ownerId, CancellationToken ct)
     {
         if (await _orgRepository.IsEntityExistByFilterAsync(o => o.SecondOrgName == secondOrgName, ct))
-            throw new BadRequestException("سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!");
+            throw new DomainLogicalException("سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!");
 
         if (await _orgRepository.IsEntityExistByFilterAsync(o => o.OwnerId == ownerId && o.IsActive, ct))
-            throw new BadRequestException("شما نمیتوانید چندین سازمان فعال داشته باشید، لطفا ابتدا سازمان فعلی خود را غیرفعال کیند");
+            throw new DomainLogicalException("شما نمیتوانید چندین سازمان فعال داشته باشید، لطفا ابتدا سازمان فعلی خود را غیرفعال کیند");
 
         var userOrgCount = await _orgRepository.GetCountByFilterAsync(o => o.OwnerId == ownerId, ct);
         if (userOrgCount == 3)
-            throw new BadRequestException("نمیوتنید بیشتر از 3 سازمان به نام خود داشته باشید!");
+            throw new DomainLogicalException("نمیوتنید بیشتر از 3 سازمان به نام خود داشته باشید!");
     }
     public async Task EnsureCanUpdateOrgAsync(string secondOrgName, long orgId, CancellationToken ct)
     {
         if (await _orgRepository.IsEntityExistByFilterAsync(o => o.SecondOrgName == secondOrgName && o.Id != orgId, ct))
-            throw new BadRequestException("سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!");
+            throw new DomainLogicalException("سازمانی با این نام وجود دارد، لطفا مقدار نام ثانویه را ویرایش کنید!");
     }
     public async Task EnsureCanDeactiveOrgAsync(long orgId, CancellationToken ct)
     {
@@ -47,7 +45,7 @@ public class OrganizationDomainService : IOrganizationDomainService
             ct
         );
         if (isProjActive)
-            throw new BadRequestException("در سازمان شما پروژه فعال وجود دارد، اول آن را کنسل یا به اتمام برسانید!");
+            throw new DomainLogicalException("در سازمان شما پروژه فعال وجود دارد، اول آن را کنسل یا به اتمام برسانید!");
     }
     // Org Membership methods
     public async Task EnsureCanUserAddToOrgAsync(long orgId, long userId, CancellationToken ct)
@@ -58,7 +56,7 @@ public class OrganizationDomainService : IOrganizationDomainService
             ct
         );
         if (isUserInOrg)
-            throw new BadRequestException("شما در این سازمان حضور دارید!");
+            throw new DomainLogicalException("شما در این سازمان حضور دارید!");
     }
     public async Task EnsureCanRemoveUserFromOrgAsync(long orgId, long userId, CancellationToken ct)
     {
@@ -69,7 +67,7 @@ public class OrganizationDomainService : IOrganizationDomainService
             ct
         );
         if (isUserInActiveProj)
-            throw new BadRequestException("کاربر مورد نظر در پروژه فعال حضور دارد، ابتدا پروژه را به اتمام برسانید یا کنسل کنید یا کاربر را از پروژه حذف کنید!");
+            throw new DomainLogicalException("کاربر مورد نظر در پروژه فعال حضور دارد، ابتدا پروژه را به اتمام برسانید یا کنسل کنید یا کاربر را از پروژه حذف کنید!");
     }
     public async Task EnsureCanChangeRoleToMemberAsync(long userId, long orgId, CancellationToken ct)
     {
@@ -80,6 +78,6 @@ public class OrganizationDomainService : IOrganizationDomainService
             ct
         );
         if (isUserHasActiveProj)
-            throw new BadRequestException("این ادمین دارای پروژه های فعال است!");
+            throw new DomainLogicalException("این ادمین دارای پروژه های فعال است!");
     }
 }

@@ -1,6 +1,6 @@
-﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Common.Helpers;
+﻿using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Enums.Statuses;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class UserToken : BaseEntity
@@ -9,7 +9,7 @@ public class UserToken : BaseEntity
     public string AccessTokenHash { get; private set; }
     public string RefreshTokenHash { get; private set; }
     public string SecurityStamp { get; set; }
-    public TokenStatus TokenStatus { get; private set; } = TokenStatus.Active;
+    public TokenStatusType TokenStatus { get; private set; } = TokenStatusType.Active;
     public DateTime ExpiredAt { get; private set; }
     public DateTime? RevokedAt { get; private set; }
     public DateTime LastUsedAt { get; private set; } = DateTime.Now;
@@ -45,10 +45,10 @@ public class UserToken : BaseEntity
     public void RefreshToken(string accessToken, string refreshToken, int ExpirationRefreshToken)
     {
         if (accessToken.IsNullParameter())
-            throw new BadRequestException("توکن خالی است!");
+            throw new DomainValidationFailureException("توکن خالی است!");
 
         if (refreshToken.IsNullParameter())
-            throw new BadRequestException("رفرش توکن خالی است!");
+            throw new DomainValidationFailureException("رفرش توکن خالی است!");
 
         AccessTokenHash = accessToken;
         RefreshTokenHash = refreshToken;
@@ -57,22 +57,22 @@ public class UserToken : BaseEntity
     }
     public void RevokeToken()
     {
-        if (TokenStatus == TokenStatus.Revoked || TokenStatus == TokenStatus.Expired)
+        if (TokenStatus == TokenStatusType.Revoked || TokenStatus == TokenStatusType.Expired)
             return;
 
-        TokenStatus = TokenStatus.Revoked;
+        TokenStatus = TokenStatusType.Revoked;
         RevokedAt = DateTime.Now;
         UpdatedAt = DateTime.Now;
     }
     public void ExpiredToken()
     {
         if (ExpiredAt > DateTime.Now)
-            throw new BadRequestException("توکن هنوز مهلت دارد!");
+            throw new DomainLogicalException("توکن هنوز مهلت دارد!");
 
-        if (TokenStatus == TokenStatus.Revoked || TokenStatus == TokenStatus.Expired)
+        if (TokenStatus == TokenStatusType.Revoked || TokenStatus == TokenStatusType.Expired)
             return;
 
-        TokenStatus = TokenStatus.Expired;
+        TokenStatus = TokenStatusType.Expired;
         UpdatedAt = DateTime.Now;
     }
 
@@ -107,6 +107,6 @@ public class UserToken : BaseEntity
             errorMessages.Add("اطلاعات دستگاه کابر خالی است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعتبر است!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعتبر است!", errorMessages);
     }
 }

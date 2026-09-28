@@ -1,4 +1,4 @@
-﻿using TaskManagement.Common.Exceptions;
+﻿using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class TaskAssignment : BaseEntity
@@ -34,10 +34,10 @@ public class TaskAssignment : BaseEntity
     public void IncreaseTotalTimeSpent(byte totalTime)
     {
         if (totalTime <= 0)
-            throw new BadRequestException("نمیتوانید کمتر از 0 ساعت به مجموع ساعت کاری این تسک اضافه کنید!");
+            throw new DomainValidationFailureException("نمیتوانید کمتر از 0 ساعت به مجموع ساعت کاری این تسک اضافه کنید!");
 
         if (totalTime > 24)
-            throw new BadRequestException("نمیتوانید بیشتر از 24 ساعت به مجموع ساعت کاری این تسک اضافه کنید!");
+            throw new DomainValidationFailureException("نمیتوانید بیشتر از 24 ساعت به مجموع ساعت کاری این تسک اضافه کنید!");
 
         TotalTimeSpent += totalTime;
 
@@ -50,7 +50,7 @@ public class TaskAssignment : BaseEntity
     public void ChangeTaskInProgress(bool isProgress)
     {
         if (IsInProgress == isProgress)
-            throw new BadRequestException(isProgress ? "تسک در حال حاضر فعال است!" : "تسک در حال حاضر غیر فعال است!");
+            throw new DomainLogicalException(isProgress ? "تسک در حال حاضر فعال است!" : "تسک در حال حاضر غیر فعال است!");
 
         IsInProgress = isProgress;
 
@@ -82,6 +82,6 @@ public class TaskAssignment : BaseEntity
             errorMessages.Add("آیدی پروژه خالی است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعتبر است!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعتبر است!", errorMessages);
     }
 }

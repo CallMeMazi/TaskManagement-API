@@ -1,5 +1,5 @@
-﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Domain.Enums.Statuses;
+﻿using TaskManagement.Domain.Enums.Statuses;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class OrganizationInvitation : BaseEntity
@@ -7,7 +7,7 @@ public class OrganizationInvitation : BaseEntity
     public long OrgId { get; private set; }
     public long UserId { get; private set; }
     public string Token { get; private set; }
-    public OrgInvitationStatus Status { get; private set; }
+    public OrgInvitationStatusType Status { get; private set; }
     public DateTime ExpiredAt { get; private set; }
     public DateTime? RevokedAt { get; private set; }
     public byte[] RowVersion { get; private set; }
@@ -28,36 +28,36 @@ public class OrganizationInvitation : BaseEntity
         OrgId = orgId;
         UserId = userId;
         Token = GenerateToken();
-        Status = OrgInvitationStatus.Pending;
+        Status = OrgInvitationStatusType.Pending;
         ExpiredAt = DateTime.Now.AddDays(1);
     }
 
 
     public void AcceptInvite()
     {
-        if (Status != OrgInvitationStatus.Pending)
-            throw new BadRequestException("لینک نامعتبر است!");
+        if (Status != OrgInvitationStatusType.Pending)
+            throw new DomainLogicalException("لینک نامعتبر است!");
 
-        Status = OrgInvitationStatus.Accepted;
+        Status = OrgInvitationStatusType.Accepted;
         UpdatedAt = DateTime.Now;
     }
     public void ExpiredInvite()
     {
-        if (Status != OrgInvitationStatus.Pending)
-            throw new BadRequestException("نمیتوانید درخواست دعوت را منقضی کنید!");
+        if (Status != OrgInvitationStatusType.Pending)
+            throw new DomainLogicalException("نمیتوانید درخواست دعوت را منقضی کنید!");
 
         if (ExpiredAt > DateTime.Now)
-            throw new BadRequestException("زمان انقضای درخواست دعوت هنوز فرا نرسیده است!");
+            throw new DomainLogicalException("زمان انقضای درخواست دعوت هنوز فرا نرسیده است!");
 
-        Status = OrgInvitationStatus.Expired;
+        Status = OrgInvitationStatusType.Expired;
         UpdatedAt = DateTime.Now;
     }
     public void RevokedInvite()
     {
-        if (Status != OrgInvitationStatus.Pending)
-            throw new BadRequestException("نمیتوانید درخواست دعوت را منقضی کنید!");
+        if (Status != OrgInvitationStatusType.Pending)
+            throw new DomainLogicalException("نمیتوانید درخواست دعوت را منقضی کنید!");
 
-        Status = OrgInvitationStatus.Revoked;
+        Status = OrgInvitationStatusType.Revoked;
         RevokedAt = DateTime.Now;
         UpdatedAt = DateTime.Now;
     }
@@ -73,7 +73,7 @@ public class OrganizationInvitation : BaseEntity
             errorMessages.Add("آیدی کاربر خالی است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعبر هستند!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعبر هستند!", errorMessages);
     }
 
     private string GenerateToken()

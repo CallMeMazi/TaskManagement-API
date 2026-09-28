@@ -1,5 +1,5 @@
-﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Common.Helpers;
+﻿using TaskManagement.Common.Helpers;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class Organization : BaseEntity
@@ -51,7 +51,7 @@ public class Organization : BaseEntity
     public void ChangeOrgActivity(bool activity)
     {
         if (IsActive == activity)
-            throw new BadRequestException(IsActive ? "سازمان در حال حاضر فعال است!" : "سازمان در حال حاضر غیر فعال است!");
+            throw new DomainLogicalException(IsActive ? "سازمان در حال حاضر فعال است!" : "سازمان در حال حاضر غیر فعال است!");
 
         IsActive = activity;
 
@@ -79,7 +79,7 @@ public class Organization : BaseEntity
             errorMessages.Add("افراد سازمان باید بیشتر از 5 نفر و کمتر از 50 نفر باشد!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعبر هستند!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعبر هستند!", errorMessages);
     }
     public void ValidateOrgUpdating(string orgName, string secondOrgName, string orgDescription)
     {
@@ -95,7 +95,7 @@ public class Organization : BaseEntity
             errorMessages.Add("توضیحات سازمان خالی است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعبر هستند!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعبر هستند!", errorMessages);
     }
 
     private string GenerateOrgCode(string secondOrgName)

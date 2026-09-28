@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace TaskManagement.Domain.Enums.Roles;
-public enum OrganizationRoles
+public enum OrganizationRole
 {
     [Display(Name = "مالک")]
     Owner,

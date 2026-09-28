@@ -4,8 +4,8 @@ using TaskManagement.Application.DTOs.ResponseDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWork;
+using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
-using TaskManagement.Common.Exceptions;
 using TaskManagement.Common.Helpers;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Enums.Roles;
@@ -49,11 +49,11 @@ public class ProjectService : IProjectService
     {
         var org = await _uow.Organization.GetOrgByIdWithMembersAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
-            throw new BadRequestException("اطلاعات ورودی نامعتبر است!");
+            throw new ValidationFailureException("اطلاعات ورودی نامعتبر است!");
 
         var isOwnerInOrg = org!.Members.Any(om =>
             om.UserId == command.CreatorId
-            && (om.Role == OrganizationRoles.Admin || om.Role == OrganizationRoles.Owner)
+            && (om.Role == OrganizationRole.Admin || om.Role == OrganizationRole.Owner)
         );
         if (!isOwnerInOrg)
             throw new ForbiddenException("شما دسترسی ندارید!");
@@ -62,7 +62,7 @@ public class ProjectService : IProjectService
 
         await _uow.Project.AddAsync(project, ct);
 
-        await CreateProjectMemberShipAsync(project.Id, command.CreatorId, ProjectRoles.Creator, ct);
+        await CreateProjectMemberShipAsync(project.Id, command.CreatorId, ProjectRole.Creator, ct);
 
         // Check UserIds And Creat ProjectMemberShip
         if (!command.UserIds.IsNullParameter())
@@ -99,7 +99,7 @@ public class ProjectService : IProjectService
 
         if (project!.IsActive
             && (project.ProjStatus == ProjectStatusType.InProgress || project.ProjStatus == ProjectStatusType.Adjournment))
-            throw new BadRequestException("ابتدا باید پروژه را به پایان برسانید یا آن را کنسل کنید!");
+            throw new ConflictException("ابتدا باید پروژه را به پایان برسانید یا آن را کنسل کنید!");
 
         await CheckUserPasswordAsync(project, command.OwnerId, command.UserPassword, ct);
 
@@ -123,7 +123,7 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         if (project!.IsActive == command.Activity)
-            throw new BadRequestException(project.IsActive ? "پروژه در حال حاضر فعال است!" : "پروژه در حال حاضر غیر فعال است!");
+            throw new ConflictException(project.IsActive ? "پروژه در حال حاضر فعال است!" : "پروژه در حال حاضر غیر فعال است!");
 
         await CheckUserPasswordAsync(project, command.OwnerId, command.UserPassword, ct);
 
@@ -143,7 +143,7 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         if (project.IsActive)
-            throw new BadRequestException("پروژه شما درحال حاضر فعال است!");
+            throw new ConflictException("پروژه شما درحال حاضر فعال است!");
 
         await CheckUserPasswordAsync(project, command.OwnerId, command.UserPassword, ct);
 
@@ -162,7 +162,7 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         if (!project!.IsActive)
-            throw new BadRequestException("پروژه شما درحال حاضر غیرفعال است!");
+            throw new ConflictException("پروژه شما درحال حاضر غیرفعال است!");
 
         await CheckUserPasswordAsync(project, command.OwnerId, command.UserPassword, ct);
 
@@ -227,11 +227,11 @@ public class ProjectService : IProjectService
 
         var isUserInProject = project!.ProjMember.Any(pm => pm.UserId == command.UserId);
         if (isUserInProject)
-            throw new BadRequestException("کاربر مورد نظر در پروژه وجود دارد!");
+            throw new ConflictException("کاربر مورد نظر در پروژه وجود دارد!");
 
         await _projectDomainService.EnsureCanAddUserToProjectAsync(project, command.UserId, project.OrgId, ct);
 
-        await CreateProjectMemberShipAsync(project.Id, command.UserId, ProjectRoles.Member, ct);
+        await CreateProjectMemberShipAsync(project.Id, command.UserId, ProjectRole.Member, ct);
 
         return GeneralResult.Success();
     }
@@ -245,7 +245,7 @@ public class ProjectService : IProjectService
 
         var projectMemberShip = project.ProjMember.FirstOrDefault(pm =>
             pm.UserId == command.UserId
-            && (pm.Role == ProjectRoles.Admin || pm.Role == ProjectRoles.Member)
+            && (pm.Role == ProjectRole.Admin || pm.Role == ProjectRole.Member)
         );
         if (projectMemberShip.IsNullParameter())
             throw new NotFoundException("کاربر مورد نظر در پروژه وجود ندارد!");
@@ -273,7 +273,7 @@ public class ProjectService : IProjectService
         if (ProjectMemberShip.IsNullParameter())
             throw new NotFoundException("کاربری با این شناسه در پروژه وجود ندارد!");
 
-        ProjectMemberShip!.ChangeUserOrgRole(ProjectRoles.Admin);
+        ProjectMemberShip!.ChangeUserOrgRole(ProjectRole.Admin);
 
         return GeneralResult.Success();
     }
@@ -294,12 +294,12 @@ public class ProjectService : IProjectService
         if (ProjectMemberShip.IsNullParameter())
             throw new NotFoundException("کاربری با این شناسه در پروژه وجود ندارد!");
 
-        ProjectMemberShip!.ChangeUserOrgRole(ProjectRoles.Member);
+        ProjectMemberShip!.ChangeUserOrgRole(ProjectRole.Member);
 
         return GeneralResult.Success();
     }
 
-    private async System.Threading.Tasks.Task CreateProjectMemberShipAsync(long projId, long userId, ProjectRoles role, CancellationToken ct)
+    private async System.Threading.Tasks.Task CreateProjectMemberShipAsync(long projId, long userId, ProjectRole role, CancellationToken ct)
     {
         var ProjectMemberShip = new ProjectMemberShip(projId, userId, role);
 
@@ -311,22 +311,19 @@ public class ProjectService : IProjectService
         try
         {
             var orgMemberIds = memberIds.ToHashSet();
-            var invalid = userIds.FirstOrDefault(u => !orgMemberIds.Contains(u));
-            if (invalid != 0)
-                throw new BadRequestException($"کاربر با شناسه {invalid} در سازمان وجود ندارد!");
+            var invalId = userIds.FirstOrDefault(u => !orgMemberIds.Contains(u));
+            if (invalId != 0)
+                throw new ConflictException($"کاربر با شناسه {invalId} در سازمان وجود ندارد!");
 
             var projectMembers = userIds
-                .Select(u => new ProjectMemberShip(projId, u, ProjectRoles.Member))
+                .Select(u => new ProjectMemberShip(projId, u, ProjectRole.Member))
                 .ToList();
 
             await _uow.ProjectMemberShip.AddRangeAsync(projectMembers, ct);
         }
         catch (Exception ex)
         {
-            throw new BadRequestException(
-                "پروژه ساخته شد ولی در افزودن اعضا مشکلی وجود داشت!",
-                innerException: ex
-            );
+            throw new ConflictException("پروژه ساخته شد ولی در افزودن اعضا مشکلی وجود داشت!", ex);
         }
     }
     private async System.Threading.Tasks.Task CheckUserPasswordAsync(Project project, long userId, string password, CancellationToken ct)
@@ -335,13 +332,13 @@ public class ProjectService : IProjectService
         {
             await _uow.Project.LoadReferenceAsync(project, p => p.Creator, ct);
             if (!_commonService.Password.Verify(project.Creator.PasswordHash, password))
-                throw new BadRequestException("رمز عبور نادرست است!");
+                throw new ValidationFailureException("رمز عبور نادرست است!");
         }
         else if (project.Org.OwnerId == userId)
         {
             await _uow.Project.LoadReferenceAsync(project, p => p.Org.Owner, ct);
             if (!_commonService.Password.Verify(project.Org.Owner.PasswordHash, password))
-                throw new BadRequestException("رمز عبور نادرست است!");
+                throw new ValidationFailureException("رمز عبور نادرست است!");
         }
         else
             throw new ForbiddenException("شما به این پروژه دسترسی ندارید!");

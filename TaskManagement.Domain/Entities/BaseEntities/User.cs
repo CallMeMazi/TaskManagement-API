@@ -1,5 +1,5 @@
-﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Common.Helpers;
+﻿using TaskManagement.Common.Helpers;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 public class User : BaseEntity
@@ -56,7 +56,7 @@ public class User : BaseEntity
     public void ChangeUserPassword(string newPassword)
     {
         if (newPassword.IsNullParameter())
-            throw new BadRequestException("رمز عبور خالی است!");
+            throw new DomainValidationFailureException("رمز عبور خالی است!");
 
         PasswordHash = newPassword;
         ChangeSecurityStamp();
@@ -96,7 +96,7 @@ public class User : BaseEntity
             errorMessages.Add("ایمیل نامعتبر است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعبر هستند!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعبر هستند!", errorMessages);
     }
     public void ValidateUserUpdating(string email, string firstName, string lastName)
     {
@@ -116,6 +116,6 @@ public class User : BaseEntity
             errorMessages.Add("ایمیل نامعتبر است!");
 
         if (errorMessages.Any())
-            throw new BadRequestException("اطلاعات نامعبر هستند!", errorMessages);
+            throw new DomainValidationFailureException("اطلاعات نامعبر هستند!", errorMessages);
     }
 }

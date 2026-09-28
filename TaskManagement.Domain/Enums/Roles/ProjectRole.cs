@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace TaskManagement.Domain.Enums.Roles;
-public enum ProjectRoles
+public enum ProjectRole
 {
     [Display(Name = "سازنده")]
     Creator,

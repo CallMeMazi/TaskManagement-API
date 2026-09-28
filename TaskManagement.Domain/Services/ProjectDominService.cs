@@ -1,9 +1,9 @@
-﻿using TaskManagement.Common.Exceptions;
-using TaskManagement.Domain.Entities.BaseEntities;
+﻿using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Enums.Roles;
 using TaskManagement.Domain.Enums.Statuses;
 using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Domain.Interface.Services;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Services;
 
@@ -25,11 +25,11 @@ public class ProjectDomainService : IProjectDomainService
         var isOwnerInOrg = await _orgMemberShipRepository.IsEntityExistByFilterAsync(om =>
             om.UserId == ownerId
             && om.OrgId == orgId
-            && (om.Role == OrganizationRoles.Owner || om.Role == OrganizationRoles.Admin),
+            && (om.Role == OrganizationRole.Owner || om.Role == OrganizationRole.Admin),
             ct
         );
         if (!isOwnerInOrg)
-            throw new ForbiddenException("شما به این پروژه دسترسی ندارید!");
+            throw new DomainAuthorizationException("شما به این پروژه دسترسی ندارید!");
     }
     public async System.Threading.Tasks.Task CheakProjectActiveTaskAsync(long projectId, CancellationToken ct)
     {
@@ -39,13 +39,13 @@ public class ProjectDomainService : IProjectDomainService
             ct
         );
         if (isProjHasActiveTask)
-            throw new BadRequestException("شما در پروژه تسک های فعال دارید، ابتدا آن ها را عیرفعال کنید!");
+            throw new DomainLogicalException("شما در پروژه تسک های فعال دارید، ابتدا آن ها را عیرفعال کنید!");
     }
     // Project Member Ship methods
     public async System.Threading.Tasks.Task EnsureCanAddUserToProjectAsync(Project project, long userId, long orgId, CancellationToken ct)
     {
         if (project.ProjMaxUsers == project.ProjMember.Count)
-            throw new BadRequestException("پروژه شما در حال حاضر پر است و نمیتوانید شخص دیگری را اضافه کنید!");
+            throw new DomainLogicalException("پروژه شما در حال حاضر پر است و نمیتوانید شخص دیگری را اضافه کنید!");
 
         var isUserInOrg = await _orgMemberShipRepository.IsEntityExistByFilterAsync(om =>
             om.UserId == userId
@@ -53,12 +53,12 @@ public class ProjectDomainService : IProjectDomainService
             ct
         );
         if (!isUserInOrg)
-            throw new BadRequestException("گاربر مورد نظر در سازمان وجود ندارد!");
+            throw new DomainValidationFailureException("گاربر مورد نظر در سازمان وجود ندارد!");
     }
     public async System.Threading.Tasks.Task EnsureCanRemoveUserFromProjectAsync(Project project, long userId, CancellationToken ct)
     {
         if (project!.CreatorId == userId)
-            throw new BadRequestException("شما مالک پروژه هستید و نمیتوانید آن را ترک کنید!");
+            throw new DomainLogicalException("شما مالک پروژه هستید و نمیتوانید آن را ترک کنید!");
 
         var isUserHasActiveTask = await _taskRepository.IsEntityExistByFilterAsync(t =>
             t.ProjId == project.Id
@@ -67,6 +67,6 @@ public class ProjectDomainService : IProjectDomainService
             ct
         );
         if (isUserHasActiveTask)
-            throw new BadRequestException("کاربر مورد نظر در تسک فعال حضور دارد، ابتدا تسک را به اتمام برسانید یا کنسل کنید!");
+            throw new DomainLogicalException("کاربر مورد نظر در تسک فعال حضور دارد، ابتدا تسک را به اتمام برسانید یا کنسل کنید!");
     }
 }

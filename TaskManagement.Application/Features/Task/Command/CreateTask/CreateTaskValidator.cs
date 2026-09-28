@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using TaskManagement.Application.Extentions;
-using TaskManagement.Domain.Enums;
+using TaskManagement.Domain.Enums.Types.Application;
 
 namespace TaskManagement.Application.Features.Task.Command.CreateTask;
 public class CreateTaskValidator

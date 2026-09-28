@@ -1,7 +1,7 @@
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Common.Settings;
 using TaskManagement.Domain.Entities.BaseEntities;
-using TaskManagement.Domain.Enums.Logs;
+using TaskManagement.Domain.Enums.Types.Logs;
 using DomainTask = TaskManagement.Domain.Entities.BaseEntities.Task;
 
 namespace TaskManagement.Infrastructure.IdGeneration;

@@ -1,9 +1,7 @@
-﻿using System.Net;
-using TaskManagement.Common.Enums;
-using TaskManagement.Common.Exceptions;
-using TaskManagement.Domain.Enums.Roles;
+﻿using TaskManagement.Domain.Enums.Roles;
 using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Domain.Interface.Services;
+using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Services;
 
@@ -25,19 +23,19 @@ public class UserDomainService : IUserDomainService
     public async Task EnsureCanCreateUserAsync(string mobileNumber, CancellationToken ct)
     {
         if (await _userRepository.IsEntityExistByFilterAsync(u => u.MobileNumber == mobileNumber, ct))
-            throw new BadRequestException("کاربری با این شماره موبایل وجود دارد!");
+            throw new DomainLogicalException("کاربری با این شماره موبایل وجود دارد!");
     }
     public async Task EnsureCanDeleteUserAsync(long userId, CancellationToken ct)
     {
         if (await _orgRepository.IsEntityExistByFilterAsync(o => o.OwnerId == userId && o.IsActive, ct))
-            throw new BadRequestException("شما هنوز سازمان فعال دارید، اول سازمان های خود را غیرفعال کنید!");
+            throw new DomainLogicalException("شما هنوز سازمان فعال دارید، اول سازمان های خود را غیرفعال کنید!");
 
         var isUserInOtherOrgs = await _orgMemberShipRepository.IsEntityExistByFilterAsync(om =>
             om.UserId == userId
-            && om.Role != OrganizationRoles.Owner,
+            && om.Role != OrganizationRole.Owner,
             ct
         );
         if (isUserInOtherOrgs)
-            throw new BadRequestException("شما در سازمان های دیگری عضو هستید، ابتدا از تمام سازمان هایی که عضو هستید خارج شوید!");
+            throw new DomainLogicalException("شما در سازمان های دیگری عضو هستید، ابتدا از تمام سازمان هایی که عضو هستید خارج شوید!");
     }
 }

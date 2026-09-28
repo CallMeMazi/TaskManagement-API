@@ -8,11 +8,12 @@ public class TaskInfoMappingProfile : Profile
     public TaskInfoMappingProfile()
     {
         // Command DTOs
-        CreateMap<TaskAssignment, TaskInfo>().ConstructUsing(src =>
+        CreateMap<TaskAssignment, TaskInfo>().ConstructUsing((src, context) =>
         new TaskInfo(
             src.TaskId,
             src.UserId,
             src.Id,
+            (string)context.Items[nameof(TaskInfo.TaskInfoDescription)],
             (DateTime)src.LastStartedAt!,
             DateTime.Now
         ));

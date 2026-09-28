@@ -1,4 +1,4 @@
-﻿using TaskManagement.Common.Exceptions;
+﻿using TaskManagement.Domain.Utilities.Exceptions;
 
 namespace TaskManagement.Domain.Entities.BaseEntities;
 
@@ -26,11 +26,10 @@ public abstract class BaseEntity : IBaseEntity
 
         Id = id;
     }
-
     public virtual void SoftDelete()
     {
         if (IsDelete)
-            throw new BadRequestException("این موجودیت از قبل حذف شده است!");
+            throw new DomainLogicalException("این موجودیت از قبل حذف شده است!");
 
         IsDelete = true;
     }
