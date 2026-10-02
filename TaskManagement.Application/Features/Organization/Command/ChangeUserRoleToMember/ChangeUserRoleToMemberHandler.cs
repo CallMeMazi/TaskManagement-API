@@ -3,11 +3,10 @@ using TaskManagement.Application.DTOs.RequestDTOs.Organization;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Organization.Command.ChangeUserRoleToMember;
 public class ChangeUserRoleToMemberHandler
-    : IRequestHandler<ChangeUserRoleToMemberCommand, GeneralResult>
+    : IRequestHandler<ChangeUserRoleToMemberCommand>
 {
     private readonly IUnitOfWork _uow;
     private readonly IOrganizationService _organizationService;
@@ -20,14 +19,12 @@ public class ChangeUserRoleToMemberHandler
         _uow = uow;
     }
 
-    public async Task<GeneralResult> Handle(ChangeUserRoleToMemberCommand request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(ChangeUserRoleToMemberCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<ChangeUserRoleOrgAppDto>(request);
 
-        var changeUserRole = await _organizationService.ChangeUserRoleToMemberAsync(dto, ct);
+        await _organizationService.ChangeUserRoleToMemberAsync(dto, ct);
 
         await _uow.SaveAsync(ct);
-
-        return changeUserRole;
     }
 }

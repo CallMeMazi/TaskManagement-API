@@ -3,11 +3,10 @@ using TaskManagement.Application.DTOs.RequestDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.ChangeProjectActivity;
 public class ChangeProjectActivityHandler
-    : IRequestHandler<ChangeProjectActivityCommand, GeneralResult>
+    : IRequestHandler<ChangeProjectActivityCommand>
 {
     private readonly IUnitOfWork _uow;
     private readonly IProjectService _projectService;
@@ -20,14 +19,12 @@ public class ChangeProjectActivityHandler
         _uow = uow;
     }
 
-    public async Task<GeneralResult> Handle(ChangeProjectActivityCommand request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(ChangeProjectActivityCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<ChangeProjectActivityAppDto>(request);
 
-        var chagneActivityProjectRes = await _projectService.ChangeProjectActivityAsync(dto, ct);
+        await _projectService.ChangeProjectActivityAsync(dto, ct);
 
         await _uow.SaveAsync(ct);
-
-        return chagneActivityProjectRes;
     }
 }

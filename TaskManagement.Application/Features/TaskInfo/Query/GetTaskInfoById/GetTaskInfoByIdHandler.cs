@@ -1,11 +1,10 @@
 ﻿using MediatR;
 using TaskManagement.Application.DTOs.ResponseDTOs.TaskInfo;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.TaskInfo.Query.GetTaskInfoById;
 public class GetTaskInfoByIdHandler
-    : IRequestHandler<GetTaskInfoByIdQuery, GeneralResult<TaskInfoDetailsDto>>
+    : IRequestHandler<GetTaskInfoByIdQuery, TaskInfoDetailsDto>
 {
     private readonly ITaskInfoService _taskInfoService;
 
@@ -14,6 +13,6 @@ public class GetTaskInfoByIdHandler
         _taskInfoService = taskInfoService;
     }
 
-    public Task<GeneralResult<TaskInfoDetailsDto>> Handle(GetTaskInfoByIdQuery request, CancellationToken ct)
+    public Task<TaskInfoDetailsDto> Handle(GetTaskInfoByIdQuery request, CancellationToken ct)
         => _taskInfoService.GetTaskInfoByIdAsync(request.TaskInfoId, ct);
 }

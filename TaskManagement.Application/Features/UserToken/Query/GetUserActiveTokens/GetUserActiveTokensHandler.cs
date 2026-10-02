@@ -1,11 +1,10 @@
 ﻿using MediatR;
 using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.UserToken.Query.GetUserActiveTokens;
 public class GetUserActiveTokensHandler
-    : IRequestHandler<GetUserActiveTokensQuery, GeneralResult<List<UserTokenDetailsDto>>>
+    : IRequestHandler<GetUserActiveTokensQuery, List<UserTokenDetailsDto>>
 {
     private readonly IAuthServiec _authService;
 
@@ -14,8 +13,6 @@ public class GetUserActiveTokensHandler
         _authService = authService;
     }
 
-    public Task<GeneralResult<List<UserTokenDetailsDto>>> Handle(GetUserActiveTokensQuery request, CancellationToken ct)
-    {
-        return _authService.GetUserActiveTokensAsync(request.UserId, ct);
-    }
+    public Task<List<UserTokenDetailsDto>> Handle(GetUserActiveTokensQuery request, CancellationToken ct)
+        => _authService.GetUserActiveTokensAsync(request.UserId, ct);
 }

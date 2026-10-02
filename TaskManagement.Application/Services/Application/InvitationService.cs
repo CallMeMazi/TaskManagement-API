@@ -25,7 +25,7 @@ public class InvitationService : IInvitationService
     }
 
     // Query methods
-    public async Task<GeneralResult<OrgInvitationDetailsDto>> GetOrgInvitationByIdAsync(long id, CancellationToken ct)
+    public async Task<OrgInvitationDetailsDto> GetOrgInvitationByIdAsync(long id, CancellationToken ct)
     {
         var invitation = await _uow.Invitation.GetByIdAsync(id, false, ct);
         if (invitation.IsNullParameter())
@@ -33,9 +33,9 @@ public class InvitationService : IInvitationService
 
         var invitationDto = _common.Mapper.Map<OrgInvitationDetailsDto>(invitation);
 
-        return GeneralResult<OrgInvitationDetailsDto>.Success(invitationDto);
+        return invitationDto;
     }
-    public async Task<GeneralResult<OrgInvitationDetailsDto>> GetPendingOrgInvitationByIdAsync(long id, CancellationToken ct)
+    public async Task<OrgInvitationDetailsDto> GetPendingOrgInvitationByIdAsync(long id, CancellationToken ct)
     {
         var invitation = await _uow.Invitation.GetByFilterAsync(oi =>
             oi.Id == id
@@ -48,9 +48,9 @@ public class InvitationService : IInvitationService
 
         var invitationDto = _common.Mapper.Map<OrgInvitationDetailsDto>(invitation);
 
-        return GeneralResult<OrgInvitationDetailsDto>.Success(invitationDto);
+        return invitationDto;
     }
-    public async Task<GeneralResult<List<OrgInvitationDetailsDto>>> GetAllOrgInvitationByOrgIdAsync(long orgId, CancellationToken ct)
+    public async Task<List<OrgInvitationDetailsDto>> GetAllOrgInvitationByOrgIdAsync(long orgId, CancellationToken ct)
     {
         var invitations = await _uow.Invitation.GetAllByFilterAsync(oi => oi.OrgId == orgId, false, ct);
         if (invitations.IsNullParameter() || !invitations.Any())
@@ -58,9 +58,9 @@ public class InvitationService : IInvitationService
 
         var invitationsDto = _common.Mapper.Map<List<OrgInvitationDetailsDto>>(invitations);
 
-        return GeneralResult<List<OrgInvitationDetailsDto>>.Success(invitationsDto);
+        return invitationsDto;
     }
-    public async Task<GeneralResult<List<OrgInvitationDetailsDto>>> GetAllPendingOrgInvitationByOrgIdAsync(long orgId, CancellationToken ct)
+    public async Task<List<OrgInvitationDetailsDto>> GetAllPendingOrgInvitationByOrgIdAsync(long orgId, CancellationToken ct)
     {
         var invitations = await _uow.Invitation.GetAllByFilterAsync(oi =>
             oi.OrgId == orgId
@@ -73,11 +73,11 @@ public class InvitationService : IInvitationService
 
         var invitationsDto = _common.Mapper.Map<List<OrgInvitationDetailsDto>>(invitations);
 
-        return GeneralResult<List<OrgInvitationDetailsDto>>.Success(invitationsDto);
+        return invitationsDto;
     }
 
     // Command methods
-    public async Task<GeneralResult<string>> GenerateInviteLinkByUserIdAsync(CreateOrgInvitatoinAppDto command, CancellationToken ct)
+    public async Task<string> GenerateInviteLinkByUserIdAsync(CreateOrgInvitatoinAppDto command, CancellationToken ct)
     {
         var user = await _uow.User.GetByFilterAsync(u => u.MobileNumber == command.UserMobileNumber, false, ct);
         if (user.IsNullParameter())
@@ -89,9 +89,9 @@ public class InvitationService : IInvitationService
 
         await _uow.Invitation.AddAsync(invatation, ct);
 
-        return GeneralResult<string>.Success(invatation.Token);
+        return invatation.Token;
     }
-    public async Task<GeneralResult<long>> AcceptInvitationAsync(AcceptOrgInvitationAppDto command, CancellationToken ct)
+    public async Task<long> AcceptInvitationAsync(AcceptOrgInvitationAppDto command, CancellationToken ct)
     {
         if (!await _uow.User.IsEntityExistByFilterAsync(u => u.Id == command.UserId, ct))
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(AcceptInvitationAsync)} method!");
@@ -109,9 +109,9 @@ public class InvitationService : IInvitationService
 
         invitation!.AcceptInvite();
 
-        return GeneralResult<long>.Success(invitation.OrgId);
+        return invitation.OrgId;
     }
-    public async Task<GeneralResult> RevokeInvitationAsync(RevokeOrgInvitationAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task RevokeInvitationAsync(RevokeOrgInvitationAppDto command, CancellationToken ct)
     {
         var invitation = await _uow.Invitation.GetByFilterWithOrgAsync(oi =>
             oi.Id == command.InvitationId
@@ -126,7 +126,5 @@ public class InvitationService : IInvitationService
             throw new ForbiddenException("شما مالک این سازمان نیستید!");
 
         invitation.RevokedInvite();
-
-        return GeneralResult.Success();
     }
 }

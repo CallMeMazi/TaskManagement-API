@@ -3,11 +3,10 @@ using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.UserToken.Command.LogoutUser;
 public class LogoutUserHandler
-    : IRequestHandler<LogoutUserCommand, GeneralResult>
+    : IRequestHandler<LogoutUserCommand>
 {
     private readonly IUnitOfWork _uow;
     private readonly IAuthServiec _authService;
@@ -20,14 +19,12 @@ public class LogoutUserHandler
         _uow = uow;
     }
 
-    public async Task<GeneralResult> Handle(LogoutUserCommand request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(LogoutUserCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<LogoutUserAppDto>(request);
 
-        var loguotUserRes = await _authService.LogoutUserAsync(dto, ct);
+        await _authService.LogoutUserAsync(dto, ct);
 
         await _uow.SaveAsync(ct);
-
-        return loguotUserRes;
     }
 }

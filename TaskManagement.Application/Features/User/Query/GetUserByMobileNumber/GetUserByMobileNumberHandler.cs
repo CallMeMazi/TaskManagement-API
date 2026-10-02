@@ -1,11 +1,10 @@
 ﻿using MediatR;
 using TaskManagement.Application.DTOs.ResponseDTOs.User;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.User.Query.GetUserByMobileNumber;
 public class GetUserByMobileNumberHandler
-    : IRequestHandler<GetUserByMobileNumberQuery, GeneralResult<UserDetailsDto>>
+    : IRequestHandler<GetUserByMobileNumberQuery, UserDetailsDto>
 {
     private readonly IUserService _userService;
 
@@ -14,6 +13,6 @@ public class GetUserByMobileNumberHandler
         _userService = userService;
     }
 
-    public Task<GeneralResult<UserDetailsDto>> Handle(GetUserByMobileNumberQuery request, CancellationToken ct)
+    public Task<UserDetailsDto> Handle(GetUserByMobileNumberQuery request, CancellationToken ct)
         => _userService.GetUserByMobileNumberAsync(request.MobileNumber, ct);
 }

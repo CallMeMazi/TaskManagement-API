@@ -10,6 +10,6 @@ internal static class EntityIdAssigner
         if (entity.Id != 0)
             return;
 
-        entity.AssignId(idGenerator.NextId(entityClrType ?? entity.GetType()));
+        entity.AssignId(idGenerator.NextId(entityClrType ?? entity.GetType()).Result);
     }
 }

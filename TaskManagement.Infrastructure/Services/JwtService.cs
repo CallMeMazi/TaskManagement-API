@@ -64,11 +64,11 @@ public class JwtService : IJwtService
     {
         var accessTokenResult = GenerateAccessToken(tokenDto);
         if (!accessTokenResult.IsSuccess)
-            return GeneralResult<UserTokenDto>.Failure(null, accessTokenResult.Message);
+            return GeneralResult<UserTokenDto>.Failure(accessTokenResult.Message);
 
         var refreshTokenResult = GenerateRefreshToken();
         if (refreshTokenResult.IsSuccess)
-            return GeneralResult<UserTokenDto>.Failure(null, refreshTokenResult.Message);
+            return GeneralResult<UserTokenDto>.Failure(refreshTokenResult.Message);
 
         return GeneralResult<UserTokenDto>.Success(new UserTokenDto(accessTokenResult.Result!, refreshTokenResult.Result!));
     }
@@ -79,24 +79,24 @@ public class JwtService : IJwtService
             var validationParameters = GetTokenValidationParameters();
             var principal = new JwtSecurityTokenHandler().ValidateToken(token, validationParameters, out var securityToken);
             if (!(securityToken is JwtSecurityToken jwt && jwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature, StringComparison.InvariantCultureIgnoreCase)))
-                return GeneralResult<ClaimsPrincipal>.Failure(null, "توکن نامعتبر است!");
+                return GeneralResult<ClaimsPrincipal>.Failure("توکن نامعتبر است!");
 
             if (!ValidationDeviceId(principal, deviceId))
-                return GeneralResult<ClaimsPrincipal>.Failure(null, "توکن متعلق به این دستگاه نیست!");
+                return GeneralResult<ClaimsPrincipal>.Failure("توکن متعلق به این دستگاه نیست!");
 
             return GeneralResult<ClaimsPrincipal>.Success(principal);
         }
         catch (SecurityTokenExpiredException)
         {
-            return GeneralResult<ClaimsPrincipal>.Failure(null, "توکن منقضی شده است!");
+            return GeneralResult<ClaimsPrincipal>.Failure("توکن منقضی شده است!");
         }
         catch (SecurityTokenInvalidSignatureException)
         {
-            return GeneralResult<ClaimsPrincipal>.Failure(null, "امضای توکن نامعتبر است!");
+            return GeneralResult<ClaimsPrincipal>.Failure("امضای توکن نامعتبر است!");
         }
         catch (SecurityTokenException)
         {
-            return GeneralResult<ClaimsPrincipal>.Failure(null, "توکن معتبر نیست!");
+            return GeneralResult<ClaimsPrincipal>.Failure("توکن معتبر نیست!");
         }
 
         bool ValidationDeviceId(ClaimsPrincipal principal, string currentDeviceId)
@@ -109,7 +109,7 @@ public class JwtService : IJwtService
     {
         var principalResult = ValidateAccessTokenAndGetPrincipal(token, deviceId);
         if (!principalResult.IsSuccess)
-            return GeneralResult<long>.Failure(default, principalResult.Message);
+            return GeneralResult<long>.Failure(principalResult.Message);
 
         var userId = principalResult.Result!.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (userId.IsNullParameter())
@@ -118,13 +118,13 @@ public class JwtService : IJwtService
         if (long.TryParse(userId, out var id))
             return GeneralResult<long>.Success(id);
 
-        return GeneralResult<long>.Failure(default, "مقدار شناسه درون توکن نامعتبر است!");
+        return GeneralResult<long>.Failure("مقدار شناسه درون توکن نامعتبر است!");
     }
     public GeneralResult<string> GetSecurityStampFromAccessToken(string token, string deviceId)
     {
         var principalResult = ValidateAccessTokenAndGetPrincipal(token, deviceId);
         if (!principalResult.IsSuccess)
-            return GeneralResult<string>.Failure(null, principalResult.Message);
+            return GeneralResult<string>.Failure(principalResult.Message);
 
         var securityStamp = principalResult.Result!.FindFirst(new ClaimsIdentityOptions().SecurityStampClaimType)?.Value;
         if (securityStamp.IsNullParameter())
@@ -136,11 +136,11 @@ public class JwtService : IJwtService
     {
         var principalResul = ValidateAccessTokenAndGetPrincipal(token, deviceId);
         if (!principalResul.IsSuccess)
-            return GeneralResult<string>.Failure(null, principalResul.Message);
+            return GeneralResult<string>.Failure(principalResul.Message);
 
         var claim = principalResul.Result!.FindFirst(claimType)?.Value;
         if (claim.IsNullParameter())
-            return GeneralResult<string>.Failure(null, "مقدار مورد نظر در توکن یافت نشد!");
+            return GeneralResult<string>.Failure("مقدار مورد نظر در توکن یافت نشد!");
 
         return GeneralResult<string>.Success(claim!);
     }

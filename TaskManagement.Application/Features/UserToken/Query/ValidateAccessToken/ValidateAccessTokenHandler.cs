@@ -2,11 +2,10 @@
 using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.UserToken.Query.ValidateAccessToken;
 public class ValidateAccessTokenHandler
-    : IRequestHandler<ValidateAcceessTokenQuery, GeneralResult>
+    : IRequestHandler<ValidateAcceessTokenQuery>
 {
     private readonly IAuthServiec _authService;
     private readonly ICommonService _common;
@@ -17,10 +16,10 @@ public class ValidateAccessTokenHandler
         _common = common;
     }
 
-    public Task<GeneralResult> Handle(ValidateAcceessTokenQuery request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(ValidateAcceessTokenQuery request, CancellationToken ct)
     {
         var requestDto = _common.Mapper.Map<ValidateUserTokenAppDto>(request);
 
-        return _authService.ValidateAccessTokenAsync(requestDto, ct);
+        await _authService.ValidateAccessTokenAsync(requestDto, ct);
     }
 }

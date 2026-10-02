@@ -2,12 +2,11 @@
 using TaskManagement.Application.DTOs.RequestDTOs.User;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.User.Command.DeleteUser;
 
 public class DeleteUserHandler
-    : IRequestHandler<DeleteUserCommand, GeneralResult>
+    : IRequestHandler<DeleteUserCommand>
 {
     private readonly IUserService _userService;
     private readonly ICommonService _common;
@@ -18,7 +17,7 @@ public class DeleteUserHandler
         _common = common;
     }
 
-    public Task<GeneralResult> Handle(DeleteUserCommand request, CancellationToken ct)
+    public System.Threading.Tasks.Task Handle(DeleteUserCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<DeleteUserAppDto>(request);
 

@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Organization.Command.ChangeOrgActivity;
 public record ChangeOrgActivityCommand(
@@ -7,4 +6,4 @@ public record ChangeOrgActivityCommand(
     long OwnerId,
     string OwnerPassword,
     bool Activity
-) : IRequest<GeneralResult>;
+) : IRequest;

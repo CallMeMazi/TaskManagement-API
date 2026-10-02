@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Task.Command.AssignUserToTask;
 public record AssignUserToTaskCommand(
@@ -7,4 +6,4 @@ public record AssignUserToTaskCommand(
     long UserId,
     long TaskId,
     long ProjId
-) : IRequest<GeneralResult>;
+) : IRequest;

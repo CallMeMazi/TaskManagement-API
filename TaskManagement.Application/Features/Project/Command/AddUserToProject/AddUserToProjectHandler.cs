@@ -3,11 +3,10 @@ using TaskManagement.Application.DTOs.RequestDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.AddUserToProject;
 public class AddUserToProjectHandler
-    : IRequestHandler<AddUserToProjectCommand, GeneralResult>
+    : IRequestHandler<AddUserToProjectCommand>
 {
     private readonly IUnitOfWork _uow;
     private readonly IProjectService _projectSerivce;
@@ -20,14 +19,12 @@ public class AddUserToProjectHandler
         _uow = uow;
     }
 
-    public async Task<GeneralResult> Handle(AddUserToProjectCommand request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(AddUserToProjectCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<AddRemoveUserProjectAppDto>(request);
 
-        var addUserProjectRes = await _projectSerivce.AddUserToProjectAysnc(dto, ct);
+        await _projectSerivce.AddUserToProjectAysnc(dto, ct);
 
         await _uow.SaveAsync(ct);
-
-        return addUserProjectRes;
     }
 }

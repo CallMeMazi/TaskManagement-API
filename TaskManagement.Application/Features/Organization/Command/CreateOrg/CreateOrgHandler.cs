@@ -3,11 +3,10 @@ using TaskManagement.Application.DTOs.RequestDTOs.Organization;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Organization.Command.CreateOrg;
 public class CreateOrgHandler
-    : IRequestHandler<CreateOrgCommand, GeneralResult>
+    : IRequestHandler<CreateOrgCommand>
 {
     private readonly IUnitOfWork _uow;
     private readonly IOrganizationService _organizationService;
@@ -20,14 +19,12 @@ public class CreateOrgHandler
         _uow = uow;
     }
 
-    public async Task<GeneralResult> Handle(CreateOrgCommand request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(CreateOrgCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<CreateOrgAppDto>(request);
 
-        var createOrgRes = await _organizationService.CreateOrgAsync(dto, ct);
+        await _organizationService.CreateOrgAsync(dto, ct);
 
         await _uow.SaveAsync(ct);
-
-        return createOrgRes;
     }
 }

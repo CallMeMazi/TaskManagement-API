@@ -3,11 +3,10 @@ using TaskManagement.Application.DTOs.RequestDTOs.Task;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Task.Command.ChangeTaskType;
 public class ChangeTaskTypeHandler
-    : IRequestHandler<ChangeTaskTypeCommand, GeneralResult>
+    : IRequestHandler<ChangeTaskTypeCommand>
 {
     private readonly IUnitOfWork _uow;
     private readonly ITaskService _taskService;
@@ -20,14 +19,12 @@ public class ChangeTaskTypeHandler
         _uow = uow;
     }
 
-    public async Task<GeneralResult> Handle(ChangeTaskTypeCommand request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(ChangeTaskTypeCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<UserTaskAppDto>(request);
 
-        var changeTaskTypeRes = await _taskService.ChangeTaskTypeAsync(dto, ct);
+        await _taskService.ChangeTaskTypeAsync(dto, ct);
 
         await _uow.SaveAsync(ct);
-
-        return changeTaskTypeRes;
     }
 }

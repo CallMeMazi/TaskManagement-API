@@ -2,11 +2,10 @@
 using TaskManagement.Application.DTOs.RequestDTOs.Task;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Task.Command.DeleteTask;
 public class DeleteTaskHandler
-    : IRequestHandler<DeleteTaskCommand, GeneralResult>
+    : IRequestHandler<DeleteTaskCommand>
 {
     private readonly ITaskService _taskService;
     private readonly ICommonService _common;
@@ -17,7 +16,7 @@ public class DeleteTaskHandler
         _common = common;
     }
 
-    public Task<GeneralResult> Handle(DeleteTaskCommand request, CancellationToken ct)
+    public System.Threading.Tasks.Task Handle(DeleteTaskCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<UserTaskAppDto>(request);
 

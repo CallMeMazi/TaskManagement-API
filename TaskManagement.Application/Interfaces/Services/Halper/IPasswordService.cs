@@ -1,7 +1,9 @@
-﻿namespace TaskManagement.Application.Interfaces.Services.Halper;
+﻿using TaskManagement.Common.Classes;
+
+namespace TaskManagement.Application.Interfaces.Services.Halper;
 public interface IPasswordService
 {
-    string Hash(string password);
-    bool Verify(string hashedPassword, string providedPassword);
+    GeneralResult<string> Hash(string password);
+    GeneralResult Verify(string hashedPassword, string providedPassword);
     void VerifyAndCheck(string hashedPassword, string providedPassword, string message);
 }

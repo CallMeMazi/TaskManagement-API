@@ -25,7 +25,7 @@ public class OrganizationService : IOrganizationService
     }
 
     // Query methods
-    public async Task<GeneralResult<OrgDetailsDto>> GetOrgByIdAsync(long id, CancellationToken ct)
+    public async Task<OrgDetailsDto> GetOrgByIdAsync(long id, CancellationToken ct)
     {
         var org = await _uow.Organization.GetByIdAsync(id, false, ct);
 
@@ -34,9 +34,9 @@ public class OrganizationService : IOrganizationService
 
         var orgDto = _common.Mapper.Map<OrgDetailsDto>(org);
 
-        return GeneralResult<OrgDetailsDto>.Success(orgDto);
+        return orgDto;
     }
-    public async Task<GeneralResult<OrgDetailsDto>> GetOrgByCodeAsync(string orgCode, CancellationToken ct)
+    public async Task<OrgDetailsDto> GetOrgByCodeAsync(string orgCode, CancellationToken ct)
     {
         var org = await _uow.Organization.GetByFilterAsync(o => o.OrgCode == orgCode, false, ct);
 
@@ -45,11 +45,11 @@ public class OrganizationService : IOrganizationService
 
         var orgDto = _common.Mapper.Map<OrgDetailsDto>(org);
 
-        return GeneralResult<OrgDetailsDto>.Success(orgDto);
+        return orgDto;
     }
 
     // command services
-    public async Task<GeneralResult> CreateOrgAsync(CreateOrgAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task CreateOrgAsync(CreateOrgAppDto command, CancellationToken ct)
     {
         await _orgDomainService.EnsureCanCreateOrgAsync(command.SecondOrgName, command.OwnerId, ct);
 
@@ -59,10 +59,8 @@ public class OrganizationService : IOrganizationService
 
         // Create relation between owner(User) and Org
         await CreateOrgMemberShipAsync(org.Id, command.OwnerId, OrganizationRole.Owner, ct);
-
-        return GeneralResult.Success()!;
     }
-    public async Task<GeneralResult> UpdateOrgAsync(UpdateOrgAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task UpdateOrgAsync(UpdateOrgAppDto command, CancellationToken ct)
     {
         var org = await _uow.Organization.GetByIdAsync(command.OrgId, true, ct);
         if (org.IsNullParameter())
@@ -74,10 +72,8 @@ public class OrganizationService : IOrganizationService
         await _orgDomainService.EnsureCanUpdateOrgAsync(command.SecondOrgName, org.Id, ct);
 
         org.UpdateOrg(command.OrgName, command.SecondOrgName, command.OrgDescription);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> SoftDeleteOrgAsync(DeleteOrgAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task SoftDeleteOrgAsync(DeleteOrgAppDto command, CancellationToken ct)
     {
         // This method use SP (Stored Procedure)
 
@@ -88,8 +84,7 @@ public class OrganizationService : IOrganizationService
         if (org!.OwnerId != command.OwnerId)
             throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید آن را حذف کنید!");
 
-        if (!_common.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
-            throw new ValidationFailureException("رمز عبور اشتباه است!");
+        _common.Password.VerifyAndCheck(org.Owner.PasswordHash, command.OwnerPassword, "رمز عبور اشتباه است!");
 
         await _orgDomainService.EnsureCanDeactiveOrgAsync(org.Id, ct);
 
@@ -102,10 +97,8 @@ public class OrganizationService : IOrganizationService
         // Delete All TaskAssignments By ProjectId (SP)
         // Delete All TaslInfos By TaskId (SP)
         await _uow.User.SoftDeleteUserSpAsync(org.Id, ct);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeOrgActivityAsync(ChangeActivityOrgAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeOrgActivityAsync(ChangeActivityOrgAppDto command, CancellationToken ct)
     {
         var org = await _uow.Organization.GetOrgByIdWithOwnerAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
@@ -114,26 +107,21 @@ public class OrganizationService : IOrganizationService
         if (org!.OwnerId != command.OwnerId)
             throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید آن را ویرایش کنید!");
 
-        if (!_common.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
-            throw new ValidationFailureException("رمز عبور اشتباه است!");
+        _common.Password.VerifyAndCheck(org.Owner.PasswordHash, command.OwnerPassword, "رمز عبور اشتباه است!");
 
         if (org.IsActive && !command.Activity)
             await _orgDomainService.EnsureCanDeactiveOrgAsync(org.Id, ct);
 
         org.ChangeOrgActivity(command.Activity);
-
-        return GeneralResult.Success();
     }
     // Org MemberShip methods
-    public async Task<GeneralResult> AddUserToOrgAsync(AddUserOrgAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task AddUserToOrgAsync(AddUserOrgAppDto command, CancellationToken ct)
     {
         await _orgDomainService.EnsureCanUserAddToOrgAsync(command.OrgId, command.UserId, ct);
 
         await CreateOrgMemberShipAsync(command.OrgId, command.UserId, OrganizationRole.Member, ct);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RemoveUserFromOrgAsync(RemoveUserOrgAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task RemoveUserFromOrgAsync(RemoveUserOrgAppDto command, CancellationToken ct)
     {
         var org = await _uow.Organization.GetByIdAsync(command.OrgId, true, ct);
         if (org.IsNullParameter())
@@ -155,10 +143,8 @@ public class OrganizationService : IOrganizationService
         await _orgDomainService.EnsureCanRemoveUserFromOrgAsync(command.OrgId, command.UserId, ct);
 
         orgMemberShip!.SoftDelete();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> LeaveUserFromOrgAsync(LeaveUserOrgAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task LeaveUserFromOrgAsync(LeaveUserOrgAppDto command, CancellationToken ct)
     {
         var org = await _uow.Organization.GetByIdAsync(command.OrgId, true, ct);
         if (org.IsNullParameter())
@@ -177,10 +163,8 @@ public class OrganizationService : IOrganizationService
         await _orgDomainService.EnsureCanRemoveUserFromOrgAsync(command.OrgId, command.UserId, ct);
 
         orgMemberShip!.SoftDelete();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeUserRoleToAdminAsync(ChangeUserRoleOrgAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeUserRoleToAdminAsync(ChangeUserRoleOrgAppDto command, CancellationToken ct)
     {
         var org = await _uow.Organization.GetByIdAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
@@ -199,10 +183,8 @@ public class OrganizationService : IOrganizationService
             throw new NotFoundException("کاربری با این شناسه در سازمان وجود ندارد!");
 
         orgMemberShip!.ChangeUserOrgRole(OrganizationRole.Admin);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeUserRoleToMemberAsync(ChangeUserRoleOrgAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeUserRoleToMemberAsync(ChangeUserRoleOrgAppDto command, CancellationToken ct)
     {
         var org = await _uow.Organization.GetByIdAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
@@ -223,8 +205,6 @@ public class OrganizationService : IOrganizationService
         await _orgDomainService.EnsureCanChangeRoleToMemberAsync(command.UserId, org.Id, ct);
 
         orgMemberShip!.ChangeUserOrgRole(OrganizationRole.Member);
-
-        return GeneralResult.Success();
     }
 
     private async System.Threading.Tasks.Task CreateOrgMemberShipAsync(long orgId, long userId, OrganizationRole role, CancellationToken ct)

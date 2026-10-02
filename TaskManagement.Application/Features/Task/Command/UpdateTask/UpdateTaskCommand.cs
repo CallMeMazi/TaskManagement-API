@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Task.Command.UpdateTask;
 public record UpdateTaskCommand(
@@ -8,4 +7,4 @@ public record UpdateTaskCommand(
     string TaskName,
     string TaskDescription,
     DateTime TaskDeadLine
-) : IRequest<GeneralResult>;
+) : IRequest;

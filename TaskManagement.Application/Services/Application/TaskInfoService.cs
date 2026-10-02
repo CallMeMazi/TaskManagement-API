@@ -21,7 +21,7 @@ public class TaskInfoService : ITaskInfoService
     }
 
     // Query methods
-    public async Task<GeneralResult<TaskInfoDetailsDto>> GetTaskInfoByIdAsync(long taskInfoId, CancellationToken ct)
+    public async Task<TaskInfoDetailsDto> GetTaskInfoByIdAsync(long taskInfoId, CancellationToken ct)
     {
         var taskInfo = await _uow.TaskInfo.GetByIdAsync(taskInfoId, false, ct);
 
@@ -30,11 +30,11 @@ public class TaskInfoService : ITaskInfoService
 
         var taskInfoDto = _common.Mapper.Map<TaskInfoDetailsDto>(taskInfo);
 
-        return GeneralResult<TaskInfoDetailsDto>.Success(taskInfoDto);
+        return taskInfoDto;
     }
 
     // Command methods
-    public async Task<GeneralResult> CreateTaskInfoAsync(CreateTaskInfoAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task CreateTaskInfoAsync(CreateTaskInfoAppDto command, CancellationToken ct)
     {
         var taskAssignment = await _uow.TaskAssignment.GetByFilterAsync(ta =>
             ta.TaskId == command.TaskId
@@ -48,7 +48,5 @@ public class TaskInfoService : ITaskInfoService
         var taskInfo = _common.Mapper.Map<TaskInfo>(taskAssignment, opt => opt.Items[nameof(TaskInfo.TaskInfoDescription)] = command.TaskInfoDescription);
 
         await _uow.TaskInfo.AddAsync(taskInfo, ct);
-
-        return GeneralResult.Success();
     }
 }

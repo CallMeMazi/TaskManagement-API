@@ -2,11 +2,10 @@
 using TaskManagement.Application.DTOs.RequestDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.DeleteProject;
 public class DeleteProjectHandler
-    : IRequestHandler<DeleteProjectCommand, GeneralResult>
+    : IRequestHandler<DeleteProjectCommand>
 {
     private readonly IProjectService _projectService;
     private readonly ICommonService _common;
@@ -17,7 +16,7 @@ public class DeleteProjectHandler
         _common = common;
     }
 
-    public Task<GeneralResult> Handle(DeleteProjectCommand request, CancellationToken ct)
+    public System.Threading.Tasks.Task Handle(DeleteProjectCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<UserProjectAppDto>(request);
 

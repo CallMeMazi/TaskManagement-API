@@ -3,11 +3,10 @@ using TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Invitation.Command.RevokeInvitation;
 public class RevokeInvitationHandler
-    : IRequestHandler<RevokeInvitationCommand, GeneralResult>
+    : IRequestHandler<RevokeInvitationCommand>
 {
     private readonly IUnitOfWork _uow;
     private readonly IInvitationService _invitationService;
@@ -20,14 +19,12 @@ public class RevokeInvitationHandler
         _uow = uow;
     }
 
-    public async Task<GeneralResult> Handle(RevokeInvitationCommand request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(RevokeInvitationCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<RevokeOrgInvitationAppDto>(request);
 
-        var revokeInvateRes = await _invitationService.RevokeInvitationAsync(dto, ct);
+        await _invitationService.RevokeInvitationAsync(dto, ct);
 
         await _uow.SaveAsync(ct);
-
-        return revokeInvateRes;
     }
 }

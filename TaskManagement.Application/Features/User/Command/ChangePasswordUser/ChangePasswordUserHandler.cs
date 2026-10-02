@@ -4,12 +4,11 @@ using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.User.Command.ChangePasswordUser;
 
 public record ChangePasswordUserHandler
-    : IRequestHandler<ChangePasswordUserCommand, GeneralResult>
+    : IRequestHandler<ChangePasswordUserCommand>
 {
     private readonly IUnitOfWork _uow;
     private readonly IUserService _userService;
@@ -25,18 +24,17 @@ public record ChangePasswordUserHandler
         _uow = uow;
     }
 
-    public async Task<GeneralResult> Handle(ChangePasswordUserCommand request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(ChangePasswordUserCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<ChangePasswordUserAppDto>(request);
 
         await _userService.ChangePasswordUserAsync(dto, ct);
 
+        var revokeDto = _common.Mapper.Map<RevokeUserTokenAppDto>(request);
+
         // revoke all User tokens except current
-        var changePassUserRes = await _authService.RevokeAllTokensExceptCurrentByUserIdAsync
-            (new RevokeUserTokenAppDto(request.UserId, request.DeviceId), ct);
+        await _authService.RevokeAllTokensExceptCurrentByUserIdAsync(revokeDto, ct);
 
         await _uow.SaveAsync(ct);
-
-        return changePassUserRes;
     }
 }

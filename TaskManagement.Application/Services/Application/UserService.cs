@@ -25,7 +25,7 @@ public class UserService : IUserService
     }
 
     // Query methods
-    public async Task<GeneralResult<UserDetailsDto>> GetUserByIdAsync(long id, CancellationToken ct)
+    public async Task<UserDetailsDto> GetUserByIdAsync(long id, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(id, false, ct);
         if (user.IsNullParameter())
@@ -33,9 +33,9 @@ public class UserService : IUserService
 
         var userDto = _common.Mapper.Map<UserDetailsDto>(user);
 
-        return GeneralResult<UserDetailsDto>.Success(userDto);
+        return userDto;
     }
-    public async Task<GeneralResult<UserDetailsDto>> GetUserByMobileNumberAsync(string mobileNumber, CancellationToken ct)
+    public async Task<UserDetailsDto> GetUserByMobileNumberAsync(string mobileNumber, CancellationToken ct)
     {
         var user = await _uow.User.GetByFilterAsync(u => u.MobileNumber == mobileNumber, false, ct);
         if (user == null)
@@ -43,11 +43,11 @@ public class UserService : IUserService
 
         var userDto = _common.Mapper.Map<UserDetailsDto>(user);
 
-        return GeneralResult<UserDetailsDto>.Success(userDto);
+        return userDto;
     }
 
     // Command methods
-    public async Task<GeneralResult<long>> CreateUserAsync(CreateUserAppDto command, CancellationToken ct)
+    public async Task<long> CreateUserAsync(CreateUserAppDto command, CancellationToken ct)
     {
         // Check mobile number exist
         await _userDomainService.EnsureCanCreateUserAsync(command.MobileNumber, ct);
@@ -57,19 +57,17 @@ public class UserService : IUserService
 
         await _uow.User.AddAsync(user, ct);
 
-        return GeneralResult<long>.Success(user.Id);
+        return user.Id;
     }
-    public async Task<GeneralResult> UpdateUserAsync(UpdateUserAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task UpdateUserAsync(UpdateUserAppDto command, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(command.UserId, true, ct);
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(UpdateUserAsync)} method!");
 
         user!.UpdateUser(command.Email, command.FirstName, command.LastName);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> SoftDeleteUserAsync(DeleteUserAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task SoftDeleteUserAsync(DeleteUserAppDto command, CancellationToken ct)
     {
         // This method use SP (Stored Procedure)
 
@@ -94,10 +92,8 @@ public class UserService : IUserService
         // Delete All TaskAssignments By ProjectId (SP)
         // Delete All TaslInfos By TaskId (SP)
         await _uow.User.SoftDeleteUserSpAsync(user.Id, ct);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangePasswordUserAsync(ChangePasswordUserAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangePasswordUserAsync(ChangePasswordUserAppDto command, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(command.UserId, true, ct);
         if (user.IsNullParameter())
@@ -105,28 +101,22 @@ public class UserService : IUserService
 
         _common.Password.VerifyAndCheck(user!.PasswordHash, command.OldPassword, "رمز عبور اشتباه است!");
 
-        user.ChangeUserPassword(_common.Password.Hash(command.NewPassword));
-
-        return GeneralResult.Success();
+        user.ChangeUserPassword(_common.Password.Hash(command.NewPassword).Result!);
     }
-    public async Task<GeneralResult> IncreaseUserPointsAsync(long id, CancellationToken ct)
+    public async System.Threading.Tasks.Task IncreaseUserPointsAsync(long id, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(id, true, ct);
         if (user.IsNullParameter())
             throw new Exception($"user by {id} ID was not found. in {nameof(IncreaseUserPointsAsync)} method!");
 
         user!.IncreaseOrDecreasePoints(_common.AppSettings.UserSetting.PositiveUserPoints);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> DecreaseUserPointsAsync(long id, CancellationToken ct)
+    public async System.Threading.Tasks.Task DecreaseUserPointsAsync(long id, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(id, true, ct);
         if (user.IsNullParameter())
             throw new Exception($"user by {id} ID was not found. in {nameof(DecreaseUserPointsAsync)} method!");
 
         user!.IncreaseOrDecreasePoints(_common.AppSettings.UserSetting.NegativeUserPoints);
-
-        return GeneralResult.Success();
     }
 }

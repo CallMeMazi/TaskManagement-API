@@ -5,12 +5,11 @@ using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.User.Command.CreateUser;
 
 public class CreateUserHandler
-    : IRequestHandler<CreateUserCommand, GeneralResult<UserTokenDto>>
+    : IRequestHandler<CreateUserCommand, UserTokenDto>
 {
     private readonly IUnitOfWork _uow;
     private readonly IUserService _userService;
@@ -26,19 +25,24 @@ public class CreateUserHandler
         _common = common;
     }
 
-    public async Task<GeneralResult<UserTokenDto>> Handle(CreateUserCommand request, CancellationToken ct)
+    public async Task<UserTokenDto> Handle(CreateUserCommand request, CancellationToken ct)
     {
         var dto = _common.Mapper.Map<CreateUserAppDto>(request);
 
         // Create User And Return UserID
-        var createUserRes = await _userService.CreateUserAsync(dto, ct);
+        var userId = await _userService.CreateUserAsync(dto, ct);
 
         // Generate User tokens(regester) after creation
-        var generateUserTokenRes = await _authService.RegisterUserAsync
-            (new RegisterUserTokenAppDto(createUserRes.Result, request.DeviceId, request.UserIp, request.UserAgent), ct);
+        var userTokenDto = await _authService.RegisterUserAsync(new RegisterUserTokenAppDto(
+            userId,
+            request.DeviceId,
+            request.UserIp,
+            request.UserAgent),
+            ct
+        );
 
         await _uow.SaveAsync(ct);
 
-        return generateUserTokenRes;
+        return userTokenDto;
     }
 }

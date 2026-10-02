@@ -1,11 +1,10 @@
 ﻿using MediatR;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.UserToken.Command.RevokeAllTokensByUserId;
 public class RevokeAllTokensByUserIdHandler
-    : IRequestHandler<RevokeAllTokensByUserIdCommand, GeneralResult>
+    : IRequestHandler<RevokeAllTokensByUserIdCommand>
 {
     private readonly IUnitOfWork _uow;
     private readonly IAuthServiec _authService;
@@ -16,12 +15,10 @@ public class RevokeAllTokensByUserIdHandler
         _uow = uow;
     }
 
-    public async Task<GeneralResult> Handle(RevokeAllTokensByUserIdCommand request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(RevokeAllTokensByUserIdCommand request, CancellationToken ct)
     {
-        var revokeAllTokens = await _authService.RevokeAllTokensByUserIdAsync(request.UserId, ct);
+        await _authService.RevokeAllTokensByUserIdAsync(request.UserId, ct);
 
         await _uow.SaveAsync(ct);
-
-        return revokeAllTokens;
     }
 }

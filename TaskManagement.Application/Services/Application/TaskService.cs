@@ -25,7 +25,7 @@ public class TaskService : ITaskService
     }
 
     // Query methods
-    public async Task<GeneralResult<TaskDetailsDto>> GetTaskByIdAsync(long taskId, CancellationToken ct)
+    public async Task<TaskDetailsDto> GetTaskByIdAsync(long taskId, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(taskId, false, ct);
         if (task.IsNullParameter())
@@ -33,11 +33,11 @@ public class TaskService : ITaskService
 
         var taskDto = _common.Mapper.Map<TaskDetailsDto>(task);
 
-        return GeneralResult<TaskDetailsDto>.Success(taskDto);
+        return taskDto;
     }
 
     // Command methods
-    public async Task<GeneralResult> CreateTaskAsync(CreateTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task CreateTaskAsync(CreateTaskAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetProjectByIdWithMembersAsync(command.ProjId, false, ct);
         if (project.IsNullParameter())
@@ -60,10 +60,8 @@ public class TaskService : ITaskService
             );
         else
             await CreateTaskAssignmentAsync(task.Id, command.UserIds!.First(), command.ProjId, ct);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> UpdateTaskAsync(UpdateTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task UpdateTaskAsync(UpdateTaskAppDto command, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(command.TaskId, true, ct);
         if (task.IsNullParameter())
@@ -72,10 +70,8 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
         task!.UpdateTask(command.TaskName, command.TaskDescription, command.TaskDeadLine);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> SoftDeleteTaskAsync(UserTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task SoftDeleteTaskAsync(UserTaskAppDto command, CancellationToken ct)
     {
         // This method use SP (Stored Procedure)
 
@@ -89,10 +85,8 @@ public class TaskService : ITaskService
         // Delete All TaskAssignments By TaskId (SP)
         // Delete All TaslInfos By TaskId (SP)
         await _uow.Task.SoftDeleteTaskSpAsync(task!.Id, ct);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeTaskActivityAsync(ChangeTaskActivityAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeTaskActivityAsync(ChangeTaskActivityAppDto command, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(command.TaskId, true, ct);
         if (task.IsNullParameter())
@@ -101,10 +95,8 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
         task!.ChangeTaskActivity(command.Activity);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> CancelTaskAsync(UserTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task CancelTaskAsync(UserTaskAppDto command, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(command.TaskId, true, ct);
         if (task.IsNullParameter())
@@ -113,10 +105,8 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
         task!.CancelTask();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> DeadTaskAsync(UserTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task DeadTaskAsync(UserTaskAppDto command, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(command.TaskId, true, ct);
         if (task.IsNullParameter())
@@ -125,10 +115,8 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
         task!.DeadTask();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> FinishTaskAsync(UserTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task FinishTaskAsync(UserTaskAppDto command, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(command.TaskId, true, ct);
         if (task.IsNullParameter())
@@ -137,10 +125,8 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskStateAsync(task!, command.UserId, ct);
 
         task!.FinishTask();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeTaskProgressAsync(ChangeTaskProgressAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeTaskProgressAsync(ChangeTaskProgressAppDto command, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(command.TaskId, true, ct);
         if (task.IsNullParameter())
@@ -149,10 +135,8 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureUserHasAdminRoleAsync(task!, command.UserId, ct);
 
         task!.ChangeTaskProgress(command.TaskProgress);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeTaskTypeAsync(UserTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeTaskTypeAsync(UserTaskAppDto command, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(command.TaskId, true, ct);
         if (task!.IsNullParameter())
@@ -161,11 +145,9 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanChangeTaskTypeAsync(task!, command.UserId, ct);
 
         task!.ChangeTaskType();
-
-        return GeneralResult.Success();
     }
     // Task Assignment methods
-    public async Task<GeneralResult> AssignUserToTaskAsync(AddRemoveUserTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task AssignUserToTaskAsync(AddRemoveUserTaskAppDto command, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(command.TaskId, false, ct);
         if (task.IsNullParameter())
@@ -174,10 +156,8 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanAssignUserToTaskAsync(task!, command.OwnerId, ct);
 
         await CreateTaskAssignmentAsync(command.TaskId, command.UserId, command.ProjId, ct);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RemoveUserFromTaskAsync(AddRemoveUserTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task RemoveUserFromTaskAsync(AddRemoveUserTaskAppDto command, CancellationToken ct)
     {
         var task = await _uow.Task.GetByIdAsync(command.TaskId, false, ct);
         if (task.IsNullParameter())
@@ -198,10 +178,8 @@ public class TaskService : ITaskService
             throw new ConflictException("کاربر درحال انجام تسک هست و نمیتوانید آن را حذف کنید!");
 
         taskAssignment.SoftDelete();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> StartTaskAsync(UserTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task StartTaskAsync(UserTaskAppDto command, CancellationToken ct)
     {
         var taskAssignment = await _uow.TaskAssignment.GetByFilterAsync(ta =>
             ta.UserId == command.UserId
@@ -215,10 +193,8 @@ public class TaskService : ITaskService
         await _taskDomainService.EnsureCanUserStartTaskAsync(command.TaskId, ct);
 
         taskAssignment!.ChangeTaskInProgress(true);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> EndTaskAsync(UserTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task EndTaskAsync(UserTaskAppDto command, CancellationToken ct)
     {
         var taskAssignment = await _uow.TaskAssignment.GetByFilterAsync(ta =>
             ta.UserId == command.UserId
@@ -230,8 +206,6 @@ public class TaskService : ITaskService
             throw new NotFoundException("اطلاعات نامعتبر است!");
 
         taskAssignment!.ChangeTaskInProgress(false);
-
-        return GeneralResult.Success();
     }
 
     private async System.Threading.Tasks.Task CheckUserIdsAndCreateTaskAssignmentsAsync(List<long> userIds, List<long> memberIds, long taskId

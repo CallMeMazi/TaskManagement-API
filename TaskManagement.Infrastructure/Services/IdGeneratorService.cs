@@ -1,5 +1,6 @@
 using TaskManagement.Application.DTOs.InternalDTOs.Common;
 using TaskManagement.Application.Interfaces.Services.Halper;
+using TaskManagement.Common.Classes;
 using TaskManagement.Common.Settings;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Enums.Types.Application;
@@ -58,27 +59,31 @@ public class IdGeneratorService : IIdGeneratorService
     {
         var workerId = appSettings.IdGeneratorSetting?.WorkerId ?? 0;
         if (workerId > WorkerMask)
-            throw new ArgumentOutOfRangeException(nameof(appSettings), $"WorkerId must be between 0 and {WorkerMask}.");
+            throw new ArgumentOutOfRangeException(nameof(appSettings), $"WorkerId must be between 0 and {WorkerMask}. In {nameof(IdGeneratorService)} Constractor!");
 
         _workerId = workerId;
     }
 
 
-    public long NextId(Type entityClrType)
+    public GeneralResult<long> NextId(Type entityClrType)
     {
         if (entityClrType is null)
-            throw new ArgumentNullException(nameof(entityClrType));
+            return GeneralResult<long>.Failure($"The entity type is null. In {nameof(NextId)} method!");
 
         if (!EntityTypeMap.TryGetValue(entityClrType, out var entityType))
-            throw new InvalidOperationException($"No id mapping is registered for '{entityClrType.Name}'.");
+            return GeneralResult<long>.Failure($"No id mapping is registered for '{entityClrType.Name}'. In {nameof(NextId)} method!");
 
-        return NextId(entityType);
+        var idResult = NextId(entityType);
+        if (!idResult.IsSuccess)
+            return GeneralResult<long>.Failure(idResult.Message);
+
+        return GeneralResult<long>.Success(idResult.Result);
     }
-    public long NextId(EntityType entityType)
+    public GeneralResult<long> NextId(EntityType entityType)
     {
         var entityValue = (long)entityType;
         if (entityValue < 0 || entityValue > EntityMask)
-            throw new ArgumentOutOfRangeException(nameof(entityType), "Entity type does not fit in the 5-bit tag.");
+            return GeneralResult<long>.Failure($"Entity type does not fit in the 5-bit tag. In {nameof(NextId)} method!");
 
         lock (_sync)
         {
@@ -98,34 +103,46 @@ public class IdGeneratorService : IIdGeneratorService
             }
 
             _lastTimestamp = timestamp;
-            return Pack(timestamp, entityValue, _workerId, _sequence, CurrentVersion);
+            var id = Pack(timestamp, entityValue, _workerId, _sequence, CurrentVersion);
+
+            return GeneralResult<long>.Success(id);
         }
     }
-    public EntityType GetEntityType(long id)
+    public GeneralResult<EntityType> GetEntityType(long id)
     {
-        return Decode(id).EntityType;
+        var idPartsResult = Decode(id);
+        if (!idPartsResult.IsSuccess)
+            return GeneralResult<EntityType>.Failure(idPartsResult.Message);
+
+        return GeneralResult<EntityType>.Success(idPartsResult.Result.EntityType);
     }
-    public EntityIdPartsInternalDto Decode(long id)
+    public GeneralResult<EntityIdPartsInternalDto> Decode(long id)
     {
         if (id <= 0)
-            throw new ArgumentOutOfRangeException(nameof(id), "Id must be a positive generated value.");
+            return GeneralResult<EntityIdPartsInternalDto>.Failure($"Id must be a positive generated value. In {nameof(Decode)} method!");
 
         var version = (byte)((id >> VersionShift) & VersionMask);
         if (version != CurrentVersion)
-            throw new InvalidOperationException($"Unsupported id version '{version}'.");
+            return GeneralResult<EntityIdPartsInternalDto>.Failure($"Unsupported id version '{version}'. In {nameof(Decode)} method!");
 
         var sequence = (int)((id >> SequenceShift) & SequenceMask);
         var workerId = (byte)((id >> WorkerShift) & WorkerMask);
         var entityType = (EntityType)((id >> EntityShift) & EntityMask);
         var timestampMs = (id >> TimestampShift) & TimestampMask;
 
-        return new(timestampMs, entityType, workerId, sequence, version);
-    }
-    public bool ValidateTypeId(long id, EntityType entityType)
-    {
-        var idParts = Decode(id);
+        var idParts = new EntityIdPartsInternalDto(timestampMs, entityType, workerId, sequence, version);
 
-        return idParts.EntityType == entityType;
+        return GeneralResult<EntityIdPartsInternalDto>.Success(idParts);
+    }
+    public GeneralResult ValidateTypeId(long id, EntityType entityType)
+    {
+        var idPartsResult = Decode(id);
+        if (!idPartsResult.IsSuccess)
+            return GeneralResult.Failure(idPartsResult.Message);
+
+        return idPartsResult.Result.EntityType == entityType 
+            ? GeneralResult.Success()
+            : GeneralResult.Failure();
     }
 
     private static long Pack(long timestamp, long entityType, byte workerId, int sequence, byte version)
