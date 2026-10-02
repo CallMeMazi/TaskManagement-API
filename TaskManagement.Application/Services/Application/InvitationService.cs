@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
+﻿using TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
 using TaskManagement.Application.DTOs.ResponseDTOs.Invitation;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
@@ -15,16 +15,14 @@ public class InvitationService : IInvitationService
 {
     private readonly IUnitOfWork _uow;
     private readonly IInvitationDomainService _invitationDomainService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-
-    public InvitationService(IUnitOfWork uow, IMapper mapper, IInvitationDomainService invitationDomainService)
+    public InvitationService(IUnitOfWork uow, IInvitationDomainService invitationDomainService, ICommonService common)
     {
         _uow = uow;
         _invitationDomainService = invitationDomainService;
-        _mapper = mapper;
+        _common = common;
     }
-
 
     // Query methods
     public async Task<GeneralResult<OrgInvitationDetailsDto>> GetOrgInvitationByIdAsync(long id, CancellationToken ct)
@@ -33,7 +31,7 @@ public class InvitationService : IInvitationService
         if (invitation.IsNullParameter())
             throw new NotFoundException("درخواست دعوتی با این آیدی وجود ندارد!");
 
-        var invitationDto = _mapper.Map<OrgInvitationDetailsDto>(invitation);
+        var invitationDto = _common.Mapper.Map<OrgInvitationDetailsDto>(invitation);
 
         return GeneralResult<OrgInvitationDetailsDto>.Success(invitationDto);
     }
@@ -48,7 +46,7 @@ public class InvitationService : IInvitationService
         if (invitation.IsNullParameter())
             throw new NotFoundException("درخواست دعوت فعالی با این آیدی وجود ندارد!");
 
-        var invitationDto = _mapper.Map<OrgInvitationDetailsDto>(invitation);
+        var invitationDto = _common.Mapper.Map<OrgInvitationDetailsDto>(invitation);
 
         return GeneralResult<OrgInvitationDetailsDto>.Success(invitationDto);
     }
@@ -58,7 +56,7 @@ public class InvitationService : IInvitationService
         if (invitations.IsNullParameter() || !invitations.Any())
             throw new NotFoundException("درخواست دعوتی با این آیدی سازمان وجود ندارد!");
 
-        var invitationsDto = _mapper.Map<List<OrgInvitationDetailsDto>>(invitations);
+        var invitationsDto = _common.Mapper.Map<List<OrgInvitationDetailsDto>>(invitations);
 
         return GeneralResult<List<OrgInvitationDetailsDto>>.Success(invitationsDto);
     }
@@ -73,7 +71,7 @@ public class InvitationService : IInvitationService
         if (invitations.IsNullParameter() || !invitations.Any())
             throw new NotFoundException("درخواست دعوت فعالی با این آیدی سازمان وجود ندارد!");
 
-        var invitationsDto = _mapper.Map<List<OrgInvitationDetailsDto>>(invitations);
+        var invitationsDto = _common.Mapper.Map<List<OrgInvitationDetailsDto>>(invitations);
 
         return GeneralResult<List<OrgInvitationDetailsDto>>.Success(invitationsDto);
     }

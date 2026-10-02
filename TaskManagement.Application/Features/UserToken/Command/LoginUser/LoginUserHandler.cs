@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
@@ -12,18 +12,18 @@ public class LoginUserHandler
 {
     private readonly IUnitOfWork _uow;
     private readonly IAuthServiec _authService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public LoginUserHandler(IAuthServiec authService, IMapper mapper, IUnitOfWork uow)
+    public LoginUserHandler(IAuthServiec authService, ICommonService common, IUnitOfWork uow)
     {
         _authService = authService;
-        _mapper = mapper;
+        _common = common;
         _uow = uow;
     }
 
     public async Task<GeneralResult<UserTokenDto>> Handle(LoginUserCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<LoginUserAppDto>(request);
+        var dto = _common.Mapper.Map<LoginUserAppDto>(request);
 
         var loginUserRes = await _authService.LoginUserAsync(dto, ct);
 

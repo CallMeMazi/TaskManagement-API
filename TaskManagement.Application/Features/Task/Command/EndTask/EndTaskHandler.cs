@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Task;
 using TaskManagement.Application.DTOs.RequestDTOs.TaskInfo;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
@@ -13,19 +13,20 @@ public class EndTaskHandler
     private readonly IUnitOfWork _uow;
     private readonly ITaskService _taskService;
     private readonly ITaskInfoService _taskInfoService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public EndTaskHandler(ITaskService taskService, ITaskInfoService taskInfoService, IMapper mapper, IUnitOfWork uow)
+    public EndTaskHandler(ITaskService taskService, ITaskInfoService taskInfoService, ICommonService common
+        , IUnitOfWork uow)
     {
         _taskService = taskService;
         _taskInfoService = taskInfoService;
-        _mapper = mapper;
+        _common = common;
         _uow = uow;
     }
 
     public async Task<GeneralResult> Handle(EndTaskCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<UserTaskAppDto>(request);
+        var dto = _common.Mapper.Map<UserTaskAppDto>(request);
 
         await _taskService.EndTaskAsync(dto, ct);
 

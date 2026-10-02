@@ -1,4 +1,3 @@
-using AutoMapper;
 using TaskManagement.Application.DTOs.RequestDTOs.Project;
 using TaskManagement.Application.DTOs.ResponseDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
@@ -17,19 +16,14 @@ public class ProjectService : IProjectService
 {
     private readonly IUnitOfWork _uow;
     private readonly IProjectDomainService _projectDomainService;
-    private readonly ICommonService _commonService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-
-    public ProjectService(IUnitOfWork uow, IProjectDomainService projectDomainService, ICommonService commonService
-        , IMapper mapper)
+    public ProjectService(IUnitOfWork uow, IProjectDomainService projectDomainService, ICommonService common)
     {
         _uow = uow;
         _projectDomainService = projectDomainService;
-        _commonService = commonService;
-        _mapper = mapper;
+        _common = common;
     }
-
 
     // Query methods
     public async Task<GeneralResult<ProjectDetailsDto>> GetProjectByIdAsync(long projId, CancellationToken ct)
@@ -39,7 +33,7 @@ public class ProjectService : IProjectService
         if (project.IsNullParameter())
             throw new NotFoundException("پروژه ای با این شناسه یافت نشد!");
 
-        var projectDto = _mapper.Map<ProjectDetailsDto>(project);
+        var projectDto = _common.Mapper.Map<ProjectDetailsDto>(project);
 
         return GeneralResult<ProjectDetailsDto>.Success(projectDto);
     }
@@ -58,7 +52,7 @@ public class ProjectService : IProjectService
         if (!isOwnerInOrg)
             throw new ForbiddenException("شما دسترسی ندارید!");
 
-        var project = _mapper.Map<Project>(command);
+        var project = _common.Mapper.Map<Project>(command);
 
         await _uow.Project.AddAsync(project, ct);
 
@@ -331,13 +325,13 @@ public class ProjectService : IProjectService
         if (project.CreatorId == userId)
         {
             await _uow.Project.LoadReferenceAsync(project, p => p.Creator, ct);
-            if (!_commonService.Password.Verify(project.Creator.PasswordHash, password))
+            if (!_common.Password.Verify(project.Creator.PasswordHash, password))
                 throw new ValidationFailureException("رمز عبور نادرست است!");
         }
         else if (project.Org.OwnerId == userId)
         {
             await _uow.Project.LoadReferenceAsync(project, p => p.Org.Owner, ct);
-            if (!_commonService.Password.Verify(project.Org.Owner.PasswordHash, password))
+            if (!_common.Password.Verify(project.Org.Owner.PasswordHash, password))
                 throw new ValidationFailureException("رمز عبور نادرست است!");
         }
         else

@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Task;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
@@ -11,18 +11,18 @@ public class AssignUserToTaskHandler
 {
     private readonly IUnitOfWork _uow;
     private readonly ITaskService _taskService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public AssignUserToTaskHandler(ITaskService taskService, IMapper mapper, IUnitOfWork uow)
+    public AssignUserToTaskHandler(ITaskService taskService, ICommonService common, IUnitOfWork uow)
     {
         _taskService = taskService;
-        _mapper = mapper;
+        _common = common;
         _uow = uow;
     }
 
     public async Task<GeneralResult> Handle(AssignUserToTaskCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<AddRemoveUserTaskAppDto>(request);
+        var dto = _common.Mapper.Map<AddRemoveUserTaskAppDto>(request);
 
         var assignUserTask = await _taskService.AssignUserToTaskAsync(dto, ct);
 

@@ -1,4 +1,3 @@
-using AutoMapper;
 using TaskManagement.Application.DTOs.RequestDTOs.Organization;
 using TaskManagement.Application.DTOs.ResponseDTOs.Organization;
 using TaskManagement.Application.Interfaces.Services.Application;
@@ -14,21 +13,16 @@ using TaskManagement.Domain.Interface.Services;
 namespace TaskManagement.Application.Services.Application;
 public class OrganizationService : IOrganizationService
 {
-    private readonly ICommonService _commonService;
+    private readonly ICommonService _common;
     private readonly IOrganizationDomainService _orgDomainService;
     private readonly IUnitOfWork _uow;
-    private readonly IMapper _mapper;
 
-
-    public OrganizationService(IUnitOfWork unitOfWork, IOrganizationDomainService orgDomainService, IMapper mapper,
-        ICommonService commonService)
+    public OrganizationService(IUnitOfWork unitOfWork, IOrganizationDomainService orgDomainService, ICommonService common)
     {
         _uow = unitOfWork;
         _orgDomainService = orgDomainService;
-        _mapper = mapper;
-        _commonService = commonService;
+        _common = common;
     }
-
 
     // Query methods
     public async Task<GeneralResult<OrgDetailsDto>> GetOrgByIdAsync(long id, CancellationToken ct)
@@ -38,7 +32,7 @@ public class OrganizationService : IOrganizationService
         if (org.IsNullParameter())
             throw new NotFoundException("سازمانی با این شناسه یافت نشد!");
 
-        var orgDto = _mapper.Map<OrgDetailsDto>(org);
+        var orgDto = _common.Mapper.Map<OrgDetailsDto>(org);
 
         return GeneralResult<OrgDetailsDto>.Success(orgDto);
     }
@@ -49,7 +43,7 @@ public class OrganizationService : IOrganizationService
         if (org.IsNullParameter())
             throw new NotFoundException("سازمانی با این کد یافت نشد!");
 
-        var orgDto = _mapper.Map<OrgDetailsDto>(org);
+        var orgDto = _common.Mapper.Map<OrgDetailsDto>(org);
 
         return GeneralResult<OrgDetailsDto>.Success(orgDto);
     }
@@ -59,7 +53,7 @@ public class OrganizationService : IOrganizationService
     {
         await _orgDomainService.EnsureCanCreateOrgAsync(command.SecondOrgName, command.OwnerId, ct);
 
-        var org = _mapper.Map<Organization>(command);
+        var org = _common.Mapper.Map<Organization>(command);
 
         await _uow.Organization.AddAsync(org, ct);
 
@@ -94,7 +88,7 @@ public class OrganizationService : IOrganizationService
         if (org!.OwnerId != command.OwnerId)
             throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید آن را حذف کنید!");
 
-        if (!_commonService.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
+        if (!_common.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
             throw new ValidationFailureException("رمز عبور اشتباه است!");
 
         await _orgDomainService.EnsureCanDeactiveOrgAsync(org.Id, ct);
@@ -120,7 +114,7 @@ public class OrganizationService : IOrganizationService
         if (org!.OwnerId != command.OwnerId)
             throw new ForbiddenException("شما مالک این سازمان نیستید و نمیتوانید آن را ویرایش کنید!");
 
-        if (!_commonService.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
+        if (!_common.Password.Verify(org.Owner.PasswordHash, command.OwnerPassword))
             throw new ValidationFailureException("رمز عبور اشتباه است!");
 
         if (org.IsActive && !command.Activity)

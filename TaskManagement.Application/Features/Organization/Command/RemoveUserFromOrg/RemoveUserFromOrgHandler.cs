@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Organization;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
@@ -11,18 +11,18 @@ public class RemoveUserFromOrgHandler
 {
     private readonly IUnitOfWork _uow;
     private readonly IOrganizationService _organizationService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public RemoveUserFromOrgHandler(IOrganizationService organizationService, IMapper mapper, IUnitOfWork uow)
+    public RemoveUserFromOrgHandler(IOrganizationService organizationService, ICommonService common, IUnitOfWork uow)
     {
         _organizationService = organizationService;
-        _mapper = mapper;
+        _common = common;
         _uow = uow;
     }
 
     public async Task<GeneralResult> Handle(RemoveUserFromOrgCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<RemoveUserOrgAppDto>(request);
+        var dto = _common.Mapper.Map<RemoveUserOrgAppDto>(request);
 
         var removeUserOrg = await _organizationService.RemoveUserFromOrgAsync(dto, ct);
 

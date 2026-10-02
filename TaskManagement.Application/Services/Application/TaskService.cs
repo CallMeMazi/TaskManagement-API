@@ -1,7 +1,7 @@
-using AutoMapper;
 using TaskManagement.Application.DTOs.RequestDTOs.Task;
 using TaskManagement.Application.DTOs.ResponseDTOs.Task;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
@@ -15,16 +15,14 @@ public class TaskService : ITaskService
 {
     private readonly IUnitOfWork _uow;
     private readonly ITaskDomainService _taskDomainService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-
-    public TaskService(IUnitOfWork unitOfWork, ITaskDomainService taskDomainService, IMapper mapper)
+    public TaskService(IUnitOfWork unitOfWork, ITaskDomainService taskDomainService, ICommonService common)
     {
         _uow = unitOfWork;
         _taskDomainService = taskDomainService;
-        _mapper = mapper;
+        _common = common;
     }
-
 
     // Query methods
     public async Task<GeneralResult<TaskDetailsDto>> GetTaskByIdAsync(long taskId, CancellationToken ct)
@@ -33,7 +31,7 @@ public class TaskService : ITaskService
         if (task.IsNullParameter())
             throw new NotFoundException("شناسه تسک نامعتبر است!");
 
-        var taskDto = _mapper.Map<TaskDetailsDto>(task);
+        var taskDto = _common.Mapper.Map<TaskDetailsDto>(task);
 
         return GeneralResult<TaskDetailsDto>.Success(taskDto);
     }
@@ -47,7 +45,7 @@ public class TaskService : ITaskService
 
         await _taskDomainService.EnsureCanCreateTaskAsync(project!, command.UserId, ct);
 
-        var task = _mapper.Map<Domain.Entities.BaseEntities.Task>(command);
+        var task = _common.Mapper.Map<Domain.Entities.BaseEntities.Task>(command);
 
         await _uow.Task.AddAsync(task, ct);
 

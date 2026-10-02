@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
@@ -11,18 +11,18 @@ public class ChangeUserRoleToAdminHandler
 {
     private readonly IUnitOfWork _uow;
     private readonly IProjectService _projectService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public ChangeUserRoleToAdminHandler(IProjectService projectService, IMapper mapper, IUnitOfWork uow)
+    public ChangeUserRoleToAdminHandler(IProjectService projectService, ICommonService common, IUnitOfWork uow)
     {
         _projectService = projectService;
-        _mapper = mapper;
+        _common = common;
         _uow = uow;
     }
 
     public async Task<GeneralResult> Handle(ChangeUserRoleToAdminCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<ChangeUserRoleProjectAppDto>(request);
+        var dto = _common.Mapper.Map<ChangeUserRoleProjectAppDto>(request);
 
         var chagneRoleProjectRes = await _projectService.ChangeUserRoleToAdminAsync(dto, ct);
 

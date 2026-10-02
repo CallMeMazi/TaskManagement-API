@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
@@ -11,17 +11,17 @@ public class GenerateInviteLinkByUserIdHandler
 {
     private readonly IUnitOfWork _uow;
     private readonly IInvitationService _invitationService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public GenerateInviteLinkByUserIdHandler(IInvitationService invitationService, IMapper mapper, IUnitOfWork uow)
+    public GenerateInviteLinkByUserIdHandler(IInvitationService invitationService, ICommonService common, IUnitOfWork uow)
     {
         _invitationService = invitationService;
-        _mapper = mapper;
+        _common = common;
         _uow = uow;
     }
     public async Task<GeneralResult<string>> Handle(GenerateInviteLinkByUserIdCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<CreateOrgInvitatoinAppDto>(request);
+        var dto = _common.Mapper.Map<CreateOrgInvitatoinAppDto>(request);
 
         var inviteUserRes = await _invitationService.GenerateInviteLinkByUserIdAsync(dto, ct);
 

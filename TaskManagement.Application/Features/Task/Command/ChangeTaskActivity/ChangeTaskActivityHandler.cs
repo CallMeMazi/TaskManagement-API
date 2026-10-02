@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Task;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
@@ -11,18 +11,18 @@ public class ChangeTaskActivityHandler
 {
     private readonly IUnitOfWork _uow;
     private readonly ITaskService _taskService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public ChangeTaskActivityHandler(ITaskService taskService, IMapper mapper, IUnitOfWork uow)
+    public ChangeTaskActivityHandler(ITaskService taskService, ICommonService common, IUnitOfWork uow)
     {
         _taskService = taskService;
-        _mapper = mapper;
+        _common = common;
         _uow = uow;
     }
 
     public async Task<GeneralResult> Handle(ChangeTaskActivityCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<ChangeTaskActivityAppDto>(request);
+        var dto = _common.Mapper.Map<ChangeTaskActivityAppDto>(request);
 
         var changeTaskActivityRes = await _taskService.ChangeTaskActivityAsync(dto, ct);
 

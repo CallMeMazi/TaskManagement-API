@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Invitatoin;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 
@@ -11,18 +11,18 @@ public class RevokeInvitationHandler
 {
     private readonly IUnitOfWork _uow;
     private readonly IInvitationService _invitationService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public RevokeInvitationHandler(IInvitationService invitationService, IMapper mapper, IUnitOfWork uow)
+    public RevokeInvitationHandler(IInvitationService invitationService, ICommonService common, IUnitOfWork uow)
     {
         _invitationService = invitationService;
-        _mapper = mapper;
+        _common = common;
         _uow = uow;
     }
 
     public async Task<GeneralResult> Handle(RevokeInvitationCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<RevokeOrgInvitationAppDto>(request);
+        var dto = _common.Mapper.Map<RevokeOrgInvitationAppDto>(request);
 
         var revokeInvateRes = await _invitationService.RevokeInvitationAsync(dto, ct);
 

@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using TaskManagement.Application.DTOs.RequestDTOs.User;
+﻿using TaskManagement.Application.DTOs.RequestDTOs.User;
 using TaskManagement.Application.DTOs.ResponseDTOs.User;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
@@ -7,7 +6,6 @@ using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Common.Settings;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Interface.Services;
 
@@ -17,18 +15,13 @@ public class UserService : IUserService
 {
     private readonly IUnitOfWork _uow;
     private readonly IUserDomainService _userDomainService;
-    private readonly AppSettings _appSettings;
-    private readonly ICommonService _commonService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public UserService(IUnitOfWork unitOfWork, IUserDomainService userDomainService, ICommonService commonService
-        , IMapper mapper, AppSettings appSettings)
+    public UserService(IUnitOfWork unitOfWork, IUserDomainService userDomainService, ICommonService commonService)
     {
         _uow = unitOfWork;
         _userDomainService = userDomainService;
-        _commonService = commonService;
-        _mapper = mapper;
-        _appSettings = appSettings;
+        _common = commonService;
     }
 
     // Query methods
@@ -38,7 +31,7 @@ public class UserService : IUserService
         if (user.IsNullParameter())
             throw new NotFoundException("کاربری با این آیدی وجود ندارد!");
 
-        var userDto = _mapper.Map<UserDetailsDto>(user);
+        var userDto = _common.Mapper.Map<UserDetailsDto>(user);
 
         return GeneralResult<UserDetailsDto>.Success(userDto);
     }
@@ -48,7 +41,7 @@ public class UserService : IUserService
         if (user == null)
             throw new NotFoundException("کاربری با این شماره موبایل وجود ندارد!");
 
-        var userDto = _mapper.Map<UserDetailsDto>(user);
+        var userDto = _common.Mapper.Map<UserDetailsDto>(user);
 
         return GeneralResult<UserDetailsDto>.Success(userDto);
     }
@@ -59,8 +52,8 @@ public class UserService : IUserService
         // Check mobile number exist
         await _userDomainService.EnsureCanCreateUserAsync(command.MobileNumber, ct);
 
-        var userPassHash = _commonService.Password.Hash(command.Password);
-        var user = _mapper.Map<User>(command, opt => opt.Items[nameof(User.PasswordHash)] = userPassHash);
+        var userPassHash = _common.Password.Hash(command.Password);
+        var user = _common.Mapper.Map<User>(command, opt => opt.Items[nameof(User.PasswordHash)] = userPassHash);
 
         await _uow.User.AddAsync(user, ct);
 
@@ -84,7 +77,7 @@ public class UserService : IUserService
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(SoftDeleteUserAsync)} method!");
 
-        _commonService.Password.VerifyAndCheck(user!.PasswordHash, command.Password, "رمز عبور اشتباه است!");
+        _common.Password.VerifyAndCheck(user!.PasswordHash, command.Password, "رمز عبور اشتباه است!");
 
         // Check user has org
         // Check user in org
@@ -110,9 +103,9 @@ public class UserService : IUserService
         if (user.IsNullParameter())
             throw new Exception($"user by {command.UserId} ID was not found. in {nameof(ChangePasswordUserAsync)} method!");
 
-        _commonService.Password.VerifyAndCheck(user!.PasswordHash, command.OldPassword, "رمز عبور اشتباه است!");
+        _common.Password.VerifyAndCheck(user!.PasswordHash, command.OldPassword, "رمز عبور اشتباه است!");
 
-        user.ChangeUserPassword(_commonService.Password.Hash(command.NewPassword));
+        user.ChangeUserPassword(_common.Password.Hash(command.NewPassword));
 
         return GeneralResult.Success();
     }
@@ -122,7 +115,7 @@ public class UserService : IUserService
         if (user.IsNullParameter())
             throw new Exception($"user by {id} ID was not found. in {nameof(IncreaseUserPointsAsync)} method!");
 
-        user!.IncreaseOrDecreasePoints(_appSettings.UserSetting.PositiveUserPoints);
+        user!.IncreaseOrDecreasePoints(_common.AppSettings.UserSetting.PositiveUserPoints);
 
         return GeneralResult.Success();
     }
@@ -132,7 +125,7 @@ public class UserService : IUserService
         if (user.IsNullParameter())
             throw new Exception($"user by {id} ID was not found. in {nameof(DecreaseUserPointsAsync)} method!");
 
-        user!.IncreaseOrDecreasePoints(_appSettings.UserSetting.NegativeUserPoints);
+        user!.IncreaseOrDecreasePoints(_common.AppSettings.UserSetting.NegativeUserPoints);
 
         return GeneralResult.Success();
     }

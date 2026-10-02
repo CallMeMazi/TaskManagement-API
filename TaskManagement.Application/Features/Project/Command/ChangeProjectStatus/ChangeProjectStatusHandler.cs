@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Common.Classes;
 using TaskManagement.Domain.Enums.Statuses;
@@ -12,18 +12,18 @@ public class ChangeProjectStatusHandler
 {
     private readonly IUnitOfWork _uow;
     private readonly IProjectService _projectService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public ChangeProjectStatusHandler(IProjectService projectService, IMapper mapper, IUnitOfWork uow)
+    public ChangeProjectStatusHandler(IProjectService projectService, ICommonService common, IUnitOfWork uow)
     {
         _projectService = projectService;
-        _mapper = mapper;
+        _common = common;
         _uow = uow;
     }
 
     public async Task<GeneralResult> Handle(ChangeProjectStatusCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<UserProjectAppDto>(request);
+        var dto = _common.Mapper.Map<UserProjectAppDto>(request);
 
         GeneralResult changeProjectStatus;
         switch (request.ProjectStatus)
