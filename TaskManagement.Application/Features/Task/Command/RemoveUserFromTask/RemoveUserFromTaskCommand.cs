@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Task.Command.RemoveUserFromTask;
 public record RemoveUserFromTaskCommand(
@@ -7,4 +6,4 @@ public record RemoveUserFromTaskCommand(
     long UserId,
     long TaskId,
     long ProjId
-) : IRequest<GeneralResult>;
+) : IRequest;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Utilities.Exceptions;
+using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Infrastructure.Services;
 
@@ -8,21 +9,23 @@ public class PasswordService : IPasswordService
 {
     private readonly PasswordHasher<object> _hasher = new();
 
-
-    public string Hash(string password)
+    public GeneralResult<string> Hash(string password)
     {
-        return _hasher.HashPassword(new object(), password);
-    }
+        var passwordHash = _hasher.HashPassword(new object(), password);
 
-    public bool Verify(string hashedPassword, string providedPassword)
+        return GeneralResult<string>.Success(passwordHash);
+    }
+    public GeneralResult Verify(string hashedPassword, string providedPassword)
     {
-        var result = _hasher.VerifyHashedPassword(new object(), hashedPassword, providedPassword);
-        return result == PasswordVerificationResult.Success;
-    }
+        var verifyResult = _hasher.VerifyHashedPassword(new object(), hashedPassword, providedPassword);
 
+        return verifyResult == PasswordVerificationResult.Success 
+            ? GeneralResult.Success()
+            : GeneralResult.Failure();
+    }
     public void VerifyAndCheck(string hashedPassword, string providedPassword, string message)
     {
-        if (!Verify(hashedPassword, providedPassword))
+        if (!Verify(hashedPassword, providedPassword).IsSuccess)
             throw new ValidationFailureException(message);
     }
 }

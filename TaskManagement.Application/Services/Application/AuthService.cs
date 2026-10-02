@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using TaskManagement.Application.DTOs.InternalDTOs.UserToken;
+﻿using TaskManagement.Application.DTOs.InternalDTOs.UserToken;
 using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
@@ -8,7 +7,6 @@ using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Application.Utilities.Exceptions;
 using TaskManagement.Common.Classes;
 using TaskManagement.Common.Helpers;
-using TaskManagement.Common.Settings;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Enums.Statuses;
 using TaskManagement.Domain.Interface.Services;
@@ -17,26 +15,19 @@ namespace TaskManagement.Application.Services.Application;
 
 public class AuthService : IAuthServiec
 {
-    private readonly ICommonService _commonService;
+    private readonly ICommonService _common;
     private readonly IUserTokenDomainService _tokenDomainService;
-    private readonly AppSettings _appSettings;
     private readonly IUnitOfWork _uow;
-    private readonly IMapper _mapper;
 
-
-    public AuthService(ICommonService commonService, IUserTokenDomainService tokenDomainService, IUnitOfWork unitOfWork
-        , AppSettings appSettings, IMapper mapper)
+    public AuthService(ICommonService common, IUserTokenDomainService tokenDomainService, IUnitOfWork unitOfWork)
     {
-        _commonService = commonService;
+        _common = common;
         _tokenDomainService = tokenDomainService;
-        _appSettings = appSettings;
         _uow = unitOfWork;
-        _mapper = mapper;
     }
 
-
     // Query methods
-    public async Task<GeneralResult<List<UserTokenDetailsDto>>> GetUserActiveTokensAsync(long userId, CancellationToken ct)
+    public async Task<List<UserTokenDetailsDto>> GetUserActiveTokensAsync(long userId, CancellationToken ct)
     {
         var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == userId
@@ -47,24 +38,24 @@ public class AuthService : IAuthServiec
         if (tokens.IsNullParameter() || !tokens.Any())
             throw new Exception($"any tokens for {userId} UserId was not found. in {nameof(GetUserActiveTokensAsync)} method!");
 
-        var tokensDto = _mapper.Map<List<UserTokenDetailsDto>>(tokens);
+        var tokensDto = _common.Mapper.Map<List<UserTokenDetailsDto>>(tokens);
 
-        return GeneralResult<List<UserTokenDetailsDto>>.Success(tokensDto);
+        return tokensDto;
     }
-    public async Task<GeneralResult> ValidateAccessTokenAsync(ValidateUserTokenAppDto query, CancellationToken ct)
+    public async System.Threading.Tasks.Task ValidateAccessTokenAsync(ValidateUserTokenAppDto query, CancellationToken ct)
     {
         // Validate JWT (Expire date, Signature, algorithm)
         // Check current DeviceId(DB) with DeviceId in token
         // Check user security stamp(DB) with security stamp in token
 
-        var SecurityStampResult = _commonService.Jwt.GetSecurityStampFromAccessToken(query.AccessToken, query.DeviceId);
+        var SecurityStampResult = _common.Jwt.GetSecurityStampFromAccessToken(query.AccessToken, query.DeviceId);
         if (!SecurityStampResult.IsSuccess)
             throw new UnAuthorizedException(SecurityStampResult.Message);
 
-        var aceessTokenHash = _commonService.Password.Hash(query.AccessToken);
+        var aceessTokenHashResult = _common.Password.Hash(query.AccessToken);
 
         var token = await _uow.UserToken.GetByFilterAsync(ut =>
-            ut.AccessTokenHash == aceessTokenHash,
+            ut.AccessTokenHash == aceessTokenHashResult.Result,
             false,
             ct
         );
@@ -74,16 +65,14 @@ public class AuthService : IAuthServiec
 
         if (token!.TokenStatus != TokenStatusType.Active || token.SecurityStamp != SecurityStampResult.Result)
             throw new UnAuthorizedException("توکن نامعتبر است، لطفا مجددا لاگین کنید!");
-
-        return GeneralResult.Success();
     }
 
     // Command methods
-    public async Task<GeneralResult<UserTokenDto>> RegisterUserAsync(RegisterUserTokenAppDto command, CancellationToken ct)
+    public async Task<UserTokenDto> RegisterUserAsync(RegisterUserTokenAppDto command, CancellationToken ct)
     {
         var user = await _uow.User.GetByIdAsync(command.UserId, false, ct);
 
-        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken
+        var tokenResult = _common.Jwt.GenerateAccessTokenAndRefreshToken
             (new GenerateTokensInternalDto(user!.Id, user.MobileNumber, user.SecurityStamp, command.DeviceId));
 
         if (!tokenResult.IsSuccess)
@@ -96,7 +85,7 @@ public class AuthService : IAuthServiec
             accessTokenHashed,
             refreshTokenHashed,
             user.SecurityStamp,
-            DateTime.Now.AddDays(_appSettings.JwtSetting.ExpirationDaysRefreshToken),
+            DateTime.Now.AddDays(_common.AppSettings.JwtSetting.ExpirationDaysRefreshToken),
             command.DeviceId,
             command.UserIp,
             command.UserAgent
@@ -106,20 +95,20 @@ public class AuthService : IAuthServiec
 
         var result = new UserTokenDto(tokenResult.Result.AccessTokenHash, tokenResult.Result.RefreshTokenHash);
 
-        return GeneralResult<UserTokenDto>.Success(result);
+        return result;
     }
-    public async Task<GeneralResult<UserTokenDto>> LoginUserAsync(LoginUserAppDto command, CancellationToken ct)
+    public async Task<UserTokenDto> LoginUserAsync(LoginUserAppDto command, CancellationToken ct)
     {
         var user = await _uow.User.GetByFilterAsync(u => u.MobileNumber == command.MobileNumber, false, ct);
         if (user.IsNullParameter())
             throw new NotFoundException("کاربری با این شماره موبایل پیدا نشد!");
 
-        _commonService.Password.VerifyAndCheck(user!.PasswordHash, command.Password, "شماره موبایل یا رمز عبور اشتباه است!");
+        _common.Password.VerifyAndCheck(user!.PasswordHash, command.Password, "شماره موبایل یا رمز عبور اشتباه است!");
 
         // Check user active device count
         await _tokenDomainService.EnsureCanLoginAsync(user.Id, ct);
 
-        var tokenResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken
+        var tokenResult = _common.Jwt.GenerateAccessTokenAndRefreshToken
             (new GenerateTokensInternalDto(user.Id, command.MobileNumber, user.SecurityStamp, command.DeviceId));
 
         if (!tokenResult.IsSuccess)
@@ -132,7 +121,7 @@ public class AuthService : IAuthServiec
             accessTokenHashed,
             refreshTokenHashed,
             user.SecurityStamp,
-            DateTime.Now.AddDays(_appSettings.JwtSetting.ExpirationDaysRefreshToken),
+            DateTime.Now.AddDays(_common.AppSettings.JwtSetting.ExpirationDaysRefreshToken),
             command.DeviceId,
             command.UserIp,
             command.UserAgent
@@ -142,9 +131,9 @@ public class AuthService : IAuthServiec
 
         var result = new UserTokenDto(tokenResult.Result.AccessTokenHash, tokenResult.Result.RefreshTokenHash);
 
-        return GeneralResult<UserTokenDto>.Success(result);
+        return result;
     }
-    public async Task<GeneralResult> LogoutUserAsync(LogoutUserAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task LogoutUserAsync(LogoutUserAppDto command, CancellationToken ct)
     {
         var token = await _uow.UserToken.GetUserTokenByFilterWithUserAsync(ut =>
             ut.TokenStatus == TokenStatusType.Active
@@ -156,19 +145,17 @@ public class AuthService : IAuthServiec
         if (token.IsNullParameter())
             throw new NotFoundException("توکنی برای شما با این اطلاعات یافت نشد!");
 
-        var validateResult = _commonService.Jwt.ValidateAccessTokenAndGetPrincipal(command.AccessToken, command.DeviceId);
+        var validateResult = _common.Jwt.ValidateAccessTokenAndGetPrincipal(command.AccessToken, command.DeviceId);
         if (!validateResult.IsSuccess)
             throw new ValidationFailureException(validateResult.Message);
 
-        var commandAccessTokenHash = _commonService.Password.Hash(command.AccessToken);
-        if (token!.AccessTokenHash != commandAccessTokenHash)
+        var commandAccessTokenHashResult = _common.Password.Hash(command.AccessToken);
+        if (token!.AccessTokenHash != commandAccessTokenHashResult.Result)
             throw new ValidationFailureException("توکن ارسالی شما نامعتبر است");
 
         token.RevokeToken();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult<UserTokenDto>> RefreshTokenAsync(RefreshUserTokenAppDto command, CancellationToken ct)
+    public async Task<UserTokenDto> RefreshTokenAsync(RefreshUserTokenAppDto command, CancellationToken ct)
     {
         var token = await _uow.UserToken.GetUserTokenByFilterWithUserAsync(ut =>
             ut.TokenStatus == TokenStatusType.Active
@@ -179,8 +166,8 @@ public class AuthService : IAuthServiec
         if (token.IsNullParameter())
             throw new NotFoundException("برای شما در این دستگاه یا مرورگر توکنی یافت نشد!");
 
-        var commandRefreshTokenHash = _commonService.Password.Hash(command.RefreshToken);
-        if (token!.RefreshTokenHash != commandRefreshTokenHash)
+        var commandRefreshTokenHashResult = _common.Password.Hash(command.RefreshToken);
+        if (token!.RefreshTokenHash != commandRefreshTokenHashResult.Result)
             throw new ValidationFailureException("رفرش توکن نامعتبر است!");
 
         if (token.User.SecurityStamp != token.SecurityStamp)
@@ -190,7 +177,7 @@ public class AuthService : IAuthServiec
             throw new ConflictException("اطلاعات کاربری بروزرسانی شده، لطفا دوباره وارد شوید!");
         }
 
-        var newTokensResult = _commonService.Jwt.GenerateAccessTokenAndRefreshToken
+        var newTokensResult = _common.Jwt.GenerateAccessTokenAndRefreshToken
             (new GenerateTokensInternalDto(token.User.Id, token.User.MobileNumber, token.User.SecurityStamp, command.DeviceId));
 
         if (!newTokensResult.IsSuccess)
@@ -198,13 +185,13 @@ public class AuthService : IAuthServiec
 
         (string accessToken, string refreshToken) = HashAcceesTokenAndRefreshToken(newTokensResult.Result!.AccessTokenHash, newTokensResult.Result.RefreshTokenHash);
 
-        token.RefreshToken(accessToken, refreshToken, _appSettings.JwtSetting.ExpirationDaysRefreshToken);
+        token.RefreshToken(accessToken, refreshToken, _common.AppSettings.JwtSetting.ExpirationDaysRefreshToken);
 
         var result = new UserTokenDto(newTokensResult.Result.AccessTokenHash, newTokensResult.Result.RefreshTokenHash);
 
-        return GeneralResult<UserTokenDto>.Success(result);
+        return result;
     }
-    public async Task<GeneralResult> RevokeTokenByDeviceIdAsync(RevokeUserTokenAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task RevokeTokenByDeviceIdAsync(RevokeUserTokenAppDto command, CancellationToken ct)
     {
         var token = await _uow.UserToken.GetByFilterAsync(ut =>
             ut.UserId == command.UserId
@@ -217,10 +204,8 @@ public class AuthService : IAuthServiec
             throw new NotFoundException("توکنی با این اطلاعات یافت نشد!");
 
         token!.RevokeToken();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RevokeAllTokensByUserIdAsync(long userId, CancellationToken ct)
+    public async System.Threading.Tasks.Task RevokeAllTokensByUserIdAsync(long userId, CancellationToken ct)
     {
         var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == userId
@@ -229,15 +214,13 @@ public class AuthService : IAuthServiec
             ct
         );
         if (tokens.IsNullParameter() || !tokens.Any())
-            return GeneralResult.Success();
+            return;
 
         tokens.ForEach(ut =>
             ut.RevokeToken()
         );
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task RevokeAllTokensExceptCurrentByUserIdAsync(RevokeUserTokenAppDto command, CancellationToken ct)
     {
         var tokens = await _uow.UserToken.GetAllByFilterAsync(ut =>
             ut.UserId == command.UserId
@@ -247,20 +230,18 @@ public class AuthService : IAuthServiec
             ct
         );
         if (tokens.IsNullParameter() || !tokens.Any())
-            return GeneralResult.Success();
+            return;
 
         tokens.ForEach(ut =>
             ut.RevokeToken()
         );
-
-        return GeneralResult.Success();
     }
 
     private (string accessToken, string refreshToken) HashAcceesTokenAndRefreshToken(string accessToken, string refreshToken)
     {
-        var accessTokenHashed = _commonService.Password.Hash(accessToken);
-        var refreshTokenHashed = _commonService.Password.Hash(refreshToken);
+        var accessTokenHashedResult = _common.Password.Hash(accessToken);
+        var refreshTokenHashedResult = _common.Password.Hash(refreshToken);
 
-        return (accessTokenHashed, refreshTokenHashed);
+        return (accessTokenHashedResult.Result!, refreshTokenHashedResult.Result!);
     }
 }

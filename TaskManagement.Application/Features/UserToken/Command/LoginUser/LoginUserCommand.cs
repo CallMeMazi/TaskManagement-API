@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.UserToken.Command.LoginUser;
 public record LoginUserCommand(
@@ -9,4 +8,4 @@ public record LoginUserCommand(
     string DeviceId,
     string UserIp,
     string UserAgent
-) : IRequest<GeneralResult<UserTokenDto>>;
+) : IRequest<UserTokenDto>;

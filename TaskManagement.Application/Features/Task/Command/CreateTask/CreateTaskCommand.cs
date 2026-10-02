@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TaskManagement.Common.Classes;
 using TaskManagement.Domain.Enums.Types.Application;
 
 namespace TaskManagement.Application.Features.Task.Command.CreateTask;
@@ -11,4 +10,4 @@ public record CreateTaskCommand(
     TaskType TaskType,
     DateTime TaskDeadLine,
     List<long> UserIds
-) : IRequest<GeneralResult>;
+) : IRequest;

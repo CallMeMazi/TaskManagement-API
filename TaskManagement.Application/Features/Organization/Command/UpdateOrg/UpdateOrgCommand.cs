@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Organization.Command.UpdateOrg;
 public record UpdateOrgCommand(
@@ -8,4 +7,4 @@ public record UpdateOrgCommand(
     string OrgName,
     string SecondOrgName,
     string OrgDescription
-) : IRequest<GeneralResult>;
+) : IRequest;

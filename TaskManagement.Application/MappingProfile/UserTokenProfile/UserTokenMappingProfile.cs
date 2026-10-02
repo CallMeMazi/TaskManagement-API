@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
+using TaskManagement.Application.Features.User.Command.ChangePasswordUser;
 using TaskManagement.Application.Features.UserToken.Command.LoginUser;
 using TaskManagement.Application.Features.UserToken.Command.LogoutUser;
 using TaskManagement.Application.Features.UserToken.Command.RefreshUserToken;
@@ -19,5 +20,6 @@ public class UserTokenMappingProfile : Profile
         CreateMap<RefreshUserTokenCommand, RefreshUserTokenAppDto>();
         CreateMap<RevokeTokenByDeviceIdCommand, RevokeUserTokenAppDto>();
         CreateMap<RevokeAllTokensExceptCurrentByUserIdCommand, RevokeUserTokenAppDto>();
+        CreateMap<ChangePasswordUserCommand, RevokeUserTokenAppDto>();
     }
 }

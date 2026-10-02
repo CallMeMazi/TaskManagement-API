@@ -1,26 +1,25 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.User;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Common.Classes;
+using TaskManagement.Application.Interfaces.Services.Halper;
 
 namespace TaskManagement.Application.Features.User.Command.DeleteUser;
 
 public class DeleteUserHandler
-    : IRequestHandler<DeleteUserCommand, GeneralResult>
+    : IRequestHandler<DeleteUserCommand>
 {
     private readonly IUserService _userService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public DeleteUserHandler(IUserService userService, IMapper mapper)
+    public DeleteUserHandler(IUserService userService, ICommonService common)
     {
         _userService = userService;
-        _mapper = mapper;
+        _common = common;
     }
 
-    public Task<GeneralResult> Handle(DeleteUserCommand request, CancellationToken ct)
+    public System.Threading.Tasks.Task Handle(DeleteUserCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<DeleteUserAppDto>(request);
+        var dto = _common.Mapper.Map<DeleteUserAppDto>(request);
 
         return _userService.SoftDeleteUserAsync(dto, ct);
     }

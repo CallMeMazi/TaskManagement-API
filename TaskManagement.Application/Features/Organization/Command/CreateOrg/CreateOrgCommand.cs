@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Organization.Command.CreateOrg;
 public record CreateOrgCommand(
@@ -8,4 +7,4 @@ public record CreateOrgCommand(
     string OrgDescription,
     long OwnerId,
     byte MaxUser
-) : IRequest<GeneralResult>;
+) : IRequest;

@@ -1,4 +1,3 @@
-using AutoMapper;
 using TaskManagement.Application.DTOs.RequestDTOs.Project;
 using TaskManagement.Application.DTOs.ResponseDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
@@ -17,35 +16,30 @@ public class ProjectService : IProjectService
 {
     private readonly IUnitOfWork _uow;
     private readonly IProjectDomainService _projectDomainService;
-    private readonly ICommonService _commonService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-
-    public ProjectService(IUnitOfWork uow, IProjectDomainService projectDomainService, ICommonService commonService
-        , IMapper mapper)
+    public ProjectService(IUnitOfWork uow, IProjectDomainService projectDomainService, ICommonService common)
     {
         _uow = uow;
         _projectDomainService = projectDomainService;
-        _commonService = commonService;
-        _mapper = mapper;
+        _common = common;
     }
 
-
     // Query methods
-    public async Task<GeneralResult<ProjectDetailsDto>> GetProjectByIdAsync(long projId, CancellationToken ct)
+    public async Task<ProjectDetailsDto> GetProjectByIdAsync(long projId, CancellationToken ct)
     {
         var project = await _uow.Project.GetByIdAsync(projId, false, ct);
 
         if (project.IsNullParameter())
             throw new NotFoundException("پروژه ای با این شناسه یافت نشد!");
 
-        var projectDto = _mapper.Map<ProjectDetailsDto>(project);
+        var projectDto = _common.Mapper.Map<ProjectDetailsDto>(project);
 
-        return GeneralResult<ProjectDetailsDto>.Success(projectDto);
+        return projectDto;
     }
 
     // Command methods
-    public async Task<GeneralResult> CreateProjectAsync(CreateProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task CreateProjectAsync(CreateProjectAppDto command, CancellationToken ct)
     {
         var org = await _uow.Organization.GetOrgByIdWithMembersAsync(command.OrgId, false, ct);
         if (org.IsNullParameter())
@@ -58,7 +52,7 @@ public class ProjectService : IProjectService
         if (!isOwnerInOrg)
             throw new ForbiddenException("شما دسترسی ندارید!");
 
-        var project = _mapper.Map<Project>(command);
+        var project = _common.Mapper.Map<Project>(command);
 
         await _uow.Project.AddAsync(project, ct);
 
@@ -72,10 +66,8 @@ public class ProjectService : IProjectService
                 project.Id,
                 ct
             );
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> UpdateProjectAsync(UpdateProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task UpdateProjectAsync(UpdateProjectAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetByIdAsync(command.ProjId, true, ct);
         if (project.IsNullParameter())
@@ -84,10 +76,8 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         project!.UpdateProject(command.ProjName, command.ProjDescription);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> SoftDeleteProjectAsync(UserProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task SoftDeleteProjectAsync(UserProjectAppDto command, CancellationToken ct)
     {
         // This method use SP (Stored Procedure)
 
@@ -111,10 +101,8 @@ public class ProjectService : IProjectService
         // Delete All TaskAssignments By ProjectId (SP)
         // Delete All TaslInfos By TaskId (SP)
         await _uow.Project.SoftDeleteProjectSpAsync(project.Id, ct);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeProjectActivityAsync(ChangeProjectActivityAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeProjectActivityAsync(ChangeProjectActivityAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetProjectByIdWithOrgAsync(command.ProjId, true, ct);
         if (project.IsNullParameter())
@@ -131,10 +119,8 @@ public class ProjectService : IProjectService
 
         project.ChangeProjActivity(command.Activity);
         await _uow.SaveAsync(ct);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeProjectStatusToInProgressAsync(UserProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeProjectStatusToInProgressAsync(UserProjectAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetProjectByIdWithOrgAsync(command.ProjId, true, ct);
         if (project.IsNullParameter())
@@ -150,10 +136,8 @@ public class ProjectService : IProjectService
         await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.ChangeProjStatusToInProgress();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeProjectStatusToAdjournmentAsync(UserProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeProjectStatusToAdjournmentAsync(UserProjectAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetProjectByIdWithOrgAsync(command.ProjId, true, ct);
         if (project.IsNullParameter())
@@ -169,10 +153,8 @@ public class ProjectService : IProjectService
         await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.ChangeProjStatusToAdjournment();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> CancelProjectAsync(UserProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task CancelProjectAsync(UserProjectAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetProjectByIdWithOrgAsync(command.ProjId, true, ct);
         if (project.IsNullParameter())
@@ -185,10 +167,8 @@ public class ProjectService : IProjectService
         await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.CancelProj();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> FinishProjectAsync(UserProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task FinishProjectAsync(UserProjectAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetProjectByIdWithOrgAsync(command.ProjId, true, ct);
         if (project.IsNullParameter())
@@ -201,10 +181,8 @@ public class ProjectService : IProjectService
         await _projectDomainService.CheakProjectActiveTaskAsync(project.Id, ct);
 
         project.FinishProj();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeProjectProgressAsync(ChangeProjectProgressAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeProjectProgressAsync(ChangeProjectProgressAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetByIdAsync(command.ProjId, true, ct);
         if (project.IsNullParameter())
@@ -213,11 +191,9 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureUserHasProjectAccessAsync(command.OwnerId, project!.OrgId, ct);
 
         project!.ChangeProjProgress(command.ProjectProgress);
-
-        return GeneralResult.Success();
     }
     // Project MemberShip methods
-    public async Task<GeneralResult> AddUserToProjectAysnc(AddRemoveUserProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task AddUserToProjectAysnc(AddRemoveUserProjectAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetProjectByIdWithMembersAsync(command.ProjId, false, ct);
         if (project.IsNullParameter())
@@ -232,10 +208,8 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureCanAddUserToProjectAsync(project, command.UserId, project.OrgId, ct);
 
         await CreateProjectMemberShipAsync(project.Id, command.UserId, ProjectRole.Member, ct);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> RemoveUserFromProjectAsync(AddRemoveUserProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task RemoveUserFromProjectAsync(AddRemoveUserProjectAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetProjectByIdWithMembersAsync(command.ProjId, false, ct);
         if (project.IsNullParameter())
@@ -253,10 +227,8 @@ public class ProjectService : IProjectService
         await _projectDomainService.EnsureCanRemoveUserFromProjectAsync(project, command.UserId, ct);
 
         projectMemberShip!.SoftDelete();
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeUserRoleToAdminAsync(ChangeUserRoleProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeUserRoleToAdminAsync(ChangeUserRoleProjectAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetByIdAsync(command.ProjId, false, ct);
         if (project.IsNullParameter())
@@ -274,10 +246,8 @@ public class ProjectService : IProjectService
             throw new NotFoundException("کاربری با این شناسه در پروژه وجود ندارد!");
 
         ProjectMemberShip!.ChangeUserOrgRole(ProjectRole.Admin);
-
-        return GeneralResult.Success();
     }
-    public async Task<GeneralResult> ChangeUserRoleToMemberAsync(ChangeUserRoleProjectAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task ChangeUserRoleToMemberAsync(ChangeUserRoleProjectAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetByIdAsync(command.ProjId, false, ct);
         if (project.IsNullParameter())
@@ -295,8 +265,6 @@ public class ProjectService : IProjectService
             throw new NotFoundException("کاربری با این شناسه در پروژه وجود ندارد!");
 
         ProjectMemberShip!.ChangeUserOrgRole(ProjectRole.Member);
-
-        return GeneralResult.Success();
     }
 
     private async System.Threading.Tasks.Task CreateProjectMemberShipAsync(long projId, long userId, ProjectRole role, CancellationToken ct)
@@ -331,14 +299,12 @@ public class ProjectService : IProjectService
         if (project.CreatorId == userId)
         {
             await _uow.Project.LoadReferenceAsync(project, p => p.Creator, ct);
-            if (!_commonService.Password.Verify(project.Creator.PasswordHash, password))
-                throw new ValidationFailureException("رمز عبور نادرست است!");
+            _common.Password.VerifyAndCheck(project.Creator.PasswordHash, password, "رمز عبور نادرست است!");
         }
         else if (project.Org.OwnerId == userId)
         {
             await _uow.Project.LoadReferenceAsync(project, p => p.Org.Owner, ct);
-            if (!_commonService.Password.Verify(project.Org.Owner.PasswordHash, password))
-                throw new ValidationFailureException("رمز عبور نادرست است!");
+            _common.Password.VerifyAndCheck(project.Org.Owner.PasswordHash, password,"رمز عبور نادرست است!");
         }
         else
             throw new ForbiddenException("شما به این پروژه دسترسی ندارید!");

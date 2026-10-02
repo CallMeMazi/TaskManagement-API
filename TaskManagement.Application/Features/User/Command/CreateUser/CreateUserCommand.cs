@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.User.Command.CreateUser;
 
@@ -14,4 +13,4 @@ public record CreateUserCommand(
     string DeviceId,
     string UserIp,
     string UserAgent
-) : IRequest<GeneralResult<UserTokenDto>>;
+) : IRequest<UserTokenDto>;

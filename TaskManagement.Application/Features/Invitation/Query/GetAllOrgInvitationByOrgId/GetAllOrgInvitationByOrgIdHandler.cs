@@ -1,11 +1,10 @@
 ﻿using MediatR;
 using TaskManagement.Application.DTOs.ResponseDTOs.Invitation;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Invitation.Query.GetAllOrgInvitationByOrgId;
 public class GetAllOrgInvitationByOrgIdHandler
-    : IRequestHandler<GetAllOrgInvitationByOrgIdQuery, GeneralResult<List<OrgInvitationDetailsDto>>>
+    : IRequestHandler<GetAllOrgInvitationByOrgIdQuery, List<OrgInvitationDetailsDto>>
 {
     private readonly IInvitationService _invitationService;
 
@@ -14,6 +13,6 @@ public class GetAllOrgInvitationByOrgIdHandler
         _invitationService = invitationService;
     }
 
-    public Task<GeneralResult<List<OrgInvitationDetailsDto>>> Handle(GetAllOrgInvitationByOrgIdQuery request, CancellationToken ct)
+    public Task<List<OrgInvitationDetailsDto>> Handle(GetAllOrgInvitationByOrgIdQuery request, CancellationToken ct)
         => _invitationService.GetAllOrgInvitationByOrgIdAsync(request.OrgId, ct);
 }

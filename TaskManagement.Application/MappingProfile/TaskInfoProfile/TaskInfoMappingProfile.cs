@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using TaskManagement.Application.DTOs.RequestDTOs.TaskInfo;
 using TaskManagement.Application.DTOs.ResponseDTOs.TaskInfo;
+using TaskManagement.Application.Features.Task.Command.EndTask;
 using TaskManagement.Domain.Entities.BaseEntities;
 
 namespace TaskManagement.Application.MappingProfile.TaskInfoProfile;
@@ -20,5 +22,8 @@ public class TaskInfoMappingProfile : Profile
 
         // Query DTOs
         CreateMap<TaskInfo, TaskInfoDetailsDto>();
+
+        // MediatR Mapping
+        CreateMap<EndTaskCommand, CreateTaskInfoAppDto>();
     }
 }

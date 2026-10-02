@@ -1,26 +1,25 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
-using TaskManagement.Common.Classes;
+using TaskManagement.Application.Interfaces.Services.Halper;
 
 namespace TaskManagement.Application.Features.UserToken.Query.ValidateAccessToken;
 public class ValidateAccessTokenHandler
-    : IRequestHandler<ValidateAcceessTokenQuery, GeneralResult>
+    : IRequestHandler<ValidateAcceessTokenQuery>
 {
     private readonly IAuthServiec _authService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public ValidateAccessTokenHandler(IAuthServiec authService, IMapper mapper)
+    public ValidateAccessTokenHandler(IAuthServiec authService, ICommonService common)
     {
         _authService = authService;
-        _mapper = mapper;
+        _common = common;
     }
 
-    public Task<GeneralResult> Handle(ValidateAcceessTokenQuery request, CancellationToken ct)
+    public async System.Threading.Tasks.Task Handle(ValidateAcceessTokenQuery request, CancellationToken ct)
     {
-        var requestDto = _mapper.Map<ValidateUserTokenAppDto>(request);
+        var requestDto = _common.Mapper.Map<ValidateUserTokenAppDto>(request);
 
-        return _authService.ValidateAccessTokenAsync(requestDto, ct);
+        await _authService.ValidateAccessTokenAsync(requestDto, ct);
     }
 }

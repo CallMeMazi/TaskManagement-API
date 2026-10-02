@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.UpdateProject;
 public record UpdateProjectCommand(
@@ -7,4 +6,4 @@ public record UpdateProjectCommand(
     long OwnerId,
     string ProjName,
     string ProjDescription
-) : IRequest<GeneralResult>;
+) : IRequest;

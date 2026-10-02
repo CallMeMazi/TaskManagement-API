@@ -1,34 +1,33 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using TaskManagement.Application.DTOs.RequestDTOs.UserToken;
 using TaskManagement.Application.DTOs.ResponseDTOs.UserToken;
 using TaskManagement.Application.Interfaces.Services.Application;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.UserToken.Command.LoginUser;
 public class LoginUserHandler
-    : IRequestHandler<LoginUserCommand, GeneralResult<UserTokenDto>>
+    : IRequestHandler<LoginUserCommand, UserTokenDto>
 {
     private readonly IUnitOfWork _uow;
     private readonly IAuthServiec _authService;
-    private readonly IMapper _mapper;
+    private readonly ICommonService _common;
 
-    public LoginUserHandler(IAuthServiec authService, IMapper mapper, IUnitOfWork uow)
+    public LoginUserHandler(IAuthServiec authService, ICommonService common, IUnitOfWork uow)
     {
         _authService = authService;
-        _mapper = mapper;
+        _common = common;
         _uow = uow;
     }
 
-    public async Task<GeneralResult<UserTokenDto>> Handle(LoginUserCommand request, CancellationToken ct)
+    public async Task<UserTokenDto> Handle(LoginUserCommand request, CancellationToken ct)
     {
-        var dto = _mapper.Map<LoginUserAppDto>(request);
+        var dto = _common.Mapper.Map<LoginUserAppDto>(request);
 
-        var loginUserRes = await _authService.LoginUserAsync(dto, ct);
+        var userTokenDto = await _authService.LoginUserAsync(dto, ct);
 
         await _uow.SaveAsync(ct);
 
-        return loginUserRes;
+        return userTokenDto;
     }
 }

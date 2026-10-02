@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TaskManagement.Common.Classes;
 
 namespace TaskManagement.Application.Features.Project.Command.ChangeProjectActivity;
 public record ChangeProjectActivityCommand(
@@ -7,4 +6,4 @@ public record ChangeProjectActivityCommand(
     long ProjId,
     string UserPassword,
     bool Activity
-) : IRequest<GeneralResult>;
+) : IRequest;
