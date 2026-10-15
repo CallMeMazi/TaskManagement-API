@@ -18,18 +18,17 @@ namespace TaskManagement.Infrastructure.Registration;
 
 public static class InfrastructureRegistration
 {
-    public static IServiceCollection RegisterAllInfrastructureLayerConfiguration(this IServiceCollection services
-        , IConfiguration configuration)
+    // Support in .net 10
+    extension(IServiceCollection services)
     {
-        services.RegisterAppDbContext(configuration)
+        public IServiceCollection RegisterAllInfrastructureLayerConfiguration(IConfiguration configuration)
+            => services.RegisterAppDbContext(configuration)
             .RegisterLogDbContext(configuration)
             .RegisterAppRepositories()
             .RegisterLogRepositpries()
             .RegisterUnitOfWorks()
             .RegisterHelperServices()
             .RegisterAppSettingConfig(configuration);
-
-        return services;
     }
 
     private static IServiceCollection RegisterAppDbContext(this IServiceCollection services, IConfiguration configuration)

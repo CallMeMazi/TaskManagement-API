@@ -43,7 +43,7 @@ public class OrganozationInvitationConfiguration : IBaseConfiguration<Organizati
 
         #endregion
 
-        builder.HasQueryFilter(oi => !oi.IsDelete);
+        builder.HasQueryFilter("IsDeleteFillter", oi => !oi.IsDelete);
 
         builder.Property(oi => oi.RowVersion)
             .IsRowVersion()

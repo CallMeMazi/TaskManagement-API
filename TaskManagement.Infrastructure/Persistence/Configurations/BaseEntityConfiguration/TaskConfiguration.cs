@@ -73,7 +73,7 @@ public class TaskConfiguration : IBaseConfiguration<Domain.Entities.BaseEntities
         builder.Property(t => t.RowVersion)
             .IsRowVersion();
 
-        builder.HasQueryFilter(t => !t.IsDelete);
+        builder.HasQueryFilter("IsDeleteFillter", t => !t.IsDelete);
 
         builder.HasIndex(t => t.CreatorId);
 
