@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -67,7 +66,7 @@ public class JwtService : IJwtService
             return GeneralResult<UserTokenDto>.Failure(accessTokenResult.Message);
 
         var refreshTokenResult = GenerateRefreshToken();
-        if (refreshTokenResult.IsSuccess)
+        if (!refreshTokenResult.IsSuccess)
             return GeneralResult<UserTokenDto>.Failure(refreshTokenResult.Message);
 
         return GeneralResult<UserTokenDto>.Success(new UserTokenDto(accessTokenResult.Result!, refreshTokenResult.Result!));

@@ -11,4 +11,11 @@ public interface ILogUnitOfWork
     void Save(bool acceptAllChangesOnSuccess);
     Task SaveAsync(CancellationToken ct = default);
     Task SaveAsync(bool acceptAllChangesOnSuccess, CancellationToken ct = default);
+
+    void BeginTransaction();
+    void CommitTransaction();
+    void RollBackTransaction();
+    Task BeginTransactionAsync(CancellationToken ct = default);
+    Task CommitTransactionAsync(CancellationToken ct = default);
+    Task RollBackTransactionAsync(CancellationToken ct = default);
 }

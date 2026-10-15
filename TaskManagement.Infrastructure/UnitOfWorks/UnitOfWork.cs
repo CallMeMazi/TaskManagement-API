@@ -1,4 +1,5 @@
-﻿using TaskManagement.Application.Interfaces.UnitOfWorks;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using TaskManagement.Application.Interfaces.UnitOfWorks;
 using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
 
@@ -52,5 +53,43 @@ public class UnitOfWork : IUnitOfWork
     public async Task SaveAsync(bool acceptAllChangesOnSuccess, CancellationToken ct = default)
     {
         await _context.SaveChangesAsync(acceptAllChangesOnSuccess, ct);
+    }
+
+    
+    public void BeginTransaction()
+    {
+        _context.Database.BeginTransaction();
+    }
+    public void CommitTransaction()
+    {
+        if (_context.Database.CurrentTransaction is null)
+            return;
+
+        _context.Database.CommitTransaction();
+    }
+    public void RollBackTransaction()
+    {
+        if (_context.Database.CurrentTransaction is null)
+            return;
+
+        _context.Database.RollbackTransaction();
+    }
+    public Task BeginTransactionAsync(CancellationToken ct = default)
+    {
+        return _context.Database.BeginTransactionAsync(ct);
+    }
+    public async Task CommitTransactionAsync(CancellationToken ct = default)
+    {
+        if (_context.Database.CurrentTransaction is null)
+            return;
+
+        await _context.Database.CommitTransactionAsync(ct);
+    }
+    public async Task RollBackTransactionAsync(CancellationToken ct = default)
+    {
+        if (_context.Database.CurrentTransaction is null)
+            return;
+
+        await _context.Database.RollbackTransactionAsync(ct);
     }
 }
