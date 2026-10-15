@@ -1,6 +1,6 @@
 ﻿namespace TaskManagement.Common.Settings;
 public class UserSetting
 {
-    public byte PositiveUserPoints { get; set; }
-    public byte NegativeUserPoints { get; set; }
+    public sbyte PositiveUserPoints { get; set; }
+    public sbyte NegativeUserPoints { get; set; }
 }

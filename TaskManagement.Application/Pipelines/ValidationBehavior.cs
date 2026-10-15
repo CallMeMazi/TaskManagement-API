@@ -18,7 +18,7 @@ public class ValidationBehavior<TRequest, TResponse>
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
     {
         if (!_validators.Any())
-            return await next();
+            return await next(ct);
 
         var validationContext = new ValidationContext<TRequest>(request);
 
@@ -26,11 +26,11 @@ public class ValidationBehavior<TRequest, TResponse>
             _validators.Select(v => v.ValidateAsync(validationContext, ct))
         );
 
-        var failures = result.SelectMany(vr => vr.Errors).Where(vf => vf != null).ToList();
+        var failures = result.SelectMany(vr => vr.Errors).Where(vf => vf is not null).ToList();
 
         if (failures.Any())
             throw new ValidationFailureException("اطلاعات ورودی نامعتبر است!", failures.Select(vf => vf.ErrorMessage).ToList());
 
-        return await next();
+        return await next(ct);
     }
 }

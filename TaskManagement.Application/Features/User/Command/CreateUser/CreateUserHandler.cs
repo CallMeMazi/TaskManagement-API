@@ -32,6 +32,8 @@ public class CreateUserHandler
         // Create User And Return UserID
         var userId = await _userService.CreateUserAsync(dto, ct);
 
+        await _uow.SaveAsync(ct);   
+
         // Generate User tokens(regester) after creation
         var userTokenDto = await _authService.RegisterUserAsync(new RegisterUserTokenAppDto(
             userId,

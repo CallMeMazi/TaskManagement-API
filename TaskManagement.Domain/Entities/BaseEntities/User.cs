@@ -10,7 +10,7 @@ public class User : BaseEntity
     public string SecurityStamp { get; private set; }
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
-    public byte Points { get; private set; }
+    public sbyte Points { get; private set; }
     public DateTime? LastLoginDate { get; private set; }
 
     #region Navigation Prop
@@ -66,7 +66,7 @@ public class User : BaseEntity
         => SecurityStamp = Guid.NewGuid().ToString();
     public void ChangeLastLoginDate()
         => LastLoginDate = DateTime.Now;
-    public void IncreaseOrDecreasePoints(byte amount)
+    public void IncreaseOrDecreasePoints(sbyte amount)
         => Points += amount;
 
     public void ValidateUserCreating(string mobileNumber, string email, string password
@@ -92,7 +92,7 @@ public class User : BaseEntity
         if (!StringHelper.MobileRegex.IsMatch(mobileNumber))
             errorMessages.Add("شماره موبایل نامعتبر است. باید با 09 شروع شود و 11 رقم باشد.");
 
-        if (email.IsValidEmail())
+        if (!email.IsValidEmail())
             errorMessages.Add("ایمیل نامعتبر است!");
 
         if (errorMessages.Any())

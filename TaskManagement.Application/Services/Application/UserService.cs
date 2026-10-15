@@ -52,7 +52,7 @@ public class UserService : IUserService
         // Check mobile number exist
         await _userDomainService.EnsureCanCreateUserAsync(command.MobileNumber, ct);
 
-        var userPassHash = _common.Password.Hash(command.Password);
+        var userPassHash = _common.Password.Hash(command.Password).Result;
         var user = _common.Mapper.Map<User>(command, opt => opt.Items[nameof(User.PasswordHash)] = userPassHash);
 
         await _uow.User.AddAsync(user, ct);
