@@ -54,7 +54,7 @@ public class TaskAssignmentConfiguration : IBaseConfiguration<TaskAssignment>
 
         #endregion
 
-        builder.HasQueryFilter(ta => !ta.IsDelete);
+        builder.HasQueryFilter("IsDeleteFillter", ta => !ta.IsDelete);
 
         builder.HasIndex(ta => ta.UserId);
 

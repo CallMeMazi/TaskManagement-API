@@ -88,7 +88,7 @@ public class ProjectConfiguration : IBaseConfiguration<Project>
         builder.Property(p => p.RowVersion)
             .IsRowVersion();
 
-        builder.HasQueryFilter(p => !p.IsDelete);
+        builder.HasQueryFilter("IsDeleteFillter", p => !p.IsDelete);
 
         builder.HasIndex(p => p.OrgId);
 

@@ -103,7 +103,7 @@ public class UserConfiguration : IBaseConfiguration<User>
 
         #endregion
 
-        builder.HasQueryFilter(u => !u.IsDelete);
+        builder.HasQueryFilter("IsDeleteFillter", u => !u.IsDelete);
 
         builder.HasIndex(u => u.MobileNumber)
             .IsUnique();

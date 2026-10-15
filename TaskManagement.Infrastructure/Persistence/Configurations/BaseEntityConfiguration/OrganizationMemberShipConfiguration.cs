@@ -31,7 +31,7 @@ public class OrganizationMemberShipConfiguration : IBaseConfiguration<Organizati
 
         #endregion
 
-        builder.HasQueryFilter(om => !om.IsDelete);
+        builder.HasQueryFilter("IsDeleteFillter", om => !om.IsDelete);
 
         builder.HasIndex(ut => ut.UserId);
 

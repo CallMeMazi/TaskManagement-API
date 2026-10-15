@@ -12,22 +12,25 @@ namespace TaskManagement.Application.Registration;
 
 public static class ApplicationRegistration
 {
-    public static IServiceCollection RegisterAllApplicationLayerConfiguration(this IServiceCollection services)
+    // Support in .net 10
+    extension(IServiceCollection services)
     {
-        services.RegisterAppServices()
+        public IServiceCollection RegisterAllApplicationLayerConfiguration()
+            => services.RegisterAppServices()
             .RegisterDomainServices()
             .RegisterAutoMapper()
             .RegisterMediatR()
             .RegisterFluentValidation();
-
-        return services;
     }
-    public static void CompileAutoMapperConfiguration(this IServiceProvider serviceProvider)
+    extension(IServiceProvider serviceProvider)
     {
-        using var scope = serviceProvider.CreateScope();
-        var configProvider = scope.ServiceProvider.GetRequiredService<AutoMapper.IConfigurationProvider>();
-        configProvider.CompileMappings();
-        configProvider.AssertConfigurationIsValid();
+        public void CompileAutoMapperConfiguration()
+        {
+            using var scope = serviceProvider.CreateScope();
+            var configProvider = scope.ServiceProvider.GetRequiredService<AutoMapper.IConfigurationProvider>();
+            configProvider.CompileMappings();
+            configProvider.AssertConfigurationIsValid();
+        }
     }
 
     private static IServiceCollection RegisterAppServices(this IServiceCollection services)
@@ -68,6 +71,7 @@ public static class ApplicationRegistration
             // Add Pipeline Behavior
             cfg.AddOpenBehavior(typeof(PerformanceBehavior<,>));
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
         });
 
         return services;

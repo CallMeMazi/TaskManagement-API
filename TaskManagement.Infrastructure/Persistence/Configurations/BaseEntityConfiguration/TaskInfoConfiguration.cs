@@ -44,7 +44,7 @@ public class TaskInfoConfiguration : IBaseConfiguration<TaskInfo>
 
         #endregion
 
-        builder.HasQueryFilter(ti => !ti.IsDelete);
+        builder.HasQueryFilter("IsDeleteFillter", ti => !ti.IsDelete);
 
         builder.HasIndex(ti => ti.TaskId);
 

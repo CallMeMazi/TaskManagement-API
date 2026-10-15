@@ -31,11 +31,10 @@ public class ProjectMemberShipConfiguration : IBaseConfiguration<ProjectMemberSh
 
         #endregion
 
-        builder.HasQueryFilter(pm => !pm.IsDelete);
+        builder.HasQueryFilter("IsDeleteFillter", pm => !pm.IsDelete);
 
         builder.HasIndex(pm => pm.ProjId);
 
         builder.HasIndex(pm => pm.UserId);
-
     }
 }

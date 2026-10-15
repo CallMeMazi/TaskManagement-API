@@ -72,7 +72,7 @@ public class OrganizationConfiguration : IBaseConfiguration<Organization>
 
         #endregion
 
-        builder.HasQueryFilter(o => !o.IsDelete);
+        builder.HasQueryFilter("IsDeleteFillter", o => !o.IsDelete);
 
         builder.HasIndex(o => o.OrgCode)
             .IsUnique();
