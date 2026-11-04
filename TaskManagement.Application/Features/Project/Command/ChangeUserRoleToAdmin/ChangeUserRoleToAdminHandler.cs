@@ -1,8 +1,12 @@
 ﻿using MediatR;
+using TaskManagement.Application.Auditing;
+using TaskManagement.Application.DTOs.InternalDTOs.Common;
 using TaskManagement.Application.DTOs.RequestDTOs.Project;
 using TaskManagement.Application.Interfaces.Services.Application;
 using TaskManagement.Application.Interfaces.Services.Halper;
+using TaskManagement.Application.Interfaces.Services.Log;
 using TaskManagement.Application.Interfaces.UnitOfWorks;
+using TaskManagement.Domain.Enums.Types.Application;
 
 namespace TaskManagement.Application.Features.Project.Command.ChangeUserRoleToAdmin;
 public class ChangeUserRoleToAdminHandler
@@ -11,12 +15,18 @@ public class ChangeUserRoleToAdminHandler
     private readonly IUnitOfWork _uow;
     private readonly IProjectService _projectService;
     private readonly ICommonService _common;
+    private readonly IAuditLogService _audit;
 
-    public ChangeUserRoleToAdminHandler(IProjectService projectService, ICommonService common, IUnitOfWork uow)
+    public ChangeUserRoleToAdminHandler(
+        IProjectService projectService,
+        ICommonService common,
+        IUnitOfWork uow,
+        IAuditLogService audit)
     {
         _projectService = projectService;
         _common = common;
         _uow = uow;
+        _audit = audit;
     }
 
     public async System.Threading.Tasks.Task Handle(ChangeUserRoleToAdminCommand request, CancellationToken ct)
@@ -24,6 +34,15 @@ public class ChangeUserRoleToAdminHandler
         var dto = _common.Mapper.Map<ChangeUserRoleProjectAppDto>(request);
 
         await _projectService.ChangeUserRoleToAdminAsync(dto, ct);
+
+        _audit.Stage(new AuditEntryInternalDto(
+            AuditActions.ProjectRoleChanged,
+            EntityType.Project,
+            request.ProjId,
+            request.OwnerId,
+            EntityType.User,
+            request.UserId,
+            AuditMetadata.Pairs(("Role", "Admin"))));
 
         await _uow.SaveAsync(ct);
     }

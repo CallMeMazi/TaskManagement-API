@@ -24,6 +24,8 @@ var app = builder.Build();
 // Compile AutoMapper Configs After Starting Application
 app.Services.CompileAutoMapperConfiguration();
 
+app.UseApplicationExceptionHandler();
+
 // System Midlewares
 app.UseExceptionHandler(new ExceptionHandlerOptions
 {

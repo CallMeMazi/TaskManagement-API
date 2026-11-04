@@ -37,7 +37,7 @@ public class TaskService : ITaskService
     }
 
     // Command methods
-    public async System.Threading.Tasks.Task CreateTaskAsync(CreateTaskAppDto command, CancellationToken ct)
+    public async System.Threading.Tasks.Task<long> CreateTaskAsync(CreateTaskAppDto command, CancellationToken ct)
     {
         var project = await _uow.Project.GetProjectByIdWithMembersAsync(command.ProjId, false, ct);
         if (project.IsNullParameter())
@@ -60,6 +60,8 @@ public class TaskService : ITaskService
             );
         else
             await CreateTaskAssignmentAsync(task.Id, command.UserIds!.First(), command.ProjId, ct);
+
+        return task.Id;
     }
     public async System.Threading.Tasks.Task UpdateTaskAsync(UpdateTaskAppDto command, CancellationToken ct)
     {
