@@ -366,3 +366,5 @@ FodyWeavers.xsd
 /TaskManagenemt.API/appsettings.Development.json
 /TaskManagenemt.API/TaskManagement-Test.http
 /TaskManagenemt.API/appsettings.json
+/TaskManagenemt.API/logs/
+/logs/

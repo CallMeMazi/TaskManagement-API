@@ -15,8 +15,6 @@ public class DomainAuthorizationExceptionHandler(IProblemDetailsService _problem
         if (exception is not DomainAuthorizationException domainAuthorization)
             return false;
 
-        // log this exception
-
         httpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
         var problemDetails = new ProblemDetails

@@ -1,9 +1,8 @@
 using Scalar.AspNetCore;
+using Serilog;
 using TaskManagement.Application.Registration;
-using TaskManagement.Application.Utilities.Exceptions;
-using TaskManagement.Domain.Utilities.Exceptions;
 using TaskManagement.Infrastructure.Registration;
-using TaskManagement.WebConfig.Register;
+using TaskManagement.WebConfig.Registeration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +15,9 @@ builder.Services.AddOpenApi();
 builder.Services.RegisterAllApplicationLayerConfiguration()
     .RegisterAllInfrastructureLayerConfiguration(builder.Configuration);
 
+// Register Serilog Congigs And Services
+builder.Host.RegisterSerilog(builder.Services);
+
 // Exception Handler Configs And ProblemDetails Service
 builder.Services.RegisterExceptionHandlersAndServices();
 
@@ -27,13 +29,17 @@ app.Services.CompileAutoMapperConfiguration();
 app.UseApplicationExceptionHandler();
 
 // System Midlewares
-app.UseExceptionHandler(new ExceptionHandlerOptions
-{
-    SuppressDiagnosticsCallback = context => context.Exception is AppException or DomainException
-});
 app.MapOpenApi();
 app.MapScalarApiReference();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-app.Run();
+
+try
+{
+    app.Run();
+}
+finally
+{
+    Log.CloseAndFlush();
+}

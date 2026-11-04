@@ -11,12 +11,12 @@ public class LogDbContext(DbContextOptions<LogDbContext> options) : DbContext(op
     {
         base.OnModelCreating(modelBuilder);
 
-        var DomainAssembly = typeof(LogBaseEntity).Assembly;
+        modelBuilder.Entity<OperationalLog>();
         modelBuilder.Entity<AuditLog>();
 
         new AuditLogConfiguration().Configure(modelBuilder.Entity<AuditLog>());
+        new OperationalLogConfiguration().Configure(modelBuilder.Entity<OperationalLog>());
         
         modelBuilder.AddRestrictDeleteBehaviorConvention();
-        modelBuilder.AddPluralizingTableNameConvention();
     }
 }

@@ -14,8 +14,6 @@ public class DomainLogicalExceptionHandler(IProblemDetailsService _problemDetail
         if (exception is not DomainLogicalException domainLogical)
             return false;
 
-        // log this exception
-
         httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
 
         var problemDetails = new ProblemDetails
