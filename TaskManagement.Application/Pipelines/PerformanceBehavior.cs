@@ -1,11 +1,12 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace TaskManagement.Application.Pipelines;
 
-public class PerformanceBehavior<TRequest, TResponse>
+public class PerformanceBehavior<TRequest, TResponse>(ILogger<PerformanceBehavior<TRequest, TResponse>> logger)
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
+    where TRequest : IBaseRequest
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
     {
@@ -17,7 +18,10 @@ public class PerformanceBehavior<TRequest, TResponse>
 
         if (stopWatch.ElapsedMilliseconds > 1000)
         {
-            // loging
+            logger.LogWarning(
+                "Request.Slow {RequestName} completed in {ElapsedMilliseconds} ms",
+                typeof(TRequest).Name,
+                stopWatch.ElapsedMilliseconds);
         }
 
         return response;

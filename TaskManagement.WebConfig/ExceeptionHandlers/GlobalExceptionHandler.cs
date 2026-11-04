@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Net;
 
 namespace TaskManagement.WebConfig.ExceeptionHandlers;
 
-public class GlobalExceptionHandler(IProblemDetailsService _problemDetailsService)
+public class GlobalExceptionHandler(
+    IProblemDetailsService _problemDetailsService,
+    ILogger<GlobalExceptionHandler> _logger) 
     : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken ct)
     {
-        // log this exception
+        _logger.LogError(exception, "UnhandledException {ExceptionType}", exception.GetType().FullName);
 
         httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 

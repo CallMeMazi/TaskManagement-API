@@ -14,8 +14,6 @@ public class DomainValidationFailureExceptionHandler(IProblemDetailsService _pro
         if (exception is not DomainValidationFailureException domainValidation)
             return false;
 
-        // log this excepiton
-
         httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
         var problemDetails = new ProblemDetails

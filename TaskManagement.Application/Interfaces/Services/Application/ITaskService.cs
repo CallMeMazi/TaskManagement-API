@@ -9,7 +9,7 @@ public interface ITaskService
     Task ChangeTaskActivityAsync(ChangeTaskActivityAppDto command, CancellationToken ct);
     Task ChangeTaskProgressAsync(ChangeTaskProgressAppDto command, CancellationToken ct);
     Task ChangeTaskTypeAsync(UserTaskAppDto command, CancellationToken ct);
-    Task CreateTaskAsync(CreateTaskAppDto command, CancellationToken ct);
+    Task<long> CreateTaskAsync(CreateTaskAppDto command, CancellationToken ct);
     Task DeadTaskAsync(UserTaskAppDto command, CancellationToken ct);
     Task EndTaskAsync(UserTaskAppDto command, CancellationToken ct);
     Task FinishTaskAsync(UserTaskAppDto command, CancellationToken ct);

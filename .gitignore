@@ -362,6 +362,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /TaskManagement.Infrastructure/Persistence/Migrations/ApplicationMigrations
+/TaskManagement.Infrastructure/Persistence/Migrations/LogMigrations
 /TaskManagenemt.API/appsettings.Development.json
 /TaskManagenemt.API/TaskManagement-Test.http
 /TaskManagenemt.API/appsettings.json
+/TaskManagenemt.API/logs/
+/logs/

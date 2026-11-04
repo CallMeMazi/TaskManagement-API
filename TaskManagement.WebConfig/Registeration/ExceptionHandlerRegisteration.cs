@@ -1,11 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using TaskManagement.WebConfig.ExceeptionHandlers;
 using TaskManagement.WebConfig.ExceeptionHandlers.AppExceptionHandlers;
 using TaskManagement.WebConfig.ExceeptionHandlers.DomainExceptionHandlers;
+using TaskManagement.WebConfig.Logging;
 
-namespace TaskManagement.WebConfig.Register;
+namespace TaskManagement.WebConfig.Registeration;
 
-public static class ExceptionHandlerConfig
+public static class ExceptionHandlerRegisteration
 {
     // Support in .net 10
     extension(IServiceCollection services)
@@ -17,6 +19,14 @@ public static class ExceptionHandlerConfig
             .RegisterGlobalExceptionHandlers();
     }
 
+    public static void UseApplicationExceptionHandler(this IApplicationBuilder app)
+    {
+        app.UseExceptionHandler(new ExceptionHandlerOptions
+        {
+            SuppressDiagnosticsCallback = static _ => true
+        });
+    }
+
     private static IServiceCollection RegisterProblemDetailsService(this IServiceCollection services)
     {
         services.AddProblemDetails(opt =>
@@ -24,7 +34,7 @@ public static class ExceptionHandlerConfig
             opt.CustomizeProblemDetails = ctx =>
             {
                 ctx.ProblemDetails.Extensions["isSuccess"] = false;
-                ctx.ProblemDetails.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
+                ctx.ProblemDetails.Extensions["traceId"] = RequestTraceResolver.Resolve(ctx.HttpContext);
                 ctx.ProblemDetails.Extensions["timeStamp"] = DateTime.Now;
                 ctx.ProblemDetails.Instance = ctx.HttpContext.Request.Path;
             };
