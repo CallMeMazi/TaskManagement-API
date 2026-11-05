@@ -1,5 +1,5 @@
-﻿using TaskManagement.Application.Interfaces.Services.Halper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManagement.Application.Interfaces.Services.Halper;
 using TaskManagement.Domain.Entities.BaseEntities;
 using TaskManagement.Domain.Interface.Repository;
 using TaskManagement.Infrastructure.Persistence.DbContexts;
@@ -11,6 +11,13 @@ public class UserRepository
     public UserRepository(ApplicationDbContext dbContext, ICommonService commonService)
         : base(dbContext, commonService) { }
 
+
+    // Query methods
+    public Task<string?> GetScurityStampAsync(long userId, CancellationToken ct)
+        => Entities.Where(u => u.Id == userId)
+            .AsNoTracking()
+            .Select(u => u.SecurityStamp)
+            .FirstOrDefaultAsync();
 
     // Command methods
     public Task<int> SoftDeleteUserSpAsync(long userId, CancellationToken ct)

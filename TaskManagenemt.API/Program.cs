@@ -1,6 +1,7 @@
 using Scalar.AspNetCore;
 using Serilog;
 using TaskManagement.Application.Registration;
+using TaskManagement.Common.Settings;
 using TaskManagement.Infrastructure.Registration;
 using TaskManagement.WebConfig.Registeration;
 
@@ -15,26 +16,22 @@ builder.Services.AddOpenApi();
 builder.Services.RegisterAllApplicationLayerConfiguration()
     .RegisterAllInfrastructureLayerConfiguration(builder.Configuration);
 
-// Register Serilog Congigs And Services
-builder.Host.RegisterSerilog(builder.Services);
-
-// Exception Handler Configs And ProblemDetails Service
+builder.Services.RegisterJwtBearer(builder.Configuration.GetValue<AppSettings>("AppSettings")!);
 builder.Services.RegisterExceptionHandlersAndServices();
+builder.Host.RegisterSerilog(builder.Services);
 
 var app = builder.Build();
 
-// Compile AutoMapper Configs After Starting Application
 app.Services.CompileAutoMapperConfiguration();
-
 app.UseApplicationExceptionHandler();
 
 // System Midlewares
 app.MapOpenApi();
 app.MapScalarApiReference();
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 try
 {
     app.Run();

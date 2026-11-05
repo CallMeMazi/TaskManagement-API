@@ -158,19 +158,16 @@ public class JwtService : IJwtService
 
         return new TokenValidationParameters
         {
-            ValidateIssuer = !_appSettings.JwtSetting.Issuer.IsNullParameter(),
-            ValidIssuer = _appSettings.JwtSetting.Issuer,
-
-            ValidateAudience = !_appSettings.JwtSetting.Audience.IsNullParameter(),
-            ValidAudience = _appSettings.JwtSetting.Audience,
-
+            ClockSkew = TimeSpan.Zero,
+            RequireSignedTokens = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(secretKey),
-
-            ClockSkew = TimeSpan.Zero,
-            ValidateLifetime = true,
             RequireExpirationTime = true,
-
+            ValidateLifetime = true,
+            ValidateAudience = true,
+            ValidAudience = _appSettings.JwtSetting.Audience,
+            ValidateIssuer = true,
+            ValidIssuer = _appSettings.JwtSetting.Issuer,
             TokenDecryptionKey = new SymmetricSecurityKey(encryptionkey)
         };
     }
